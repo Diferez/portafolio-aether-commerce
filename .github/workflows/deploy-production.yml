@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     environment: production
+    if: ${{ vars.AETHER_D1_DATABASE_ID != '' && vars.NEXT_PUBLIC_AETHER_API_URL != '' && vars.NEXT_PUBLIC_PORTFOLIO_URL != '' && vars.APP_ORIGIN_ADMIN != '' }}
 
     env:
       AETHER_API_WORKER_NAME: ${{ vars.AETHER_API_WORKER_NAME || 'aether-api' }}
