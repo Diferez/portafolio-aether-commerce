@@ -494,6 +494,8 @@ export const content = {
           title: "Plataformas gestionadas",
           items: [
             "Vercel",
+            "Cloudflare Pages",
+            "Cloudflare Workers",
             "Supabase",
             "Firebase",
             "Preview deployments",
@@ -501,6 +503,23 @@ export const content = {
             "Databases",
             "Storage",
             "Edge functions",
+          ],
+        },
+        {
+          title: "Stack usado en Aether",
+          items: [
+            "Cloudflare Workers",
+            "Cloudflare D1",
+            "Wrangler",
+            "Hono",
+            "Zod",
+            "Drizzle ORM",
+            "Stripe Checkout",
+            "Clerk-ready auth",
+            "Resend",
+            "Cloudinary",
+            "GitHub Actions",
+            "pnpm workspace",
           ],
         },
         {
@@ -559,7 +578,7 @@ export const content = {
       title: "Soluciones cloud sin limitarse a un solo proveedor.",
       description:
         "No todos los proyectos necesitan usar varias nubes al mismo tiempo. La arquitectura se define según el contexto, el presupuesto y las necesidades operativas.",
-      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Vercel", "Supabase"],
+      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Cloudflare", "Vercel", "Supabase"],
       factors: [
         "Requisitos del producto",
         "Costos",
@@ -1154,6 +1173,8 @@ export const content = {
           title: "Managed platforms",
           items: [
             "Vercel",
+            "Cloudflare Pages",
+            "Cloudflare Workers",
             "Supabase",
             "Firebase",
             "Preview deployments",
@@ -1161,6 +1182,23 @@ export const content = {
             "Databases",
             "Storage",
             "Edge functions",
+          ],
+        },
+        {
+          title: "Aether project stack",
+          items: [
+            "Cloudflare Workers",
+            "Cloudflare D1",
+            "Wrangler",
+            "Hono",
+            "Zod",
+            "Drizzle ORM",
+            "Stripe Checkout",
+            "Clerk-ready auth",
+            "Resend",
+            "Cloudinary",
+            "GitHub Actions",
+            "pnpm workspace",
           ],
         },
         {
@@ -1219,7 +1257,7 @@ export const content = {
       title: "Cloud solutions without vendor tunnel vision.",
       description:
         "Not every project needs several clouds at once. Architecture is defined by context, costs, and operational needs.",
-      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Vercel", "Supabase"],
+      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Cloudflare", "Vercel", "Supabase"],
       factors: [
         "Product requirements",
         "Costs",

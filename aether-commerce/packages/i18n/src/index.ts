@@ -5,7 +5,7 @@ export const locales = ["en", "es"] as const;
 export const dictionaries = {
   en: {
     brand: "Aether",
-    tagline: "Curated products for modern shopping.",
+    tagline: "Selected products for modern shopping.",
     shopNow: "Shop now",
     shop: "Shop",
     cart: "Cart",
@@ -28,8 +28,8 @@ export const dictionaries = {
     searchProducts: "Search products",
     searchPlaceholder: "Search products, furniture, fashion...",
     filterCatalog: "Filter catalog",
-    premiumCatalog: "Curated marketplace catalog",
-    catalogDescription: "Browse a curated multi-category catalog with normalized product data, clean imagery, inventory-aware pricing, and demo checkout.",
+    premiumCatalog: "Marketplace catalog",
+    catalogDescription: "Browse a multi-category marketplace catalog with normalized product data, clean imagery, inventory-aware pricing, and demo checkout.",
     pageOf: "Page {page} of {pageCount}",
     previousPage: "Previous page",
     nextPage: "Next page",
@@ -105,14 +105,14 @@ export const dictionaries = {
     adding: "Adding...",
     addToCart: "Add to cart",
     relatedProducts: "Related products",
-    relatedDescription: "More curated products from the normalized Aether catalog.",
+    relatedDescription: "More products from the normalized Aether catalog.",
     categories: "Categories",
     shopByCategory: "Shop by category",
     categoryCards: [
       ["Electronics", "Devices and practical digital accessories.", "electronics"],
       ["Furniture", "Home, desk, and studio pieces.", "furniture"],
       ["Shoes", "Lifestyle and fashion footwear.", "shoes"],
-      ["Miscellaneous", "Curated marketplace finds normalized by Aether.", "miscellaneous"]
+      ["Miscellaneous", "Marketplace finds normalized by Aether.", "miscellaneous"]
     ],
     availability: {
       in_stock: "in stock",
@@ -124,7 +124,7 @@ export const dictionaries = {
     homeHighlights: [
       ["Worker-owned checkout", "Prices and inventory are recalculated server-side before Stripe test checkout."],
       ["Bilingual demo", "English and Spanish copy is centralized so pages do not mix languages."],
-      ["Curated catalog", "External products are cleaned, filtered, and normalized before reaching the storefront."]
+      ["Quality catalog", "External products are cleaned, filtered, and normalized before reaching the storefront."]
     ],
     contactForm: {
       eyebrow: "Contact",
@@ -147,7 +147,7 @@ export const dictionaries = {
   },
   es: {
     brand: "Aether",
-    tagline: "Productos curados para comprar mejor.",
+    tagline: "Productos seleccionados para comprar mejor.",
     shopNow: "Comprar ahora",
     shop: "Tienda",
     cart: "Carrito",
@@ -170,8 +170,8 @@ export const dictionaries = {
     searchProducts: "Buscar productos",
     searchPlaceholder: "Buscar productos, muebles, moda...",
     filterCatalog: "Filtrar catalogo",
-    premiumCatalog: "Catalogo marketplace curado",
-    catalogDescription: "Explora un catalogo curado de varias categorias con datos normalizados, imagenes limpias, inventario y checkout demo.",
+    premiumCatalog: "Catalogo marketplace",
+    catalogDescription: "Explora un catalogo marketplace de varias categorias con datos normalizados, imagenes limpias, inventario y checkout demo.",
     pageOf: "Pagina {page} de {pageCount}",
     previousPage: "Pagina anterior",
     nextPage: "Pagina siguiente",
@@ -247,14 +247,14 @@ export const dictionaries = {
     adding: "Agregando...",
     addToCart: "Agregar al carrito",
     relatedProducts: "Productos relacionados",
-    relatedDescription: "Mas productos curados del catalogo normalizado de Aether.",
+    relatedDescription: "Mas productos del catalogo normalizado de Aether.",
     categories: "Categorias",
     shopByCategory: "Comprar por categoria",
     categoryCards: [
       ["Electronica", "Dispositivos y accesorios digitales utiles.", "electronics"],
       ["Muebles", "Piezas para hogar, escritorio y estudio.", "furniture"],
       ["Calzado", "Zapatos de estilo y uso diario.", "shoes"],
-      ["Miscelaneos", "Hallazgos de marketplace curados por Aether.", "miscellaneous"]
+      ["Miscelaneos", "Hallazgos de marketplace normalizados por Aether.", "miscellaneous"]
     ],
     availability: {
       in_stock: "en stock",
@@ -266,7 +266,7 @@ export const dictionaries = {
     homeHighlights: [
       ["Checkout controlado por backend", "Precios e inventario se recalculan en el servidor antes del checkout de prueba con Stripe."],
       ["Demo bilingue", "Los textos en ingles y espanol estan centralizados para evitar mezcla de idiomas."],
-      ["Catalogo curado", "Los productos externos se limpian, filtran y normalizan antes de mostrarse en tienda."]
+      ["Catalogo de calidad", "Los productos externos se limpian, filtran y normalizan antes de mostrarse en tienda."]
     ],
     contactForm: {
       eyebrow: "Contacto",
