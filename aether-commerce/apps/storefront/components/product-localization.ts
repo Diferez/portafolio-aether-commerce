@@ -23,13 +23,22 @@ const spanishCategoryNames: Record<string, string> = {
   furniture: "Muebles",
   shoes: "Calzado",
   miscellaneous: "Miscelaneos",
-  audio: "Audio"
+  audio: "Audio",
+  clothes: "Ropa",
+  clothing: "Ropa",
+  technology: "Productos",
+  home: "Hogar"
 };
 
 export function getLocalizedProduct(product: Product, locale: Locale) {
   const copy = locale === "es" ? spanishProductCopy[product.slug] : undefined;
+  const category = spanishCategoryNames[product.category.slug] ?? product.category.name;
+  const spanishDescription =
+    copy?.description ??
+    `Producto curado de ${category.toLowerCase()} seleccionado para la demo Aether, con datos normalizados, precio validado e imagen revisada.`;
+
   return {
-    category: locale === "es" ? copy?.category ?? spanishCategoryNames[product.category.slug] ?? product.category.name : product.category.name,
-    description: copy?.description ?? product.description
+    category: locale === "es" ? copy?.category ?? category : product.category.name,
+    description: locale === "es" ? spanishDescription : product.description
   };
 }

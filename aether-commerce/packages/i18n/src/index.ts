@@ -5,14 +5,14 @@ export const locales = ["en", "es"] as const;
 export const dictionaries = {
   en: {
     brand: "Aether",
-    tagline: "Premium technology, curated for modern work.",
+    tagline: "Curated products for modern shopping.",
     shopNow: "Shop now",
     shop: "Shop",
     cart: "Cart",
     account: "Account",
     signIn: "Sign in",
-    featured: "Featured devices",
-    deals: "Private demo deals",
+    featured: "Featured picks",
+    deals: "Demo deals",
     all: "All",
     new: "New",
     demoReady: "Demo data ready",
@@ -26,10 +26,10 @@ export const dictionaries = {
     contact: "Contact",
     portfolio: "Portfolio",
     searchProducts: "Search products",
-    searchPlaceholder: "Search laptops, audio...",
+    searchPlaceholder: "Search products, furniture, fashion...",
     filterCatalog: "Filter catalog",
-    premiumCatalog: "Premium tech catalog",
-    catalogDescription: "Browse normalized Platzi catalog products, Aether overrides, inventory-aware pricing, and demo checkout.",
+    premiumCatalog: "Curated marketplace catalog",
+    catalogDescription: "Browse a curated multi-category catalog with normalized product data, clean imagery, inventory-aware pricing, and demo checkout.",
     pageOf: "Page {page} of {pageCount}",
     previousPage: "Previous page",
     nextPage: "Next page",
@@ -105,14 +105,14 @@ export const dictionaries = {
     adding: "Adding...",
     addToCart: "Add to cart",
     relatedProducts: "Related products",
-    relatedDescription: "More products from the normalized Aether catalog.",
+    relatedDescription: "More curated products from the normalized Aether catalog.",
     categories: "Categories",
     shopByCategory: "Shop by category",
     categoryCards: [
-      ["Electronics", "Premium devices and work technology.", "electronics"],
-      ["Furniture", "Modern desk and studio environments.", "furniture"],
-      ["Shoes", "Lifestyle accessories from the external source.", "shoes"],
-      ["Miscellaneous", "Curated items normalized by Aether.", "miscellaneous"]
+      ["Electronics", "Devices and practical digital accessories.", "electronics"],
+      ["Furniture", "Home, desk, and studio pieces.", "furniture"],
+      ["Shoes", "Lifestyle and fashion footwear.", "shoes"],
+      ["Miscellaneous", "Curated marketplace finds normalized by Aether.", "miscellaneous"]
     ],
     availability: {
       in_stock: "in stock",
@@ -124,7 +124,7 @@ export const dictionaries = {
     homeHighlights: [
       ["Worker-owned checkout", "Prices and inventory are recalculated server-side before Stripe test checkout."],
       ["Bilingual demo", "English and Spanish copy is centralized so pages do not mix languages."],
-      ["Public admin preview", "Visitors can inspect operations without changing persistent data."]
+      ["Curated catalog", "External products are cleaned, filtered, and normalized before reaching the storefront."]
     ],
     contactForm: {
       eyebrow: "Contact",
@@ -147,14 +147,14 @@ export const dictionaries = {
   },
   es: {
     brand: "Aether",
-    tagline: "Tecnologia premium, curada para el trabajo moderno.",
+    tagline: "Productos curados para comprar mejor.",
     shopNow: "Comprar ahora",
     shop: "Tienda",
     cart: "Carrito",
     account: "Cuenta",
     signIn: "Ingresar",
-    featured: "Dispositivos destacados",
-    deals: "Ofertas de demostracion",
+    featured: "Productos destacados",
+    deals: "Ofertas demo",
     all: "Todos",
     new: "Nuevos",
     demoReady: "Datos demo listos",
@@ -168,10 +168,10 @@ export const dictionaries = {
     contact: "Contacto",
     portfolio: "Portafolio",
     searchProducts: "Buscar productos",
-    searchPlaceholder: "Buscar laptops, audio...",
+    searchPlaceholder: "Buscar productos, muebles, moda...",
     filterCatalog: "Filtrar catalogo",
-    premiumCatalog: "Catalogo de tecnologia premium",
-    catalogDescription: "Explora productos normalizados, ajustes de Aether, inventario y checkout de demostracion.",
+    premiumCatalog: "Catalogo marketplace curado",
+    catalogDescription: "Explora un catalogo curado de varias categorias con datos normalizados, imagenes limpias, inventario y checkout demo.",
     pageOf: "Pagina {page} de {pageCount}",
     previousPage: "Pagina anterior",
     nextPage: "Pagina siguiente",
@@ -247,14 +247,14 @@ export const dictionaries = {
     adding: "Agregando...",
     addToCart: "Agregar al carrito",
     relatedProducts: "Productos relacionados",
-    relatedDescription: "Mas productos del catalogo normalizado de Aether.",
+    relatedDescription: "Mas productos curados del catalogo normalizado de Aether.",
     categories: "Categorias",
     shopByCategory: "Comprar por categoria",
     categoryCards: [
-      ["Electronica", "Dispositivos premium y tecnologia para trabajar.", "electronics"],
-      ["Muebles", "Escritorios y estudios modernos.", "furniture"],
-      ["Calzado", "Accesorios de estilo desde la fuente externa.", "shoes"],
-      ["Miscelaneos", "Articulos curados y normalizados por Aether.", "miscellaneous"]
+      ["Electronica", "Dispositivos y accesorios digitales utiles.", "electronics"],
+      ["Muebles", "Piezas para hogar, escritorio y estudio.", "furniture"],
+      ["Calzado", "Zapatos de estilo y uso diario.", "shoes"],
+      ["Miscelaneos", "Hallazgos de marketplace curados por Aether.", "miscellaneous"]
     ],
     availability: {
       in_stock: "en stock",
@@ -266,7 +266,7 @@ export const dictionaries = {
     homeHighlights: [
       ["Checkout controlado por backend", "Precios e inventario se recalculan en el servidor antes del checkout de prueba con Stripe."],
       ["Demo bilingue", "Los textos en ingles y espanol estan centralizados para evitar mezcla de idiomas."],
-      ["Vista admin publica", "Los visitantes pueden revisar operaciones sin cambiar datos persistentes."]
+      ["Catalogo curado", "Los productos externos se limpian, filtran y normalizan antes de mostrarse en tienda."]
     ],
     contactForm: {
       eyebrow: "Contacto",

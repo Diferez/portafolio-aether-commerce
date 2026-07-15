@@ -15,7 +15,7 @@ type PlatziProduct = {
   };
 };
 
-const catalogCacheKey = "platzi-products-v3";
+const catalogCacheKey = "platzi-products-v4";
 const fallbackImageUrl = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80";
 const memoryCacheTtlMs = 5 * 60 * 1000;
 let memoryCatalogCache: { expiresAt: number; products: Product[] } | null = null;
@@ -44,6 +44,78 @@ const fallbackProducts: PlatziProduct[] = [
     description: "A low-latency headset tuned for calls, focus sessions, and travel.",
     images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80"],
     category: { id: 3, name: "Audio" }
+  },
+  {
+    id: 9004,
+    title: "Nordic Lounge Chair",
+    price: 489,
+    description: "A sculpted lounge chair with warm textile upholstery for home studios and reading corners.",
+    images: ["https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 4, name: "Furniture" }
+  },
+  {
+    id: 9005,
+    title: "Canvas Weekender Bag",
+    price: 138,
+    description: "A durable travel bag with structured compartments for short trips and daily carry.",
+    images: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 5, name: "Accessories" }
+  },
+  {
+    id: 9006,
+    title: "Everyday Runner Sneakers",
+    price: 119,
+    description: "Lightweight sneakers built for daily movement, casual outfits, and weekend walks.",
+    images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 6, name: "Shoes" }
+  },
+  {
+    id: 9007,
+    title: "Minimal Desk Lamp",
+    price: 86,
+    description: "A compact LED desk lamp with focused lighting for workspaces, bedrooms, and studios.",
+    images: ["https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 4, name: "Furniture" }
+  },
+  {
+    id: 9008,
+    title: "Ceramic Coffee Set",
+    price: 64,
+    description: "A balanced ceramic coffee set for slow mornings, small kitchens, and thoughtful gifting.",
+    images: ["https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 7, name: "Home" }
+  },
+  {
+    id: 9009,
+    title: "Wireless Travel Speaker",
+    price: 156,
+    description: "A portable speaker with clear audio, compact build, and battery life for everyday trips.",
+    images: ["https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 3, name: "Audio" }
+  },
+  {
+    id: 9010,
+    title: "Leather Card Wallet",
+    price: 58,
+    description: "A slim leather wallet with clean stitching and quick access for essential cards.",
+    images: ["https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 5, name: "Accessories" }
+  },
+  {
+    id: 9011,
+    title: "Classic Denim Jacket",
+    price: 132,
+    description: "A versatile denim jacket with a structured fit for layered everyday styling.",
+    images: ["https://images.unsplash.com/photo-1543076447-215ad9ba6923?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 8, name: "Clothing" }
+  },
+  {
+    id: 9012,
+    title: "Modern Side Table",
+    price: 174,
+    description: "A compact side table with clean lines for living rooms, bedrooms, and small apartments.",
+    images: ["https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=1200&q=80"],
+    category: { id: 4, name: "Furniture" }
   }
 ];
 
@@ -78,17 +150,18 @@ function normalizeCategoryName(name?: string) {
 
 function isMeaningfulText(value: string, minWords = 2) {
   const trimmed = value.trim();
+  const blockedTitles = /^(new product|test product|sample product|demo product|kkk|aaa|asd|asdf|qwerty)$/i;
   const words = trimmed.split(/\s+/).filter(Boolean);
   const hasVowels = /[aeiou]/i.test(trimmed);
   const repeatedChars = /(.)\1{2,}/i.test(trimmed);
   const mostlySymbols = trimmed.replace(/[a-z0-9\s-]/gi, "").length > trimmed.length / 3;
-  return trimmed.length >= 6 && words.length >= minWords && hasVowels && !repeatedChars && !mostlySymbols;
+  return trimmed.length >= 6 && words.length >= minWords && hasVowels && !repeatedChars && !mostlySymbols && !blockedTitles.test(trimmed);
 }
 
 function isTrustedImageUrl(url: string) {
   try {
     const { hostname, pathname } = new URL(url);
-    const allowedHosts = ["images.unsplash.com", "i.imgur.com", "placeimg.com", "api.lorem.space"];
+    const allowedHosts = ["images.unsplash.com", "i.imgur.com", "placeimg.com", "api.lorem.space", "api.escuelajs.co"];
     const blockedPatterns = /(placeholder|dummy|test|example|kkk|undefined|null|\.(svg|gif)$)/i;
     return allowedHosts.some((host) => hostname === host || hostname.endsWith(`.${host}`)) && !blockedPatterns.test(pathname);
   } catch {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CreditCard, RotateCcw, Ticket, Trash2 } from "lucide-react";
 import { formatUsd } from "@aether/core";
 import type { Cart } from "@aether/schemas";
-import { apiBaseUrl } from "../../components/config";
+import { apiBaseUrl, storefrontPath } from "../../components/config";
 import {
   getCartId,
   readLocalCart,
@@ -12,6 +12,7 @@ import {
   removeProductFromCart,
   syncLocalCartToApi
 } from "../../components/cart-client";
+import { getCurrentCustomer } from "../../components/customer-client";
 import { useLanguage } from "../../components/LanguageProvider";
 
 type CheckoutPayload = {
@@ -84,6 +85,11 @@ export default function CartPage() {
   }
 
   async function checkout() {
+    if (!getCurrentCustomer()) {
+      window.location.href = storefrontPath("/register?next=/cart&checkout=1");
+      return;
+    }
+
     setStatus(t.preparingCheckout);
 
     try {

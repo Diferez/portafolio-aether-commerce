@@ -13,6 +13,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  function nextPath() {
+    const next = new URLSearchParams(window.location.search).get("next");
+    return next?.startsWith("/") ? next : "/account";
+  }
+
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -20,7 +25,7 @@ export default function LoginPage() {
     try {
       const customer = loginCustomer({ email, password });
       migrateGuestFavoritesToCustomer(customer);
-      window.location.href = storefrontPath("/account");
+      window.location.href = storefrontPath(nextPath());
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : t.couldNotSignIn);
     }
@@ -69,7 +74,7 @@ export default function LoginPage() {
 
         <p className="mt-5 text-sm text-zinc-600">
           {t.newCustomer}{" "}
-          <a href={storefrontPath("/register")} className="font-semibold text-teal-700 hover:text-teal-900">
+          <a href={storefrontPath(`/register${typeof window !== "undefined" ? window.location.search : ""}`)} className="font-semibold text-teal-700 hover:text-teal-900">
             {t.createAccount}
           </a>
         </p>
