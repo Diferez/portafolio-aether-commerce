@@ -14,7 +14,16 @@ function useSlug() {
   const [slug, setSlug] = useState("");
 
   useEffect(() => {
-    setSlug(new URLSearchParams(window.location.search).get("slug") ?? "");
+    const syncSlug = () => setSlug(new URLSearchParams(window.location.search).get("slug") ?? "");
+    syncSlug();
+    const interval = window.setInterval(syncSlug, 150);
+    window.addEventListener("popstate", syncSlug);
+    window.addEventListener("pageshow", syncSlug);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("popstate", syncSlug);
+      window.removeEventListener("pageshow", syncSlug);
+    };
   }, []);
 
   return slug;
@@ -24,31 +33,38 @@ export default function ProductDetailByQueryPage() {
   const { locale, t } = useLanguage();
   const slug = useSlug();
   const fallback = useMemo(() => demoProducts.find((candidate) => candidate.slug === slug) ?? demoProducts[0]!, [slug]);
-  const [product, setProduct] = useState<Product>(fallback);
-  const [status, setStatus] = useState<"demo" | "live" | "offline">("demo");
+  const [product, setProduct] = useState<Product | null>(null);
+  const [status, setStatus] = useState<"loading" | "demo" | "live" | "offline">("loading");
   const [isAdding, setIsAdding] = useState(false);
-  const localized = getLocalizedProduct(product, locale);
-
-  useEffect(() => {
-    setProduct(fallback);
-  }, [fallback]);
+  const localized = product ? getLocalizedProduct(product, locale) : null;
 
   useEffect(() => {
     if (!slug) return;
     const controller = new AbortController();
+    setProduct(null);
+    setStatus("loading");
     fetch(`${apiBaseUrl}/api/v1/products/slug/${encodeURIComponent(slug)}`, { signal: controller.signal })
       .then((response) => response.json())
       .then((payload: { success: boolean; data?: Product }) => {
+        if (controller.signal.aborted) return;
         if (payload.success && payload.data) {
           setProduct(payload.data);
           setStatus("live");
+          return;
         }
+        setProduct(fallback);
+        setStatus("demo");
       })
-      .catch(() => setStatus("offline"));
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setProduct(fallback);
+        setStatus("offline");
+      });
     return () => controller.abort();
-  }, [slug]);
+  }, [fallback, slug]);
 
   async function addToCart() {
+    if (!product) return;
     setIsAdding(true);
     try {
       await addProductToCart(product);
@@ -60,30 +76,47 @@ export default function ProductDetailByQueryPage() {
 
   return (
     <main className="aether-shell py-8">
-      <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <img src={product.thumbnail} alt={product.name} className="aspect-[4/3] w-full rounded-lg object-cover" />
-        <div className="rounded-lg border border-zinc-200 bg-white p-5">
-          <p className="text-sm font-semibold uppercase text-teal-700">
-            {status === "live" ? t.liveProductDetail : status === "offline" ? t.offlineProductDetail : t.demoProduct}
-          </p>
-          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">{product.name}</h1>
-          <p className="mt-4 text-base leading-7 text-zinc-600">{localized.description}</p>
-          <p className="mt-5 text-3xl font-semibold text-zinc-950">{formatUsd(product.finalPrice, locale === "es" ? "es-CO" : "en-US")}</p>
-          <dl className="mt-6 grid gap-3 text-sm">
-            <div className="flex justify-between"><dt>SKU</dt><dd>{product.sku}</dd></div>
-            <div className="flex justify-between"><dt>{t.category}</dt><dd>{localized.category}</dd></div>
-            <div className="flex justify-between"><dt>{t.availabilityLabel}</dt><dd>{t.availability[product.inventory.status]}</dd></div>
-          </dl>
-          <button
-            type="button"
-            onClick={() => void addToCart()}
-            disabled={isAdding}
-            className="focus-ring mt-6 inline-flex min-h-11 items-center rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:cursor-wait disabled:bg-zinc-500"
-          >
-            {isAdding ? t.adding : t.addToCart}
-          </button>
-        </div>
-      </section>
+      {status === "loading" || !product || !localized ? (
+        <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]" aria-label={locale === "es" ? "Cargando producto" : "Loading product"}>
+          <div className="aspect-[4/3] w-full animate-pulse rounded-lg bg-zinc-200" />
+          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+            <div className="h-4 w-36 animate-pulse rounded bg-teal-100" />
+            <div className="mt-4 h-11 w-4/5 animate-pulse rounded bg-zinc-200" />
+            <div className="mt-6 grid gap-3">
+              <div className="h-4 w-full animate-pulse rounded bg-zinc-100" />
+              <div className="h-4 w-11/12 animate-pulse rounded bg-zinc-100" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-zinc-100" />
+            </div>
+            <div className="mt-6 h-9 w-32 animate-pulse rounded bg-zinc-200" />
+            <div className="mt-6 h-11 w-36 animate-pulse rounded bg-zinc-950/20" />
+          </div>
+        </section>
+      ) : (
+        <section className="grid animate-[fadeIn_0.22s_ease-out] gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <img src={product.thumbnail} alt={product.name} className="aspect-[4/3] w-full rounded-lg object-cover" />
+          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+            <p className="text-sm font-semibold uppercase text-teal-700">
+              {status === "live" ? t.liveProductDetail : status === "offline" ? t.offlineProductDetail : t.demoProduct}
+            </p>
+            <h1 className="mt-2 text-4xl font-semibold text-zinc-950">{product.name}</h1>
+            <p className="mt-4 text-base leading-7 text-zinc-600">{localized.description}</p>
+            <p className="mt-5 text-3xl font-semibold text-zinc-950">{formatUsd(product.finalPrice, locale === "es" ? "es-CO" : "en-US")}</p>
+            <dl className="mt-6 grid gap-3 text-sm">
+              <div className="flex justify-between"><dt>SKU</dt><dd>{product.sku}</dd></div>
+              <div className="flex justify-between"><dt>{t.category}</dt><dd>{localized.category}</dd></div>
+              <div className="flex justify-between"><dt>{t.availabilityLabel}</dt><dd>{t.availability[product.inventory.status]}</dd></div>
+            </dl>
+            <button
+              type="button"
+              onClick={() => void addToCart()}
+              disabled={isAdding}
+              className="focus-ring mt-6 inline-flex min-h-11 items-center rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:cursor-wait disabled:bg-zinc-500"
+            >
+              {isAdding ? t.adding : t.addToCart}
+            </button>
+          </div>
+        </section>
+      )}
       <ProductGrid compact heading={t.relatedProducts} description={t.relatedDescription} />
     </main>
   );

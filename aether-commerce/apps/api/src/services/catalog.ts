@@ -15,6 +15,8 @@ type PlatziProduct = {
   };
 };
 
+const catalogCacheKey = "platzi-products-v2";
+
 const fallbackProducts: PlatziProduct[] = [
   {
     id: 9001,
@@ -58,9 +60,22 @@ function flagsFor(product: PlatziProduct): Product["flags"] {
   return flags.length > 0 ? flags : ["featured"];
 }
 
+function normalizeCategoryName(name?: string) {
+  const candidate = name?.trim();
+  if (!candidate) {
+    return "Technology";
+  }
+
+  const looksLikeError =
+    /(error|failed|exception|query|syntax|typeorm|select|insert|update|delete|undefined|null)/i.test(candidate) ||
+    candidate.length > 48;
+
+  return looksLikeError ? "Technology" : candidate;
+}
+
 function normalize(product: PlatziProduct): Product {
   const slug = slugify(product.title || `product-${product.id}`);
-  const categoryName = product.category?.name || "Technology";
+  const categoryName = normalizeCategoryName(product.category?.name);
   const categorySlug = slugify(categoryName);
   const price = Math.max(0, Math.round(Number(product.price || 0) * 100));
   const discountPercentage = discountFor(product.id);
@@ -191,8 +206,10 @@ function withAetherProducts(products: Product[]) {
 async function readCachedProducts(env: Env): Promise<Product[] | null> {
   try {
     const row = await env.DB.prepare(
-      "select payload_json from products_cache where id = 'platzi-products' and expires_at > datetime('now')"
-    ).first<{ payload_json: string }>();
+      "select payload_json from products_cache where id = ? and expires_at > datetime('now')"
+    )
+      .bind(catalogCacheKey)
+      .first<{ payload_json: string }>();
     return row ? (JSON.parse(row.payload_json) as Product[]) : null;
   } catch {
     return null;
@@ -203,10 +220,10 @@ async function writeCachedProducts(env: Env, products: Product[]) {
   try {
     await env.DB.prepare(
       `insert into products_cache (id, source, payload_json, expires_at, created_at, updated_at)
-       values ('platzi-products', 'platzi', ?, datetime('now', '+15 minutes'), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       values (?, 'platzi', ?, datetime('now', '+15 minutes'), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        on conflict(id) do update set payload_json = excluded.payload_json, expires_at = excluded.expires_at, updated_at = CURRENT_TIMESTAMP`
     )
-      .bind(JSON.stringify(products))
+      .bind(catalogCacheKey, JSON.stringify(products))
       .run();
   } catch {
     // Cache failures should never block the storefront.
