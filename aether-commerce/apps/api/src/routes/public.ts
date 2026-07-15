@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { productQuerySchema } from "@aether/schemas";
 import { defaultShippingSettings } from "@aether/core";
@@ -8,22 +9,36 @@ import { getCatalogProducts, getCategories, getProductById, getProductBySlug } f
 
 export const publicRoutes = new Hono<AppBindings>();
 
+function cachePublicCatalog(c: Context<AppBindings>) {
+  c.header("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
+}
+
 publicRoutes.get("/products", zValidator("query", productQuerySchema), async (c) => {
   const result = await getCatalogProducts(c.env, c.req.valid("query"));
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
 publicRoutes.get("/products/:id", async (c) => {
   const product = await getProductById(c.env, c.req.param("id"));
+  if (product) {
+    cachePublicCatalog(c);
+  }
   return product ? ok(c, product) : fail(c, 404, "PRODUCT_NOT_FOUND", "Product not found.");
 });
 
 publicRoutes.get("/products/slug/:slug", async (c) => {
   const product = await getProductBySlug(c.env, c.req.param("slug"));
+  if (product) {
+    cachePublicCatalog(c);
+  }
   return product ? ok(c, product) : fail(c, 404, "PRODUCT_NOT_FOUND", "Product not found.");
 });
 
-publicRoutes.get("/categories", async (c) => ok(c, await getCategories(c.env)));
+publicRoutes.get("/categories", async (c) => {
+  cachePublicCatalog(c);
+  return ok(c, await getCategories(c.env));
+});
 
 publicRoutes.get("/categories/:slug/products", async (c) => {
   const result = await getCatalogProducts(c.env, {
@@ -32,6 +47,7 @@ publicRoutes.get("/categories/:slug/products", async (c) => {
     category: c.req.param("slug"),
     sort: "featured"
   });
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
@@ -42,21 +58,25 @@ publicRoutes.get("/search", async (c) => {
     search: c.req.query("q") ?? c.req.query("search") ?? "",
     sort: "featured"
   });
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
 publicRoutes.get("/featured-products", async (c) => {
   const result = await getCatalogProducts(c.env, { page: 1, pageSize: 12, featured: true, sort: "featured" });
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
 publicRoutes.get("/deals", async (c) => {
   const result = await getCatalogProducts(c.env, { page: 1, pageSize: 12, deal: true, sort: "discount" });
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
 publicRoutes.get("/new-arrivals", async (c) => {
   const result = await getCatalogProducts(c.env, { page: 1, pageSize: 12, newArrival: true, sort: "newest" });
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { productQuerySchema } from "@aether/schemas";
 import type { AppBindings } from "../types";
@@ -7,9 +8,14 @@ import { getCatalogProducts, getCategories, getProductBySlug } from "../services
 
 export const catalogRoutes = new Hono<AppBindings>();
 
+function cachePublicCatalog(c: Context<AppBindings>) {
+  c.header("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
+}
+
 catalogRoutes.get("/products", zValidator("query", productQuerySchema), async (c) => {
   const query = c.req.valid("query");
   const result = await getCatalogProducts(c.env, query);
+  cachePublicCatalog(c);
   return collection(c, result.data, result.pagination);
 });
 
@@ -18,7 +24,11 @@ catalogRoutes.get("/products/:slug", async (c) => {
   if (!product) {
     return fail(c, 404, "PRODUCT_NOT_FOUND", "Product not found.");
   }
+  cachePublicCatalog(c);
   return ok(c, product);
 });
 
-catalogRoutes.get("/categories", async (c) => ok(c, await getCategories(c.env)));
+catalogRoutes.get("/categories", async (c) => {
+  cachePublicCatalog(c);
+  return ok(c, await getCategories(c.env));
+});

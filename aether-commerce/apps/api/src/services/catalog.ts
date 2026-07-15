@@ -17,6 +17,8 @@ type PlatziProduct = {
 
 const catalogCacheKey = "platzi-products-v3";
 const fallbackImageUrl = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80";
+const memoryCacheTtlMs = 5 * 60 * 1000;
+let memoryCatalogCache: { expiresAt: number; products: Product[] } | null = null;
 
 const fallbackProducts: PlatziProduct[] = [
   {
@@ -244,13 +246,22 @@ function withAetherProducts(products: Product[]) {
 }
 
 async function readCachedProducts(env: Env): Promise<Product[] | null> {
+  if (memoryCatalogCache && memoryCatalogCache.expiresAt > Date.now()) {
+    return memoryCatalogCache.products;
+  }
+
   try {
     const row = await env.DB.prepare(
       "select payload_json from products_cache where id = ? and expires_at > datetime('now')"
     )
       .bind(catalogCacheKey)
       .first<{ payload_json: string }>();
-    return row ? (JSON.parse(row.payload_json) as Product[]) : null;
+    if (!row) {
+      return null;
+    }
+    const products = JSON.parse(row.payload_json) as Product[];
+    memoryCatalogCache = { products, expiresAt: Date.now() + memoryCacheTtlMs };
+    return products;
   } catch {
     return null;
   }
@@ -265,9 +276,21 @@ async function writeCachedProducts(env: Env, products: Product[]) {
     )
       .bind(catalogCacheKey, JSON.stringify(products))
       .run();
+    memoryCatalogCache = { products, expiresAt: Date.now() + memoryCacheTtlMs };
   } catch {
     // Cache failures should never block the storefront.
   }
+}
+
+async function getCatalogSource(env: Env) {
+  const cached = await readCachedProducts(env);
+  if (cached) {
+    return withAetherProducts(cached).filter((product) => product.visibility === "visible");
+  }
+
+  const source = await fetchPlatziProducts(env).then((items) => withAetherProducts(items.filter(isCatalogCandidate).map(normalize)));
+  await writeCachedProducts(env, source);
+  return source.filter((product) => product.visibility === "visible");
 }
 
 async function fetchPlatziProducts(env: Env): Promise<PlatziProduct[]> {
@@ -295,15 +318,7 @@ async function fetchPlatziProducts(env: Env): Promise<PlatziProduct[]> {
 }
 
 export async function getCatalogProducts(env: Env, query: ProductQuery) {
-  const cached = await readCachedProducts(env);
-  let source: Product[];
-  if (cached) {
-    source = withAetherProducts(cached);
-  } else {
-    source = await fetchPlatziProducts(env).then((items) => withAetherProducts(items.filter(isCatalogCandidate).map(normalize)));
-    await writeCachedProducts(env, source);
-  }
-  let products = source.filter((product) => product.visibility === "visible");
+  let products = await getCatalogSource(env);
 
   const search = query.search ?? query.q;
   if (search) {
@@ -374,17 +389,17 @@ export async function getCatalogProducts(env: Env, query: ProductQuery) {
 }
 
 export async function getProductBySlug(env: Env, slug: string) {
-  const { data } = await getCatalogProducts(env, { page: 1, pageSize: 60, sort: "featured" });
+  const data = await getCatalogSource(env);
   return data.find((product) => product.slug === slug);
 }
 
 export async function getProductById(env: Env, id: string) {
-  const { data } = await getCatalogProducts(env, { page: 1, pageSize: 60, sort: "featured" });
+  const data = await getCatalogSource(env);
   return data.find((product) => product.id === id || String(product.externalId) === id);
 }
 
 export async function getCategories(env: Env) {
-  const { data } = await getCatalogProducts(env, { page: 1, pageSize: 60, sort: "featured" });
+  const data = await getCatalogSource(env);
   const map = new Map<string, Product["category"]>();
   data.forEach((product) => map.set(product.category.slug, product.category));
   return [...map.values()];
