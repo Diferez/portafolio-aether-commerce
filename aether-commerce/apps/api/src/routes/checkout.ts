@@ -4,7 +4,8 @@ import { zValidator } from "@hono/zod-validator";
 import type { AppBindings } from "../types";
 import { fail, ok } from "../http";
 import { readCart } from "../services/cart";
-import { createCheckoutSession } from "../services/stripe";
+import { createCheckoutSession, retrieveCheckoutSession } from "../services/stripe";
+import { createOrderFromStripeSession } from "../services/orders";
 
 export const checkoutRoutes = new Hono<AppBindings>();
 
@@ -25,6 +26,29 @@ checkoutRoutes.post(
         500,
         "STRIPE_CHECKOUT_FAILED",
         "Stripe checkout could not be started. Check STRIPE_SECRET_KEY and network access."
+      );
+    }
+  }
+);
+
+checkoutRoutes.post(
+  "/confirm",
+  zValidator("json", z.object({ sessionId: z.string().min(1) })),
+  async (c) => {
+    try {
+      const session = await retrieveCheckoutSession(c.env, c.req.valid("json").sessionId);
+      if (session.payment_status !== "paid") {
+        return fail(c, 422, "PAYMENT_NOT_PAID", "Stripe checkout session is not paid yet.");
+      }
+
+      const result = await createOrderFromStripeSession(c.env, session);
+      return ok(c, { order: result.order, created: result.created }, result.created ? 201 : 200);
+    } catch (error) {
+      return fail(
+        c,
+        500,
+        "CHECKOUT_CONFIRM_FAILED",
+        error instanceof Error ? error.message : "Checkout confirmation failed."
       );
     }
   }

@@ -7,6 +7,17 @@ type StripeErrorLog = {
   message?: string;
 };
 
+export type StripeCheckoutSession = {
+  id: string;
+  payment_status?: string;
+  amount_total?: number;
+  currency?: string;
+  customer_details?: { email?: string };
+  customer_email?: string;
+  metadata?: { cartId?: string; userId?: string };
+  payment_intent?: string;
+};
+
 export function getStripeSecretKeyStatus(secretKey?: string) {
   if (!secretKey) {
     return "missing";
@@ -68,9 +79,15 @@ export async function createCheckoutSession(env: Env, cart: Cart) {
 
   const params = new URLSearchParams();
   params.set("mode", "payment");
-  params.set("success_url", storefrontUrl(origin, `/checkout/success?checkout=success&cart=${encodeURIComponent(cart.id)}`));
+  params.set(
+    "success_url",
+    storefrontUrl(origin, `/checkout/success?checkout=success&cart=${encodeURIComponent(cart.id)}&session_id={CHECKOUT_SESSION_ID}`)
+  );
   params.set("cancel_url", storefrontUrl(origin, "/cart?checkout=cancelled"));
   params.set("metadata[cartId]", cart.id);
+  if (cart.userId) {
+    params.set("metadata[userId]", cart.userId);
+  }
 
   cart.items.forEach((item, index) => {
     params.set(`line_items[${index}][quantity]`, String(item.quantity));
@@ -127,6 +144,30 @@ export async function createCheckoutSession(env: Env, cart: Cart) {
       ? payload.url
       : storefrontUrl(origin, "/cart?checkout=missing-url");
   return { checkoutUrl };
+}
+
+export async function retrieveCheckoutSession(env: Env, sessionId: string): Promise<StripeCheckoutSession> {
+  if (!env.STRIPE_SECRET_KEY) {
+    throw new Error("Stripe secret key is not configured");
+  }
+
+  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+    headers: {
+      authorization: `Bearer ${env.STRIPE_SECRET_KEY}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    console.error("Stripe session retrieval failed", {
+      status: response.status,
+      statusText: response.statusText,
+      stripeError: parseStripeError(errorBody)
+    });
+    throw new Error("Stripe session could not be retrieved");
+  }
+
+  return response.json();
 }
 
 export async function verifyStripeSignature(secret: string, body: string, signatureHeader: string) {

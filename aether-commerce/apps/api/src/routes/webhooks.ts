@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { AppBindings } from "../types";
 import { fail, ok } from "../http";
 import { verifyStripeSignature } from "../services/stripe";
+import { createOrderFromStripeSession } from "../services/orders";
 
 export const webhookRoutes = new Hono<AppBindings>();
 
@@ -18,7 +19,22 @@ webhookRoutes.post("/stripe", async (c) => {
     return fail(c, 401, "INVALID_SIGNATURE", "Invalid Stripe webhook signature.");
   }
 
-  const payload = JSON.parse(body) as { id: string; type: string };
+  const payload = JSON.parse(body) as {
+    id: string;
+    type: string;
+    data?: {
+      object?: {
+        id: string;
+        payment_status?: string;
+        amount_total?: number;
+        currency?: string;
+        customer_details?: { email?: string };
+        customer_email?: string;
+        metadata?: { cartId?: string; userId?: string };
+        payment_intent?: string;
+      };
+    };
+  };
   await c.env.DB.prepare(
     `insert into webhook_events
       (id, provider, provider_event_id, payload_json, processed_at, created_at, updated_at)
@@ -28,5 +44,11 @@ webhookRoutes.post("/stripe", async (c) => {
     .bind(crypto.randomUUID(), payload.id, body)
     .run();
 
-  return ok(c, { received: true, type: payload.type });
+  let orderCreated = false;
+  if (payload.type === "checkout.session.completed" && payload.data?.object) {
+    const result = await createOrderFromStripeSession(c.env, payload.data.object);
+    orderCreated = result.created;
+  }
+
+  return ok(c, { received: true, type: payload.type, orderCreated });
 });
