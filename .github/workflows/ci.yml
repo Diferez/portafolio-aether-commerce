@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate portfolio and Aether
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.6.0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install portfolio dependencies
+        run: npm ci
+
+      - name: Install Aether dependencies
+        working-directory: aether-commerce
+        run: pnpm install --frozen-lockfile
+
+      - name: Portfolio lint
+        run: npm run lint
+
+      - name: Aether typecheck
+        working-directory: aether-commerce
+        run: pnpm typecheck
+
+      - name: Aether lint
+        working-directory: aether-commerce
+        run: pnpm lint
+
+      - name: Aether tests
+        working-directory: aether-commerce
+        run: pnpm test
+
+      - name: OpenAPI check
+        working-directory: aether-commerce
+        run: pnpm openapi:check
+
+      - name: Build portfolio and storefront
+        env:
+          NEXT_PUBLIC_AETHER_API_URL: https://preview-api.invalid
+          AETHER_API_ORIGIN: https://preview-api.invalid
+          NEXT_PUBLIC_PORTFOLIO_URL: https://example.com
+        run: npm run build
+
+      - name: Build admin
+        working-directory: aether-commerce
+        run: pnpm --filter @aether/admin build
+
+      - name: Portfolio tests
+        run: node --test tests/*.test.mjs
+
+      - name: Verify build outputs
+        run: |
+          test -f dist/server/index.js
+          test -f dist/client/store/index.html
+          test -f aether-commerce/apps/admin/out/index.html

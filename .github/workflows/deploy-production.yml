@@ -1,0 +1,136 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: aether-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: production
+
+    env:
+      AETHER_API_WORKER_NAME: ${{ vars.AETHER_API_WORKER_NAME || 'aether-api' }}
+      AETHER_FRONT_WORKER_NAME: ${{ vars.AETHER_FRONT_WORKER_NAME || 'portafolio-aether-commerce' }}
+      AETHER_ADMIN_PAGES_PROJECT: ${{ vars.AETHER_ADMIN_PAGES_PROJECT || 'aether-admin' }}
+      AETHER_D1_DATABASE_NAME: ${{ vars.AETHER_D1_DATABASE_NAME || 'aether-production' }}
+      AETHER_D1_DATABASE_ID: ${{ vars.AETHER_D1_DATABASE_ID }}
+      AETHER_ENV: production
+      PLATZI_API_BASE_URL: ${{ vars.PLATZI_API_BASE_URL || 'https://api.escuelajs.co/api/v1' }}
+      NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
+      AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
+      NEXT_PUBLIC_PORTFOLIO_URL: ${{ vars.NEXT_PUBLIC_PORTFOLIO_URL }}
+      APP_ORIGIN_STORE: ${{ vars.APP_ORIGIN_STORE || vars.NEXT_PUBLIC_PORTFOLIO_URL }}
+      APP_ORIGIN_ADMIN: ${{ vars.APP_ORIGIN_ADMIN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.6.0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install portfolio dependencies
+        run: npm ci
+
+      - name: Install Aether dependencies
+        working-directory: aether-commerce
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify required deployment settings
+        run: |
+          test -n "${AETHER_D1_DATABASE_ID}"
+          test -n "${NEXT_PUBLIC_AETHER_API_URL}"
+          test -n "${NEXT_PUBLIC_PORTFOLIO_URL}"
+          test -n "${APP_ORIGIN_ADMIN}"
+
+      - name: Lint and test
+        run: |
+          npm run lint
+          pnpm --dir aether-commerce typecheck
+          pnpm --dir aether-commerce lint
+          pnpm --dir aether-commerce test
+          pnpm --dir aether-commerce openapi:check
+
+      - name: Build portfolio and storefront
+        run: npm run build
+
+      - name: Build admin
+        working-directory: aether-commerce
+        run: pnpm --filter @aether/admin build
+
+      - name: Verify build outputs
+        run: |
+          test -f dist/server/index.js
+          test -f dist/client/store/index.html
+          test -f aether-commerce/apps/admin/out/index.html
+
+      - name: Generate Aether API Wrangler config
+        run: node scripts/write-aether-api-wrangler-config.mjs
+
+      - name: Patch front Worker config
+        run: node scripts/patch-front-worker-config.mjs
+
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: aether-commerce/apps/api
+          wranglerVersion: "4"
+          command: d1 migrations apply DB --remote --config wrangler.production.json
+
+      - name: Deploy Aether API Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: aether-commerce/apps/api
+          wranglerVersion: "4"
+          command: deploy --config wrangler.production.json
+
+      - name: Deploy portfolio and storefront Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: deploy --config dist/server/wrangler.json
+
+      - name: Deploy admin Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages deploy aether-commerce/apps/admin/out --project-name=${{ env.AETHER_ADMIN_PAGES_PROJECT }} --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify API health
+        run: curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_AETHER_API_URL}/api/v1/health"
+
+      - name: Verify portfolio
+        run: curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_PORTFOLIO_URL}"
+
+      - name: Verify admin
+        run: curl --fail --retry 3 --retry-delay 5 "${APP_ORIGIN_ADMIN}"

@@ -90,6 +90,33 @@ npm run build
 `AETHER_STOREFRONT_ORIGIN` es opcional. Solo se usa como respaldo si decides
 desplegar la tienda como Pages separado; el flujo recomendado no lo necesita.
 
+### GitHub Actions
+
+El repo incluye workflows para controlar el despliegue desde GitHub Actions:
+
+- `.github/workflows/ci.yml`: valida pull requests sin credenciales de produccion.
+- `.github/workflows/deploy-production.yml`: en `main`, migra D1, despliega el Worker API de Aether, despliega el Worker del portafolio con la tienda en `/store`, y publica el admin en Cloudflare Pages.
+
+Variables no sensibles del environment `production`:
+
+- `AETHER_API_WORKER_NAME`
+- `AETHER_FRONT_WORKER_NAME`
+- `AETHER_ADMIN_PAGES_PROJECT`
+- `AETHER_D1_DATABASE_NAME`
+- `AETHER_D1_DATABASE_ID`
+- `NEXT_PUBLIC_AETHER_API_URL`
+- `AETHER_API_ORIGIN`
+- `NEXT_PUBLIC_PORTFOLIO_URL`
+- `APP_ORIGIN_ADMIN`
+- `PLATZI_API_BASE_URL`
+
+Secrets requeridos del environment `production`:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+Los secretos privados del Worker (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `CONTACT_RECIPIENT_EMAIL`, etc.) deben configurarse en Cloudflare con `wrangler secret put`, no en el frontend ni en variables `NEXT_PUBLIC_*`.
+
 ## Pruebas
 
 ```bash
