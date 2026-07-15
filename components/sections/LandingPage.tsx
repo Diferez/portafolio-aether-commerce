@@ -205,7 +205,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 <p className="hero-description">{content.hero.description}</p>
               </Reveal>
               <Reveal className="hero-actions" delay={0.24}>
-                <a className="primary-button" href={`#${ids.experience}`}>
+                <a className="ghost-button" href={`#${ids.experience}`}>
                   {content.hero.primaryCta}
                   <ArrowRight aria-hidden="true" size={18} />
                 </a>
@@ -214,7 +214,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 </a>
                 {siteConfig.storeUrl ? (
                   <a
-                    className="ghost-button"
+                    className="primary-button"
                     href={siteConfig.storeUrl}
                     target={storeIsExternal ? "_blank" : undefined}
                     rel={storeIsExternal ? "noreferrer" : undefined}
