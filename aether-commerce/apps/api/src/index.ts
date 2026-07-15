@@ -16,6 +16,7 @@ import { contactRoutes } from "./routes/contact";
 import { publicRoutes } from "./routes/public";
 import { userRoutes } from "./routes/user";
 import { webhookRoutes } from "./routes/webhooks";
+import { getStripeSecretKeyStatus } from "./services/stripe";
 
 const app = new Hono<AppBindings>();
 
@@ -45,6 +46,7 @@ api.get("/health", async (c) => {
       d1,
       platziBaseUrl: Boolean(c.env.PLATZI_API_BASE_URL),
       stripeSandboxConfigured: Boolean(c.env.STRIPE_SECRET_KEY),
+      stripeSecretKeyStatus: getStripeSecretKeyStatus(c.env.STRIPE_SECRET_KEY),
       resendConfigured: Boolean(c.env.RESEND_API_KEY)
     },
     time: new Date().toISOString()

@@ -1,6 +1,55 @@
 import type { Cart } from "@aether/schemas";
 import type { Env } from "../types";
 
+type StripeErrorLog = {
+  type?: string;
+  code?: string;
+  message?: string;
+};
+
+export function getStripeSecretKeyStatus(secretKey?: string) {
+  if (!secretKey) {
+    return "missing";
+  }
+
+  if (secretKey.startsWith("sk_test_")) {
+    return "test_secret";
+  }
+
+  if (secretKey.startsWith("sk_live_")) {
+    return "live_secret";
+  }
+
+  if (secretKey.startsWith("pk_")) {
+    return "publishable_key";
+  }
+
+  if (secretKey.startsWith("rk_")) {
+    return "restricted_key";
+  }
+
+  return "unknown";
+}
+
+function parseStripeError(body: string): StripeErrorLog {
+  try {
+    const payload = JSON.parse(body) as { error?: StripeErrorLog };
+    const stripeError: StripeErrorLog = {};
+    if (payload.error?.type) {
+      stripeError.type = payload.error.type;
+    }
+    if (payload.error?.code) {
+      stripeError.code = payload.error.code;
+    }
+    if (payload.error?.message) {
+      stripeError.message = payload.error.message;
+    }
+    return stripeError;
+  } catch {
+    return { message: body.slice(0, 180) };
+  }
+}
+
 export async function createCheckoutSession(env: Env, cart: Cart) {
   const origin = env.APP_ORIGIN_STORE ?? "http://localhost:3000";
   const simulatedCheckout = {
@@ -48,16 +97,20 @@ export async function createCheckoutSession(env: Env, cart: Cart) {
   }
 
   if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    const stripeError = parseStripeError(errorBody);
     if (env.AETHER_ENV !== "production") {
       console.info("Stripe checkout unavailable in development. Using simulated checkout.", {
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
+        stripeError
       });
       return simulatedCheckout;
     }
     console.error("Stripe checkout failed", {
       status: response.status,
-      statusText: response.statusText
+      statusText: response.statusText,
+      stripeError
     });
     throw new Error("Stripe session could not be created");
   }
