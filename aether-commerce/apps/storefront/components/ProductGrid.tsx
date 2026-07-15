@@ -61,7 +61,7 @@ export function ProductGrid({
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<ApiPagination>({
     page: 1,
-    pageSize: compact ? 6 : 12,
+    pageSize: 6,
     total: demoProducts.length,
     pageCount: 1
   });
@@ -72,7 +72,7 @@ export function ProductGrid({
     const timeout = window.setTimeout(() => controller.abort(), catalogApiTimeoutMs);
     const params = new URLSearchParams({
       page: String(page),
-      pageSize: compact ? "6" : "12",
+      pageSize: "6",
       sort: flag === "new" ? "newest" : flag === "deal" ? "discount" : "featured"
     });
     if (query.trim()) params.set("search", query.trim());
@@ -88,7 +88,7 @@ export function ProductGrid({
           setPagination(
             payload.pagination ?? {
               page,
-              pageSize: compact ? 6 : 12,
+              pageSize: 6,
               total: payload.data.length,
               pageCount: 1
             }
