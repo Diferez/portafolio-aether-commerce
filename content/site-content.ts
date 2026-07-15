@@ -679,6 +679,7 @@ export const content = {
       ],
       languageOptions: { es: "Español", en: "Inglés" },
       submit: "Solicitar una evaluación",
+      whatsappCta: "Contactar por WhatsApp",
       sending: "Enviando solicitud...",
       success: "Solicitud recibida. Gracias por compartir el contexto.",
       error:
@@ -1364,6 +1365,7 @@ export const content = {
       ],
       languageOptions: { es: "Spanish", en: "English" },
       submit: "Request an assessment",
+      whatsappCta: "Contact on WhatsApp",
       sending: "Sending request...",
       success: "Request received. Thanks for sharing the context.",
       error: "The request could not be sent. Please try again in a few minutes.",

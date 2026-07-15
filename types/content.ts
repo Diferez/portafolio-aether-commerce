@@ -79,6 +79,7 @@ export type ContactContent = {
   projectTypes: readonly string[];
   languageOptions: Record<Locale, string>;
   submit: string;
+  whatsappCta: string;
   sending: string;
   success: string;
   error: string;

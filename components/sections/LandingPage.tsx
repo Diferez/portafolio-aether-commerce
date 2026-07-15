@@ -183,6 +183,9 @@ export function LandingPage({ content }: LandingPageProps) {
             <a href={siteConfig.storeUrl} onClick={() => setMenuOpen(false)}>
               {content.hero.storeCta}
             </a>
+            <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>
+              {content.contact.whatsappCta}
+            </a>
             <button type="button" onClick={switchLanguage}>
               {content.nav.switchLanguage}
             </button>
@@ -301,6 +304,9 @@ export function LandingPage({ content }: LandingPageProps) {
               </a>
             ))}
             <a href={siteConfig.storeUrl}>{content.hero.storeCta}</a>
+            <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
+              {content.contact.whatsappCta}
+            </a>
             <a href="#privacidad">{content.footer.privacyLabel}</a>
             <button type="button" onClick={switchLanguage}>
               {alternateLocale.toUpperCase()}
@@ -666,6 +672,10 @@ function ContactSection({ content, id }: { content: LandingContent; id: string }
         <h2>{content.contact.title}</h2>
         <p>{content.contact.description}</p>
         <div className="contact-links">
+          <a className="whatsapp-button" href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
+            <MessageSquareText aria-hidden="true" size={16} />
+            {content.contact.whatsappCta}
+          </a>
           {siteConfig.socialLinks.map((link) => (
             <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
               <ExternalLink aria-hidden="true" size={16} />

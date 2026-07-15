@@ -5,6 +5,7 @@ export const siteConfig = {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://portfolio.example.com",
   storeUrl: process.env.NEXT_PUBLIC_STORE_URL?.trim() || "/store",
+  whatsappUrl: "https://wa.me/message/QUSZJKVQDACUM1",
   availability: {
     es: "Disponible para nuevos proyectos",
     en: "Available for selected projects",
