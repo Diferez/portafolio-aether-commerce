@@ -15,7 +15,8 @@ type PlatziProduct = {
   };
 };
 
-const catalogCacheKey = "platzi-products-v2";
+const catalogCacheKey = "platzi-products-v3";
+const fallbackImageUrl = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80";
 
 const fallbackProducts: PlatziProduct[] = [
   {
@@ -73,6 +74,37 @@ function normalizeCategoryName(name?: string) {
   return looksLikeError ? "Technology" : candidate;
 }
 
+function isMeaningfulText(value: string, minWords = 2) {
+  const trimmed = value.trim();
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  const hasVowels = /[aeiou]/i.test(trimmed);
+  const repeatedChars = /(.)\1{2,}/i.test(trimmed);
+  const mostlySymbols = trimmed.replace(/[a-z0-9\s-]/gi, "").length > trimmed.length / 3;
+  return trimmed.length >= 6 && words.length >= minWords && hasVowels && !repeatedChars && !mostlySymbols;
+}
+
+function isTrustedImageUrl(url: string) {
+  try {
+    const { hostname, pathname } = new URL(url);
+    const allowedHosts = ["images.unsplash.com", "i.imgur.com", "placeimg.com", "api.lorem.space"];
+    const blockedPatterns = /(placeholder|dummy|test|example|kkk|undefined|null|\.(svg|gif)$)/i;
+    return allowedHosts.some((host) => hostname === host || hostname.endsWith(`.${host}`)) && !blockedPatterns.test(pathname);
+  } catch {
+    return false;
+  }
+}
+
+function isCatalogCandidate(product: PlatziProduct) {
+  const images = cleanImageUrls(product.images, fallbackImageUrl).filter(isTrustedImageUrl);
+  return (
+    Number.isFinite(product.id) &&
+    Number(product.price) > 0 &&
+    isMeaningfulText(product.title) &&
+    isMeaningfulText(product.description, 4) &&
+    images.length > 0
+  );
+}
+
 function normalize(product: PlatziProduct): Product {
   const slug = slugify(product.title || `product-${product.id}`);
   const categoryName = normalizeCategoryName(product.category?.name);
@@ -89,14 +121,22 @@ function normalize(product: PlatziProduct): Product {
   const availabilityStatus = getInventoryStatus(available, 4);
   const images = cleanImageUrls(
     product.images,
-    "https://res.cloudinary.com/demo/image/upload/c_fill,w_1200,h_900/sample.jpg"
+    fallbackImageUrl
+  ).filter(isTrustedImageUrl).map((url, index): Product["images"][number] => ({
+    url,
+    alt: `${product.title} image ${index + 1}`,
+    source: "platzi"
+  }));
+  const safeImages = images.length > 0 ? images : cleanImageUrls(
+    [fallbackImageUrl],
+    fallbackImageUrl
   ).map((url, index): Product["images"][number] => ({
     url,
     alt: `${product.title} image ${index + 1}`,
-    source: url.includes("cloudinary") ? "cloudinary" : "platzi"
+    source: "fallback"
   }));
   const flags = flagsFor(product);
-  const categoryImage = product.category?.image && cleanImageUrls([product.category.image], images[0]?.url ?? "")[0];
+  const categoryImage = product.category?.image && cleanImageUrls([product.category.image], safeImages[0]?.url ?? fallbackImageUrl).filter(isTrustedImageUrl)[0];
   const shortDescription = (product.description || "Premium technology selected for Aether.").slice(0, 140);
   const sku = `AET-${product.id}-STD`;
   const now = new Date().toISOString();
@@ -131,9 +171,9 @@ function normalize(product: PlatziProduct): Product {
     adjustedStock,
     availableStock: available,
     availabilityStatus: availabilityStatus === "hidden" ? "discontinued" : availabilityStatus,
-    thumbnail: images[0]?.url ?? "https://res.cloudinary.com/demo/image/upload/c_fill,w_1200,h_900/sample.jpg",
-    images,
-    gallery: images.map((image) => image.url),
+    thumbnail: safeImages[0]?.url ?? fallbackImageUrl,
+    images: safeImages,
+    gallery: safeImages.map((image) => image.url),
     specifications: [
       { key: "Source", value: "Platzi Fake Store API" },
       { key: "Warranty", value: "Demo international warranty" },
@@ -260,7 +300,7 @@ export async function getCatalogProducts(env: Env, query: ProductQuery) {
   if (cached) {
     source = withAetherProducts(cached);
   } else {
-    source = await fetchPlatziProducts(env).then((items) => withAetherProducts(items.map(normalize)));
+    source = await fetchPlatziProducts(env).then((items) => withAetherProducts(items.filter(isCatalogCandidate).map(normalize)));
     await writeCachedProducts(env, source);
   }
   let products = source.filter((product) => product.visibility === "visible");

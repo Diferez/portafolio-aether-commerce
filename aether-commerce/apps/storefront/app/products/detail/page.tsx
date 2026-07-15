@@ -32,9 +32,9 @@ function useSlug() {
 export default function ProductDetailByQueryPage() {
   const { locale, t } = useLanguage();
   const slug = useSlug();
-  const fallback = useMemo(() => demoProducts.find((candidate) => candidate.slug === slug) ?? demoProducts[0]!, [slug]);
+  const fallback = useMemo(() => demoProducts.find((candidate) => candidate.slug === slug) ?? null, [slug]);
   const [product, setProduct] = useState<Product | null>(null);
-  const [status, setStatus] = useState<"loading" | "demo" | "live" | "offline">("loading");
+  const [status, setStatus] = useState<"loading" | "demo" | "live" | "offline" | "not-found">("loading");
   const [isAdding, setIsAdding] = useState(false);
   const localized = product ? getLocalizedProduct(product, locale) : null;
 
@@ -53,12 +53,12 @@ export default function ProductDetailByQueryPage() {
           return;
         }
         setProduct(fallback);
-        setStatus("demo");
+        setStatus(fallback ? "demo" : "not-found");
       })
       .catch(() => {
         if (controller.signal.aborted) return;
         setProduct(fallback);
-        setStatus("offline");
+        setStatus(fallback ? "offline" : "not-found");
       });
     return () => controller.abort();
   }, [fallback, slug]);
@@ -76,7 +76,27 @@ export default function ProductDetailByQueryPage() {
 
   return (
     <main className="aether-shell py-8">
-      {status === "loading" || !product || !localized ? (
+      {status === "not-found" ? (
+        <section className="mx-auto max-w-2xl rounded-lg border border-zinc-200 bg-white p-6 text-center">
+          <p className="text-sm font-semibold uppercase text-teal-700">
+            {locale === "es" ? "Producto no disponible" : "Product unavailable"}
+          </p>
+          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">
+            {locale === "es" ? "Este producto fue filtrado" : "This product was filtered"}
+          </h1>
+          <p className="mt-4 text-zinc-600">
+            {locale === "es"
+              ? "El catalogo descarta productos sin imagen confiable, nombre claro o datos utiles."
+              : "The catalog excludes products without a trusted image, clear name, or useful product data."}
+          </p>
+          <a
+            href={storefrontPath("/products")}
+            className="focus-ring mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white"
+          >
+            {t.browseProducts}
+          </a>
+        </section>
+      ) : status === "loading" || !product || !localized ? (
         <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]" aria-label={locale === "es" ? "Cargando producto" : "Loading product"}>
           <div className="aspect-[4/3] w-full animate-pulse rounded-lg bg-zinc-200" />
           <div className="rounded-lg border border-zinc-200 bg-white p-5">
