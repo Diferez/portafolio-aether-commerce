@@ -65,7 +65,7 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.doesNotMatch(en, /name="budget"/);
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
-  assert.match(en, /The recipient email is configured only on the server/);
+  assert.match(en, /stored securely for follow-up/);
 });
 
 test("proxy keeps browser language detection and saved preference", async () => {

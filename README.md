@@ -1,6 +1,6 @@
 # Diego Fernando Martinez Portfolio Landing
 
-Landing page bilingüe para un Software Engineer Full Stack. Incluye rutas en español e inglés, contenido editable, SEO localizado, formulario de contacto del lado servidor y pruebas básicas.
+Landing page bilingüe para un Software Engineer Full Stack. Incluye rutas en español e inglés, contenido editable, SEO localizado, formulario de contacto persistido en D1 mediante el Worker API de Aether y pruebas básicas.
 
 ## Requisitos
 
@@ -24,8 +24,7 @@ Copia `.env.example` a `.env.local` y ajusta los valores:
 - `NEXT_PUBLIC_BRAND_NAME`: marca profesional visible.
 - `NEXT_PUBLIC_STORE_URL`: ruta pública de la tienda; para Cloudflare usa `/store`.
 - `NEXT_PUBLIC_AETHER_API_URL`: URL pública del Worker API de Aether.
-- `CONTACT_RECIPIENT_EMAIL`: correo receptor, solo disponible en servidor.
-- `CONTACT_DELIVERY_PROVIDER`: usa `formsubmit` para enviar las solicitudes al correo configurado.
+- `AETHER_API_ORIGIN`: origen server-side del Worker API de Aether. El formulario del portafolio usa `/api/v1/contact` para guardar solicitudes en D1.
 
 No coloques correos privados, teléfonos o datos sensibles en componentes, HTML, archivos públicos o variables `NEXT_PUBLIC`.
 
@@ -46,7 +45,7 @@ Edita `content/site-content.ts`. Mantén los proyectos confidenciales con nombre
 
 ## Contacto
 
-El endpoint `app/api/contact/route.ts` valida datos, sanitiza entradas, usa honeypot antispam y aplica limitación básica de frecuencia en memoria. Con `CONTACT_DELIVERY_PROVIDER=formsubmit`, el servidor reenvía la solicitud al correo de `CONTACT_RECIPIENT_EMAIL` sin exponerlo en el navegador.
+El endpoint `app/api/contact/route.ts` valida datos, sanitiza entradas, usa honeypot antispam y aplica limitación básica de frecuencia en memoria. Después adapta el mensaje al contrato de Aether y llama al Worker API (`/api/v1/contact`) para persistir la solicitud en la tabla D1 `contact_messages`.
 
 ## SEO
 
@@ -70,8 +69,7 @@ Antes de publicar, configura:
 - `NEXT_PUBLIC_SITE_URL`: dominio final del portafolio en Cloudflare.
 - `NEXT_PUBLIC_STORE_URL=/store`.
 - `NEXT_PUBLIC_AETHER_API_URL`: URL del Worker API de Aether.
-- `CONTACT_RECIPIENT_EMAIL`: correo receptor del formulario.
-- `CONTACT_DELIVERY_PROVIDER=formsubmit`.
+- `AETHER_API_ORIGIN`: URL del Worker API de Aether, por ejemplo `https://tu-api.tu-subdominio.workers.dev`.
 
 El build principal ejecuta el portafolio y la tienda juntos:
 

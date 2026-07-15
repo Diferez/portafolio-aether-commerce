@@ -624,7 +624,7 @@ export const content = {
       eyebrow: "Contacto",
       title: "Hablemos de tu proyecto.",
       description:
-        "Comparte el contexto esencial y recibirás una confirmación de recepción. El correo receptor se configura solo en el servidor.",
+        "Comparte el contexto esencial y la solicitud quedara registrada de forma segura para seguimiento.",
       fields: {
         name: "Nombre",
         company: "Empresa",
@@ -1284,7 +1284,7 @@ export const content = {
       eyebrow: "Contact",
       title: "Let's discuss your idea.",
       description:
-        "Share the essential context and you will receive a confirmation. The recipient email is configured only on the server.",
+        "Share the essential context and the request will be stored securely for follow-up.",
       fields: {
         name: "Name",
         company: "Company",

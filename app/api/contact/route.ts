@@ -78,15 +78,22 @@ export async function POST(request: NextRequest) {
     name,
     company,
     email,
-    projectType,
-    message,
+    subject: `Portfolio: ${projectType}`.slice(0, 160),
+    message: [
+      `Project type: ${projectType}`,
+      company ? `Company: ${company}` : "Company: Not provided",
+      `Preferred language: ${preferredLanguage || locale || "Not provided"}`,
+      "",
+      message,
+    ].join("\n"),
     preferredLanguage,
-    locale,
+    locale: locale === "es" ? "es" : "en",
     receivedAt: new Date().toISOString(),
+    consent,
   };
 
   try {
-    await queueContactRequest(contactRequest);
+    await saveContactRequest(contactRequest);
   } catch {
     return NextResponse.json({ ok: false, code: "delivery_error" }, { status: 502 });
   }
@@ -94,45 +101,50 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-async function queueContactRequest(contactRequest: Record<string, string>) {
-  const deliveryProvider = process.env.CONTACT_DELIVERY_PROVIDER?.trim();
-  const recipient = process.env.CONTACT_RECIPIENT_EMAIL?.trim();
+async function saveContactRequest(contactRequest: {
+  name: string;
+  company: string;
+  email: string;
+  subject: string;
+  message: string;
+  preferredLanguage: string;
+  locale: "en" | "es";
+  receivedAt: string;
+  consent: boolean;
+}) {
+  const apiOrigin = (
+    process.env.AETHER_API_ORIGIN ||
+    process.env.NEXT_PUBLIC_AETHER_API_URL ||
+    "http://localhost:8787"
+  ).replace(/\/$/, "");
 
-  if (!deliveryProvider || !recipient) {
-    throw new Error("Contact delivery is not configured.");
-  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
 
-  if (deliveryProvider === "formsubmit") {
-    const response = await fetch(
-      `https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          _subject: `Portfolio contact: ${contactRequest.projectType}`,
-          _template: "table",
-          _captcha: "false",
-          Name: contactRequest.name,
-          Company: contactRequest.company || "Not provided",
-          Email: contactRequest.email,
-          "Project type": contactRequest.projectType,
-          Message: contactRequest.message,
-          "Preferred language": contactRequest.preferredLanguage,
-          Locale: contactRequest.locale,
-          "Received at": contactRequest.receivedAt,
-        }),
+  try {
+    const response = await fetch(`${apiOrigin}/api/v1/contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      signal: controller.signal,
+      body: JSON.stringify({
+        name: contactRequest.name,
+        email: contactRequest.email,
+        company: contactRequest.company || undefined,
+        subject: contactRequest.subject,
+        message: contactRequest.message,
+        consent: contactRequest.consent,
+        locale: contactRequest.locale,
+        website: "",
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error("Contact delivery failed.");
+      throw new Error("D1 contact storage failed.");
     }
-
-    return;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  throw new Error("Unsupported contact delivery provider.");
 }
