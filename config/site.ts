@@ -1,6 +1,6 @@
 export const siteConfig = {
   brandName:
-    process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Full Stack Software Engineer",
+    process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Diego Fernando Martinez",
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://portfolio.example.com",
@@ -9,5 +9,10 @@ export const siteConfig = {
     es: "Disponible para nuevos proyectos",
     en: "Available for selected projects",
   },
-  socialLinks: [] as Array<{ label: string; href: string }>,
+  socialLinks: [
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/diferez/",
+    },
+  ] as Array<{ label: string; href: string }>,
 } as const;

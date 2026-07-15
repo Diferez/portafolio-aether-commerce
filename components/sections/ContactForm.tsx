@@ -135,13 +135,6 @@ export function ContactForm({ content, locale }: ContactFormProps) {
         ) : null}
       </label>
 
-      <Field
-        id={`${formId}-budget`}
-        name="budget"
-        label={content.fields.budget}
-        placeholder={content.placeholders.budget}
-      />
-
       <label className="field field-full">
         <span>{content.fields.message}</span>
         <textarea

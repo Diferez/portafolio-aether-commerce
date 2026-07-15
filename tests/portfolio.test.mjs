@@ -62,6 +62,8 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.match(en, /name="projectType"/);
   assert.match(en, /name="message"/);
   assert.match(en, /name="website"/);
+  assert.doesNotMatch(en, /name="budget"/);
+  assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
   assert.match(en, /The recipient email is configured only on the server/);
 });

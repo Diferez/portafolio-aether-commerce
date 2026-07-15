@@ -5,8 +5,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
   title: {
-    default: "Full Stack Software Engineer",
-    template: "%s | Full Stack Software Engineer",
+    default: "Diego Fernando Martinez",
+    template: "%s | Diego Fernando Martinez",
   },
   description:
     "Full stack software engineering for web platforms, cloud architecture, payments, automation, and AI-enabled products.",

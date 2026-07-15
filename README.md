@@ -1,4 +1,4 @@
-# Full Stack Portfolio Landing
+# Diego Fernando Martinez Portfolio Landing
 
 Landing page bilingüe para un Software Engineer Full Stack. Incluye rutas en español e inglés, contenido editable, SEO localizado, formulario de contacto del lado servidor y pruebas básicas.
 
@@ -24,7 +24,7 @@ Copia `.env.example` a `.env.local` y ajusta los valores:
 - `NEXT_PUBLIC_BRAND_NAME`: marca profesional visible.
 - `NEXT_PUBLIC_STORE_URL`: enlace opcional de la tienda demo. Si queda vacío, la interfaz muestra un estado de próximamente.
 - `CONTACT_RECIPIENT_EMAIL`: correo receptor, solo disponible en servidor.
-- `CONTACT_DELIVERY_PROVIDER`: proveedor o flujo que se conectará al endpoint de contacto.
+- `CONTACT_DELIVERY_PROVIDER`: usa `formsubmit` para enviar las solicitudes al correo configurado.
 
 No coloques correos privados, teléfonos o datos sensibles en componentes, HTML, archivos públicos o variables `NEXT_PUBLIC`.
 
@@ -45,7 +45,7 @@ Edita `content/site-content.ts`. Mantén los proyectos confidenciales con nombre
 
 ## Contacto
 
-El endpoint `app/api/contact/route.ts` valida datos, sanitiza entradas, usa honeypot antispam y aplica limitación básica de frecuencia en memoria. La función `queueContactRequest` queda preparada para conectar un proveedor de correo, una cola o una función serverless.
+El endpoint `app/api/contact/route.ts` valida datos, sanitiza entradas, usa honeypot antispam y aplica limitación básica de frecuencia en memoria. Con `CONTACT_DELIVERY_PROVIDER=formsubmit`, el servidor reenvía la solicitud al correo de `CONTACT_RECIPIENT_EMAIL` sin exponerlo en el navegador.
 
 ## SEO
 

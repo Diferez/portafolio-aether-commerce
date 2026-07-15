@@ -1217,7 +1217,8 @@ h3 {
 }
 
 .footer-specialties,
-.footer-links {
+.footer-links,
+.contact-links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1228,11 +1229,32 @@ h3 {
 }
 
 .footer-links a,
-.footer-links button {
+.footer-links button,
+.contact-links a {
   min-height: 36px;
   padding: 7px 10px;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.03);
+}
+
+.contact-links {
+  margin-top: 22px;
+}
+
+.contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  color: var(--text);
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.contact-links a:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--cyan);
 }
 
 .copyright {

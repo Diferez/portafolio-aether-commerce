@@ -10,7 +10,6 @@ type ContactPayload = {
   company?: unknown;
   email?: unknown;
   projectType?: unknown;
-  budget?: unknown;
   message?: unknown;
   preferredLanguage?: unknown;
   locale?: unknown;
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
   const company = sanitizeText(payload.company, 120);
   const email = sanitizeText(payload.email, 180).toLowerCase();
   const projectType = sanitizeText(payload.projectType, 120);
-  const budget = sanitizeText(payload.budget, 120);
   const message = sanitizeText(payload.message, 2500);
   const preferredLanguage = sanitizeText(payload.preferredLanguage, 30);
   const locale = sanitizeText(payload.locale, 10);
@@ -81,14 +79,17 @@ export async function POST(request: NextRequest) {
     company,
     email,
     projectType,
-    budget,
     message,
     preferredLanguage,
     locale,
     receivedAt: new Date().toISOString(),
   };
 
-  await queueContactRequest(contactRequest);
+  try {
+    await queueContactRequest(contactRequest);
+  } catch {
+    return NextResponse.json({ ok: false, code: "delivery_error" }, { status: 502 });
+  }
 
   return NextResponse.json({ ok: true });
 }
@@ -98,10 +99,40 @@ async function queueContactRequest(contactRequest: Record<string, string>) {
   const recipient = process.env.CONTACT_RECIPIENT_EMAIL?.trim();
 
   if (!deliveryProvider || !recipient) {
-    void contactRequest;
+    throw new Error("Contact delivery is not configured.");
+  }
+
+  if (deliveryProvider === "formsubmit") {
+    const response = await fetch(
+      `https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          _subject: `Portfolio contact: ${contactRequest.projectType}`,
+          _template: "table",
+          _captcha: "false",
+          Name: contactRequest.name,
+          Company: contactRequest.company || "Not provided",
+          Email: contactRequest.email,
+          "Project type": contactRequest.projectType,
+          Message: contactRequest.message,
+          "Preferred language": contactRequest.preferredLanguage,
+          Locale: contactRequest.locale,
+          "Received at": contactRequest.receivedAt,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Contact delivery failed.");
+    }
+
     return;
   }
 
-  void contactRequest;
-  // Wire an email provider, queue, or serverless workflow here.
+  throw new Error("Unsupported contact delivery provider.");
 }

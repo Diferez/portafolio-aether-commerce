@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n/config";
 import type { LandingContent } from "@/types/content";
 
 const sharedKeywords = [
-  "Full Stack Software Engineer",
+  "Diego Fernando Martinez",
   "Backend Developer",
   "Next.js Developer",
   "Node.js Developer",
@@ -630,7 +630,6 @@ export const content = {
         company: "Empresa",
         email: "Correo",
         projectType: "Tipo de proyecto",
-        budget: "Presupuesto aproximado",
         message: "Mensaje",
         preferredLanguage: "Idioma preferido",
         consent:
@@ -641,7 +640,6 @@ export const content = {
         name: "Tu nombre",
         company: "Empresa o equipo",
         email: "tu@empresa.com",
-        budget: "Rango estimado o por definir",
         message: "Cuéntame qué necesitas construir, mejorar o mantener.",
       },
       projectTypes: [
@@ -686,7 +684,7 @@ export const content = {
   en: {
     locale: "en",
     metadata: {
-      title: "Full Stack Software Engineer for web, cloud, and AI products",
+      title: "Diego Fernando Martinez | Full Stack Software Engineer",
       description:
         "I build web applications, SaaS platforms, APIs, cloud systems, payments, automation, and AI-enabled solutions ready for production.",
       keywords: [
@@ -1220,7 +1218,7 @@ export const content = {
       eyebrow: "Multicloud",
       title: "Cloud solutions without vendor tunnel vision.",
       description:
-        "Not every project needs several clouds at once. Architecture is defined by context, budget, and operational needs.",
+        "Not every project needs several clouds at once. Architecture is defined by context, costs, and operational needs.",
       platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Vercel", "Supabase"],
       factors: [
         "Product requirements",
@@ -1292,7 +1290,6 @@ export const content = {
         company: "Company",
         email: "Email",
         projectType: "Project type",
-        budget: "Approximate budget",
         message: "Message",
         preferredLanguage: "Preferred language",
         consent:
@@ -1303,7 +1300,6 @@ export const content = {
         name: "Your name",
         company: "Company or team",
         email: "you@company.com",
-        budget: "Estimated range or to be defined",
         message: "Tell me what you need to build, improve, or maintain.",
       },
       projectTypes: [

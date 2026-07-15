@@ -131,7 +131,7 @@ export function LandingPage({ content }: LandingPageProps) {
         <BackgroundTexture />
         <header className="site-header">
           <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
-            <span className="brand-mark">FS</span>
+            <span className="brand-mark">DM</span>
             <span>{siteConfig.brandName}</span>
           </a>
 
@@ -274,7 +274,7 @@ export function LandingPage({ content }: LandingPageProps) {
         <footer className="site-footer">
           <div>
             <a className="brand" href={`#${ids.home}`}>
-              <span className="brand-mark">FS</span>
+              <span className="brand-mark">DM</span>
               <span>{siteConfig.brandName}</span>
             </a>
             <p>{content.footer.remote}</p>
@@ -288,6 +288,11 @@ export function LandingPage({ content }: LandingPageProps) {
             {content.nav.items.map((item) => (
               <a key={item.href} href={item.href}>
                 {item.label}
+              </a>
+            ))}
+            {siteConfig.socialLinks.map((link) => (
+              <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                {link.label}
               </a>
             ))}
             <a href="#privacidad">{content.footer.privacyLabel}</a>
@@ -654,6 +659,14 @@ function ContactSection({ content, id }: { content: LandingContent; id: string }
         <p className="eyebrow">{content.contact.eyebrow}</p>
         <h2>{content.contact.title}</h2>
         <p>{content.contact.description}</p>
+        <div className="contact-links">
+          {siteConfig.socialLinks.map((link) => (
+            <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+              <ExternalLink aria-hidden="true" size={16} />
+              {link.label}
+            </a>
+          ))}
+        </div>
       </Reveal>
       <Reveal>
         <ContactForm content={content.contact} locale={content.locale} />

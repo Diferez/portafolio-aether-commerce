@@ -65,7 +65,6 @@ export type ContactContent = {
     company: string;
     email: string;
     projectType: string;
-    budget: string;
     message: string;
     preferredLanguage: string;
     consent: string;
@@ -75,7 +74,6 @@ export type ContactContent = {
     name: string;
     company: string;
     email: string;
-    budget: string;
     message: string;
   };
   projectTypes: readonly string[];
