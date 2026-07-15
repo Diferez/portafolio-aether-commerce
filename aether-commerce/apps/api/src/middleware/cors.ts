@@ -11,7 +11,7 @@ export function aetherCors() {
       }
       return "";
     },
-    allowHeaders: ["authorization", "content-type", "x-request-id", "idempotency-key"],
+    allowHeaders: ["authorization", "content-type", "x-request-id", "idempotency-key", "x-aether-customer-email"],
     allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
     maxAge: 600

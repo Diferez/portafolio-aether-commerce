@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Heart, Search, ShoppingBag, SlidersHorizontal } from "lucide-react";
+import { Check, Heart, Search, ShoppingBag, SlidersHorizontal } from "lucide-react";
 import type { Product } from "@aether/schemas";
 import { formatUsd } from "@aether/core";
 import { apiBaseUrl, storefrontPath } from "./config";
@@ -56,6 +56,8 @@ export function ProductGrid({
   const [status, setStatus] = useState<CatalogStatus>("demo");
   const [statusMessage, setStatusMessage] = useState("");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [addingIds, setAddingIds] = useState<string[]>([]);
+  const [addedProduct, setAddedProduct] = useState<Product | null>(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<ApiPagination>({
     page: 1,
@@ -123,16 +125,27 @@ export function ProductGrid({
   const filtered = useMemo(() => products, [products]);
 
   async function addToCart(product: Product) {
-    const result = await addProductToCart(product);
-    setStatusMessage(
-      locale === "es"
-        ? result === "synced"
-          ? `${product.name} agregado al carrito`
-          : `${product.name} guardado localmente`
-        : result === "synced"
-          ? `${product.name} added to cart`
-          : `${product.name} saved locally`
-    );
+    if (addingIds.includes(product.id)) {
+      return;
+    }
+
+    setAddingIds((current) => [...current, product.id]);
+    try {
+      const result = await addProductToCart(product);
+      setAddedProduct(product);
+      setStatusMessage(
+        locale === "es"
+          ? result === "synced"
+            ? `${product.name} agregado al carrito`
+            : `${product.name} guardado localmente`
+          : result === "synced"
+            ? `${product.name} added to cart`
+            : `${product.name} saved locally`
+      );
+      window.setTimeout(() => setAddedProduct((current) => (current?.id === product.id ? null : current)), 3200);
+    } finally {
+      setAddingIds((current) => current.filter((id) => id !== product.id));
+    }
   }
 
   function goToPage(nextPage: number) {
@@ -213,9 +226,16 @@ export function ProductGrid({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((product) => {
           const localized = getLocalizedProduct(product, locale);
+          const isAdding = addingIds.includes(product.id);
+          const isAdded = addedProduct?.id === product.id;
 
           return (
-            <article key={product.id} className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+            <article
+              key={product.id}
+              className={`overflow-hidden rounded-lg border bg-white shadow-sm transition ${
+                isAdded ? "border-teal-400 ring-2 ring-teal-100" : "border-zinc-200"
+              }`}
+            >
               <a href={storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`)} className="block">
                 <img
                   src={product.images[0]?.url}
@@ -255,10 +275,22 @@ export function ProductGrid({
                     <button
                       type="button"
                       onClick={() => void addToCart(product)}
-                      className="focus-ring grid h-10 w-10 place-items-center rounded-md bg-zinc-950 text-white hover:bg-zinc-800"
+                      disabled={isAdding}
+                      className={`focus-ring grid h-10 w-10 place-items-center rounded-md text-white transition ${
+                        isAdded
+                          ? "scale-105 bg-teal-700"
+                          : isAdding
+                            ? "bg-zinc-700"
+                            : "bg-zinc-950 hover:bg-zinc-800"
+                      }`}
                       aria-label={locale === "es" ? `Agregar ${product.name} al carrito` : `Add ${product.name} to cart`}
+                      aria-busy={isAdding}
                     >
-                      <ShoppingBag size={17} aria-hidden />
+                      {isAdded ? (
+                        <Check size={18} className="animate-[bounce_0.7s_ease-in-out_1]" aria-hidden />
+                      ) : (
+                        <ShoppingBag size={17} className={isAdding ? "animate-pulse" : ""} aria-hidden />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -267,6 +299,31 @@ export function ProductGrid({
           );
         })}
       </div>
+      {addedProduct ? (
+        <div
+          className="fixed bottom-5 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-teal-200 bg-white p-4 shadow-xl"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-teal-700 text-white">
+              <Check size={18} aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-zinc-950">
+                {locale === "es" ? "Agregado al carrito" : "Added to cart"}
+              </p>
+              <p className="truncate text-sm text-zinc-600">{addedProduct.name}</p>
+            </div>
+            <a
+              href={storefrontPath("/cart")}
+              className="focus-ring shrink-0 rounded-md bg-zinc-950 px-3 py-2 text-sm font-semibold text-white"
+            >
+              {t.cart}
+            </a>
+          </div>
+        </div>
+      ) : null}
       <div className="mt-6 flex flex-col gap-3 border-t border-zinc-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-zinc-600">
           {locale === "es"
