@@ -4,7 +4,7 @@ export const siteConfig = {
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://portfolio.example.com",
-  storeUrl: process.env.NEXT_PUBLIC_STORE_URL?.trim() || "",
+  storeUrl: process.env.NEXT_PUBLIC_STORE_URL?.trim() || "/store",
   availability: {
     es: "Disponible para nuevos proyectos",
     en: "Available for selected projects",

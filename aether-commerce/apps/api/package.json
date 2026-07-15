@@ -1,0 +1,36 @@
+{
+  "name": "@aether/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts --local --port 8787 --config ./wrangler.toml --env-file ./.dev.vars --show-interactive-dev-session false",
+    "build": "wrangler deploy --dry-run --outdir dist --config ./wrangler.toml",
+    "deploy": "wrangler deploy --config ./wrangler.toml",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply aether-demo --local --config ./wrangler.toml",
+    "db:migrate:remote": "wrangler d1 migrations apply aether-demo --remote --config ./wrangler.toml",
+    "db:seed": "pnpm db:seed:base && pnpm db:seed:demo",
+    "db:seed:base": "wrangler d1 execute aether-demo --local --file ./migrations/0002_seed_demo.sql --config ./wrangler.toml",
+    "db:seed:demo": "wrangler d1 execute aether-demo --local --file ./migrations/0004_demo_operational_data.sql --config ./wrangler.toml",
+    "db:seed:remote": "wrangler d1 execute aether-demo --remote --file ./migrations/0002_seed_demo.sql --config ./wrangler.toml && wrangler d1 execute aether-demo --remote --file ./migrations/0004_demo_operational_data.sql --config ./wrangler.toml"
+  },
+  "dependencies": {
+    "@aether/core": "workspace:*",
+    "@aether/schemas": "workspace:*",
+    "@hono/zod-validator": "^0.8.0",
+    "drizzle-orm": "^0.45.0",
+    "hono": "^4.10.0",
+    "jose": "^6.1.0",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260515.1",
+    "drizzle-kit": "0.31.10",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.92.0"
+  }
+}

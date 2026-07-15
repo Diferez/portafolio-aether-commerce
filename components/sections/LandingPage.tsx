@@ -92,6 +92,7 @@ export function LandingPage({ content }: LandingPageProps) {
   const locale = content.locale;
   const ids = sectionIds(locale);
   const alternateLocale = locale === "es" ? "en" : "es";
+  const storeIsExternal = /^https?:\/\//.test(siteConfig.storeUrl);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -141,6 +142,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 {item.label}
               </a>
             ))}
+            <a href={siteConfig.storeUrl}>{content.hero.storeCta}</a>
           </nav>
 
           <div className="header-actions">
@@ -178,6 +180,9 @@ export function LandingPage({ content }: LandingPageProps) {
                 {item.label}
               </a>
             ))}
+            <a href={siteConfig.storeUrl} onClick={() => setMenuOpen(false)}>
+              {content.hero.storeCta}
+            </a>
             <button type="button" onClick={switchLanguage}>
               {content.nav.switchLanguage}
             </button>
@@ -211,8 +216,8 @@ export function LandingPage({ content }: LandingPageProps) {
                   <a
                     className="ghost-button"
                     href={siteConfig.storeUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                    target={storeIsExternal ? "_blank" : undefined}
+                    rel={storeIsExternal ? "noreferrer" : undefined}
                   >
                     {content.hero.storeCta}
                     <ExternalLink aria-hidden="true" size={16} />
@@ -295,6 +300,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 {link.label}
               </a>
             ))}
+            <a href={siteConfig.storeUrl}>{content.hero.storeCta}</a>
             <a href="#privacidad">{content.footer.privacyLabel}</a>
             <button type="button" onClick={switchLanguage}>
               {alternateLocale.toUpperCase()}

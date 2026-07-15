@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: #060711;
+  --foreground: #f8fafc;
+  --muted: #a1a1aa;
+  --line: rgba(148, 163, 184, 0.22);
+  --accent: #8b5cf6;
+  --accent-2: #22d3ee;
+  --danger: #fb7185;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(124, 58, 237, 0.28), transparent 34vw),
+    radial-gradient(circle at 82% 0%, rgba(37, 99, 235, 0.22), transparent 30vw),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.72), transparent 420px),
+    var(--background);
+  color: var(--foreground);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.aether-shell {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, 0.45);
+  outline-offset: 3px;
+}
+
+.bg-white {
+  background-color: rgba(15, 23, 42, 0.72) !important;
+  backdrop-filter: blur(18px);
+}
+
+.bg-zinc-100,
+.bg-zinc-50 {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+.border-zinc-200,
+.border-zinc-300 {
+  border-color: var(--line) !important;
+}
+
+.text-zinc-950,
+.text-zinc-900,
+.text-zinc-800 {
+  color: #f8fafc !important;
+}
+
+.text-zinc-700,
+.text-zinc-600,
+.text-zinc-500 {
+  color: #cbd5e1 !important;
+}
+
+.bg-zinc-950 {
+  background-color: #8b5cf6 !important;
+}
+
+.hover\:bg-zinc-100:hover {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,42 @@
+name: Aether CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: aether-commerce/pnpm-lock.yaml
+      - name: Install
+        working-directory: aether-commerce
+        run: pnpm install --frozen-lockfile=false
+      - name: Secret scan
+        working-directory: aether-commerce
+        run: |
+          ! grep -R "sk_live_\|rk_live_\|whsec_[A-Za-z0-9]" -n apps packages docs || exit 1
+      - name: Typecheck
+        working-directory: aether-commerce
+        run: pnpm typecheck
+      - name: Lint
+        working-directory: aether-commerce
+        run: pnpm lint
+      - name: Unit and contract tests
+        working-directory: aether-commerce
+        run: pnpm test
+      - name: OpenAPI check
+        working-directory: aether-commerce
+        run: pnpm openapi:check
+      - name: Build
+        working-directory: aether-commerce
+        run: pnpm build

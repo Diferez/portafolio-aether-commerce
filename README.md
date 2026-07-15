@@ -22,7 +22,8 @@ Copia `.env.example` a `.env.local` y ajusta los valores:
 
 - `NEXT_PUBLIC_SITE_URL`: URL pública usada para canonical, sitemap y Open Graph.
 - `NEXT_PUBLIC_BRAND_NAME`: marca profesional visible.
-- `NEXT_PUBLIC_STORE_URL`: enlace opcional de la tienda demo. Si queda vacío, la interfaz muestra un estado de próximamente.
+- `NEXT_PUBLIC_STORE_URL`: ruta pública de la tienda; para Cloudflare usa `/store`.
+- `NEXT_PUBLIC_AETHER_API_URL`: URL pública del Worker API de Aether.
 - `CONTACT_RECIPIENT_EMAIL`: correo receptor, solo disponible en servidor.
 - `CONTACT_DELIVERY_PROVIDER`: usa `formsubmit` para enviar las solicitudes al correo configurado.
 
@@ -59,9 +60,37 @@ La app genera:
 - `robots.txt`.
 - JSON-LD de servicio profesional.
 
-## Despliegue
+## Despliegue en Cloudflare
 
-El proyecto está listo para Vercel o para el flujo de hosting configurado en `.openai/hosting.json`. Antes de publicar, actualiza `NEXT_PUBLIC_SITE_URL` con el dominio final.
+El front se publica como un solo sitio: el portafolio vive en `/` y la tienda
+Aether vive en `/store`.
+
+Antes de publicar, configura:
+
+- `NEXT_PUBLIC_SITE_URL`: dominio final del portafolio en Cloudflare.
+- `NEXT_PUBLIC_STORE_URL=/store`.
+- `NEXT_PUBLIC_AETHER_API_URL`: URL del Worker API de Aether.
+- `CONTACT_RECIPIENT_EMAIL`: correo receptor del formulario.
+- `CONTACT_DELIVERY_PROVIDER=formsubmit`.
+
+El build principal ejecuta el portafolio y la tienda juntos:
+
+```bash
+npm run build
+```
+
+Para un build limpio en Cloudflare, instala dependencias del portafolio y de
+Aether antes de construir:
+
+```bash
+npm ci
+cd aether-commerce && corepack enable && pnpm install --frozen-lockfile
+cd ..
+npm run build
+```
+
+`AETHER_STOREFRONT_ORIGIN` es opcional. Solo se usa como respaldo si decides
+desplegar la tienda como Pages separado; el flujo recomendado no lo necesita.
 
 ## Pruebas
 
