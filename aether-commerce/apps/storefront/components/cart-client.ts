@@ -55,6 +55,7 @@ function readLocalItems(): CartItem[] {
 
 function writeLocalItems(items: CartItem[]) {
   window.localStorage.setItem(localCartKey, JSON.stringify(items));
+  window.dispatchEvent(new Event("aether-cart-changed"));
 }
 
 export function readLocalCartItems() {
