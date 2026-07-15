@@ -50,10 +50,16 @@ function parseStripeError(body: string): StripeErrorLog {
   }
 }
 
+function storefrontUrl(origin: string, path: string) {
+  const normalizedOrigin = origin.replace(/\/(?:en|es)\/?$/, "").replace(/\/store\/?$/, "").replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${normalizedOrigin}/store${normalizedPath}`;
+}
+
 export async function createCheckoutSession(env: Env, cart: Cart) {
   const origin = env.APP_ORIGIN_STORE ?? "http://localhost:3000";
   const simulatedCheckout = {
-    checkoutUrl: `${origin}/checkout/success?checkout=simulated&cart=${encodeURIComponent(cart.id)}`
+    checkoutUrl: storefrontUrl(origin, `/checkout/success?checkout=simulated&cart=${encodeURIComponent(cart.id)}`)
   };
 
   if (!env.STRIPE_SECRET_KEY) {
@@ -62,8 +68,8 @@ export async function createCheckoutSession(env: Env, cart: Cart) {
 
   const params = new URLSearchParams();
   params.set("mode", "payment");
-  params.set("success_url", `${origin}/account?checkout=success&cart=${encodeURIComponent(cart.id)}`);
-  params.set("cancel_url", `${origin}/cart?checkout=cancelled`);
+  params.set("success_url", storefrontUrl(origin, `/checkout/success?checkout=success&cart=${encodeURIComponent(cart.id)}`));
+  params.set("cancel_url", storefrontUrl(origin, "/cart?checkout=cancelled"));
   params.set("metadata[cartId]", cart.id);
 
   cart.items.forEach((item, index) => {
@@ -119,7 +125,7 @@ export async function createCheckoutSession(env: Env, cart: Cart) {
   const checkoutUrl =
     payload && typeof payload === "object" && "url" in payload && typeof payload.url === "string"
       ? payload.url
-      : `${origin}/cart?checkout=missing-url`;
+      : storefrontUrl(origin, "/cart?checkout=missing-url");
   return { checkoutUrl };
 }
 
