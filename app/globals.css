@@ -130,7 +130,7 @@ button {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  width: min(1180px, calc(100% - 28px));
+  width: min(1320px, calc(100% - 28px));
   min-height: 64px;
   padding: 10px 12px;
   border: 1px solid var(--border);
@@ -171,6 +171,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   gap: 4px;
 }
 
@@ -186,7 +187,8 @@ button {
 }
 
 .desktop-nav a {
-  padding: 9px 10px;
+  padding: 9px 8px;
+  white-space: nowrap;
 }
 
 .desktop-nav a:hover,
@@ -1286,7 +1288,7 @@ h3 {
   }
 }
 
-@media (max-width: 1120px) {
+@media (max-width: 1240px) {
   .desktop-nav {
     display: none;
   }
