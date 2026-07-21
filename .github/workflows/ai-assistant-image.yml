@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/aether-ai-assistant
+      IMAGE_NAME: ghcr.io/diferez/aether-ai-assistant
 
     steps:
       - name: Checkout repository
