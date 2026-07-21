@@ -1,8 +1,13 @@
 from dataclasses import dataclass
-
-from langchain_core.language_models.chat_models import BaseChatModel
+from typing import Protocol
 
 from app.config import Settings
+from app.llm.gemini_rest import GeminiRestChatModel
+
+
+class StructuredChatModel(Protocol):
+    def with_structured_output(self, schema: type, include_raw: bool = False) -> object:
+        ...
 
 
 @dataclass(frozen=True)
@@ -18,23 +23,13 @@ def build_gemini_model_configs(settings: Settings) -> list[GeminiModelConfig]:
     return models
 
 
-def create_chat_models(settings: Settings) -> list[BaseChatModel]:
+def create_chat_models(settings: Settings) -> list[StructuredChatModel]:
     if not settings.gemini_api_key:
         return []
 
-    from langchain_google_genai import ChatGoogleGenerativeAI
-
-    return [
-        ChatGoogleGenerativeAI(
-            model=config.model,
-            google_api_key=settings.gemini_api_key,
-            temperature=settings.gemini_temperature,
-            max_output_tokens=settings.gemini_max_output_tokens,
-        )
-        for config in build_gemini_model_configs(settings)
-    ]
+    return [GeminiRestChatModel(settings, config.model) for config in build_gemini_model_configs(settings)]
 
 
-def create_chat_model(settings: Settings) -> BaseChatModel | None:
+def create_chat_model(settings: Settings) -> StructuredChatModel | None:
     models = create_chat_models(settings)
     return models[0] if models else None

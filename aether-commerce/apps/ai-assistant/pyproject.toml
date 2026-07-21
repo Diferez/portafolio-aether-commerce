@@ -10,7 +10,6 @@ dependencies = [
   "httpx",
   "langgraph",
   "langchain",
-  "langchain-google-genai",
   "python-json-logger",
   "opentelemetry-api",
   "opentelemetry-sdk",

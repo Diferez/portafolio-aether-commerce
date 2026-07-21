@@ -1,8 +1,12 @@
 import asyncio
+import json
+
+import httpx
 
 from app.config import Settings
 from app.graph import AssistantGraph
 from app.llm.provider import build_gemini_model_configs
+from app.llm.gemini_rest import GeminiRestChatModel
 from app.llm.usage import extract_token_usage
 from app.observability import metrics
 from app.schemas import AssistantMessageRequest, IntentResult
@@ -118,5 +122,56 @@ def test_graph_records_llm_token_metrics_when_provider_reports_usage() -> None:
 
         assert metrics.counters["ai_llm_tokens_input_total"] >= before_input + 11
         assert metrics.counters["ai_llm_tokens_output_total"] >= before_output + 7
+
+    asyncio.run(run())
+
+
+def test_gemini_rest_model_parses_structured_output(monkeypatch) -> None:
+    async def run() -> None:
+        requests: list[dict] = []
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            requests.append(json.loads(request.content.decode("utf-8")))
+            return httpx.Response(
+                200,
+                json={
+                    "candidates": [
+                        {
+                            "content": {
+                                "parts": [
+                                    {
+                                        "text": json.dumps(
+                                            {
+                                                "intent": "SEARCH_PRODUCTS",
+                                                "confidence": 0.92,
+                                                "referenced_position": None,
+                                                "explanation": "The user wants to find products.",
+                                            }
+                                        )
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "usageMetadata": {"promptTokenCount": 13, "candidatesTokenCount": 8},
+                },
+            )
+
+        transport = httpx.MockTransport(handler)
+        original_client = httpx.AsyncClient
+
+        def client_factory(*args, **kwargs):
+            kwargs["transport"] = transport
+            return original_client(*args, **kwargs)
+
+        monkeypatch.setattr(httpx, "AsyncClient", client_factory)
+        model = GeminiRestChatModel(Settings(gemini_api_key="test-key"), "gemini-test")
+        structured = model.with_structured_output(IntentResult, include_raw=True)
+
+        result = await structured.ainvoke([("system", "Classify"), ("human", "Show me shoes")])
+
+        assert result["parsed"].intent == "SEARCH_PRODUCTS"
+        assert result["raw"].usage_metadata["prompt_token_count"] == 13
+        assert requests[0]["generationConfig"]["responseMimeType"] == "application/json"
 
     asyncio.run(run())

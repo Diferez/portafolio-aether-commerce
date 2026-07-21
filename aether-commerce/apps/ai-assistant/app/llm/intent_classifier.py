@@ -1,7 +1,12 @@
-from langchain_core.language_models.chat_models import BaseChatModel
+from typing import Protocol
 
 from app.schemas import IntentResult
 from app.llm.usage import TokenUsage, extract_token_usage
+
+
+class StructuredChatModel(Protocol):
+    def with_structured_output(self, schema: type, include_raw: bool = False) -> object:
+        ...
 
 
 CLASSIFIER_PROMPT = """Classify the user's Aether store assistant request.
@@ -15,7 +20,7 @@ Safety rules:
 """
 
 
-async def classify_intent_with_llm(model: BaseChatModel, message: str) -> tuple[IntentResult, TokenUsage]:
+async def classify_intent_with_llm(model: StructuredChatModel, message: str) -> tuple[IntentResult, TokenUsage]:
     try:
         structured = model.with_structured_output(IntentResult, include_raw=True)
     except TypeError:

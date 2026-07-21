@@ -14,9 +14,9 @@ This audit maps the original assistant requirements to current workspace evidenc
 | --- | --- | --- |
 | Repository inspection before implementation | Verified | `docs/ai-assistant/architecture-analysis.md` documents the existing Aether frontend, Worker API, D1 schema, cart, auth/session model, deployment and test surfaces. |
 | Decoupled AI service | Verified | `apps/ai-assistant` is a standalone FastAPI service integrated with Aether through HTTP clients and storefront configuration. |
-| Python 3.12/3.13, FastAPI, Pydantic v2, LangGraph, LangChain, Gemini provider | Verified | `pyproject.toml`, `requirements-docker.txt`, `app/main.py`, `app/graph.py`, and `app/llm/provider.py`. |
+| Python 3.12/3.13, FastAPI, Pydantic v2, LangGraph, LangChain, Gemini provider | Verified | `pyproject.toml`, `requirements-docker.txt`, `app/main.py`, `app/graph.py`, `app/llm/provider.py`, and the Cloudflare-safe REST Gemini adapter in `app/llm/gemini_rest.py`. |
 | Centralized model configuration | Verified | `app/llm/provider.py`, `.env.example`, and `tests/test_llm_provider.py`. |
-| Real Gemini availability | Verified | `GEMINI_API_KEY` exists in the GitHub production environment and direct official Gemini API model lookup passed for `models/gemini-3.5-flash`. The limited LangChain classifier evaluation still timed out in this Windows workspace and should be rerun from Linux or the deployed runtime. |
+| Real Gemini availability | Verified | `GEMINI_API_KEY` exists in the GitHub production environment and direct official Gemini API model lookup passed for `models/gemini-3.5-flash`. The Worker runtime uses the official Gemini REST API path so Cloudflare packaging does not need the Google gRPC dependency chain. |
 | Required LangGraph nodes and bounded flow | Verified | `app/graph.py`, architecture Mermaid graph, and `tests/test_graph_cart.py` graph-structure coverage. |
 | Typed state and structured intent classification | Verified | `app/schemas.py`, `app/intent.py`, and `app/llm/intent_classifier.py`. |
 | Product search, detail, variant and comparison tools | Verified | `app/tools.py`, `app/clients/aether.py`, and tool/contract tests. |
@@ -56,6 +56,6 @@ This audit maps the original assistant requirements to current workspace evidenc
 1. Provision production PostgreSQL and Redis for the assistant.
 2. Run the `AI assistant image` workflow and confirm the GHCR image is published.
 3. Deploy the assistant service from the GHCR image and set `NEXT_PUBLIC_AETHER_AI_URL`.
-4. Re-run the limited LangChain/Gemini classifier evaluation from Linux or the deployed runtime.
+4. Re-run the limited Gemini classifier evaluation from the deployed runtime.
 5. Run production smoke checks and update `acceptance-status.md`.
 6. Re-run this audit after environment-backed evidence exists.

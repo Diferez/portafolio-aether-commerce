@@ -3,7 +3,6 @@ from typing import Any, TypedDict
 from uuid import uuid4
 
 from langgraph.graph import END, START, StateGraph
-from langchain_core.language_models.chat_models import BaseChatModel
 from app.observability import metrics
 
 from app.clients.aether import AetherApiClient
@@ -11,6 +10,7 @@ from app.cart_token import verify_cart_token
 from app.config import Settings
 from app.intent import detect_intent_heuristic, extract_constraints_heuristic
 from app.llm.intent_classifier import classify_intent_with_llm
+from app.llm.provider import StructuredChatModel
 from app.schemas import (
     AssistantAction,
     AssistantMessageRequest,
@@ -60,7 +60,7 @@ class AssistantGraph:
         settings: Settings,
         aether: AetherApiClient,
         storage: AssistantStorage,
-        chat_model: BaseChatModel | list[BaseChatModel] | None = None,
+        chat_model: StructuredChatModel | list[StructuredChatModel] | None = None,
     ) -> None:
         self.settings = settings
         self.aether = aether

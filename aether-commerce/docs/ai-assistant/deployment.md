@@ -74,6 +74,7 @@ The free-tier deployment target for the assistant is a Cloudflare Python Worker 
 - `worker.py` adapts the existing FastAPI app to the Workers ASGI runtime.
 - `pyproject.toml` is the Cloudflare Python Worker package manifest.
 - `requirements-docker.txt` is kept for Docker/local/container validation only.
+- The Worker build uses the REST Gemini adapter in `app/llm/gemini_rest.py`; the Docker-only dependency file can keep provider SDKs that are not compatible with Cloudflare Python Worker packaging.
 - Supabase must be configured as a private `DATABASE_URL` secret. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for assistant persistence.
 
 The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with `pywrangler` from Linux because local Windows Pyodide packaging can fail before upload.
