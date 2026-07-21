@@ -107,3 +107,23 @@ test("order state machine includes required commerce states", () => {
     assert.match(schema, new RegExp(`"${state}"`));
   }
 });
+
+test("cart reads and mutations require signed cart token", () => {
+  const cartRoutes = read("apps/api/src/routes/cart.ts");
+  const cartTokenService = read("apps/api/src/services/cart-token.ts");
+  const storefrontCartClient = read("apps/storefront/components/cart-client.ts");
+  const cartPage = read("apps/storefront/app/cart/page.tsx");
+
+  assert.match(cartRoutes, /verifyCartToken/);
+  assert.match(cartRoutes, /CART_TOKEN_REQUIRED/);
+  assert.match(cartRoutes, /cartRoutes\.get\("\/:id"/);
+  assert.match(cartRoutes, /cartRoutes\.post\("\/:id\/items"/);
+  assert.match(cartRoutes, /cartRoutes\.patch\(/);
+  assert.match(cartRoutes, /updateItemQuantity/);
+  assert.match(cartRoutes, /cartRoutes\.delete\("\/:id\/items\/:itemId"/);
+  assert.match(cartTokenService, /HMAC/);
+  assert.match(cartTokenService, /exp/);
+  assert.match(storefrontCartClient, /x-aether-cart-token/);
+  assert.match(cartPage, /getCartToken/);
+  assert.match(cartPage, /x-aether-cart-token/);
+});

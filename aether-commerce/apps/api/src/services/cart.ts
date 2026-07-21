@@ -110,3 +110,14 @@ export async function removeItem(env: Env, cartId: string, itemId: string): Prom
   const totals = calculateCartTotals(items, cart.couponCode === defaultCoupon.code ? defaultCoupon : undefined);
   return writeCart(env, { ...cart, items, totals });
 }
+
+export async function updateItemQuantity(env: Env, cartId: string, itemId: string, quantity: number): Promise<Cart> {
+  const cart = await readCart(env, cartId);
+  const items = cart.items.map((item) =>
+    item.productId === itemId || item.variantId === itemId || item.slug === itemId
+      ? { ...item, quantity, lineTotal: item.finalUnitPrice * quantity }
+      : item
+  );
+  const totals = calculateCartTotals(items, cart.couponCode === defaultCoupon.code ? defaultCoupon : undefined);
+  return writeCart(env, { ...cart, items, totals });
+}

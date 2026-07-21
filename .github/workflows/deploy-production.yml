@@ -35,6 +35,7 @@ jobs:
       NEXT_PUBLIC_PORTFOLIO_URL: ${{ vars.NEXT_PUBLIC_PORTFOLIO_URL }}
       APP_ORIGIN_STORE: ${{ vars.APP_ORIGIN_STORE || vars.NEXT_PUBLIC_PORTFOLIO_URL }}
       APP_ORIGIN_ADMIN: ${{ vars.APP_ORIGIN_ADMIN }}
+      NEXT_PUBLIC_AETHER_AI_URL: ${{ vars.NEXT_PUBLIC_AETHER_AI_URL }}
 
     steps:
       - name: Checkout repository
@@ -51,6 +52,11 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install portfolio dependencies
         run: npm ci
 
@@ -65,6 +71,14 @@ jobs:
           test -n "${NEXT_PUBLIC_PORTFOLIO_URL}"
           test -n "${APP_ORIGIN_ADMIN}"
 
+      - name: Verify Cloudflare secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "${CLOUDFLARE_API_TOKEN}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+
       - name: Lint and test
         run: |
           npm run lint
@@ -72,6 +86,35 @@ jobs:
           pnpm --dir aether-commerce lint
           pnpm --dir aether-commerce test
           pnpm --dir aether-commerce openapi:check
+
+      - name: AI assistant tests
+        working-directory: aether-commerce/apps/ai-assistant
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+          PYTHONPATH: "."
+        run: |
+          python -m pip install -r requirements.txt
+          python -m compileall app tests scripts
+          python scripts/security_scan.py
+          python -m app.evaluation
+          python scripts/acceptance_audit.py
+          python tests/run_direct.py
+
+      - name: Build AI assistant image
+        working-directory: aether-commerce/apps/ai-assistant
+        run: docker build -t aether-ai-assistant:test .
+
+      - name: Smoke AI assistant image
+        working-directory: aether-commerce/apps/ai-assistant
+        run: |
+          docker run --rm -d --name aether-ai-assistant-smoke -p 8090:8090 \
+            -e AETHER_API_BASE_URL=https://preview-api.invalid \
+            -e AETHER_CART_TOKEN_SECRET=ci-cart-token-secret \
+            -e DATABASE_URL= \
+            -e REDIS_URL= \
+            aether-ai-assistant:test
+          trap 'docker stop aether-ai-assistant-smoke || true' EXIT
+          python scripts/smoke.py
 
       - name: Build portfolio and storefront
         run: npm run build
@@ -135,3 +178,7 @@ jobs:
 
       - name: Verify admin
         run: curl --fail --retry 3 --retry-delay 5 "${APP_ORIGIN_ADMIN}"
+
+      - name: Verify AI assistant
+        if: ${{ vars.NEXT_PUBLIC_AETHER_AI_URL != '' }}
+        run: curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_AETHER_AI_URL}/healthz"

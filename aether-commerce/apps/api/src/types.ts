@@ -12,6 +12,7 @@ export type Env = {
   CONTACT_RECIPIENT_EMAIL?: string;
   CLOUDINARY_CLOUD_NAME?: string;
   PLATZI_API_BASE_URL?: string;
+  AETHER_CART_TOKEN_SECRET?: string;
   AETHER_ENV?: string;
 };
 

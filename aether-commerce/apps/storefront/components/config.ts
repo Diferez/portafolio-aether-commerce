@@ -13,6 +13,8 @@ function resolveApiBaseUrl() {
 
 export const apiBaseUrl = resolveApiBaseUrl();
 
+export const aiAssistantUrl = process.env.NEXT_PUBLIC_AETHER_AI_URL?.trim() || "";
+
 export const storefrontBasePath = (process.env.NEXT_PUBLIC_AETHER_BASE_PATH || "").replace(/\/$/, "");
 
 export function storefrontPath(path = "/") {

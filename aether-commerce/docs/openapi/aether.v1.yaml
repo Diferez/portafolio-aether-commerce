@@ -156,9 +156,30 @@ paths:
           required: true
           schema:
             type: string
+        - in: header
+          name: x-aether-cart-token
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+  /cart/{id}/token:
+    get:
+      summary: Issue signed cart token
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Signed cart token
           content:
             application/json:
               schema:
@@ -169,6 +190,11 @@ paths:
       parameters:
         - in: path
           name: id
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: x-aether-cart-token
           required: true
           schema:
             type: string
@@ -191,6 +217,61 @@ paths:
       responses:
         "201":
           description: Updated cart
+  /cart/{id}/items/{itemId}:
+    patch:
+      summary: Update cart item quantity
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: x-aether-cart-token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 25
+      responses:
+        "200":
+          description: Updated cart
+    delete:
+      summary: Remove cart item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: x-aether-cart-token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated cart
   /cart/items:
     post:
       tags: [User]
@@ -203,6 +284,11 @@ paths:
       parameters:
         - in: path
           name: id
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: x-aether-cart-token
           required: true
           schema:
             type: string

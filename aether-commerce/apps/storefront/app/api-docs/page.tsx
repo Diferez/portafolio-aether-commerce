@@ -1,7 +1,8 @@
 const endpoints = [
   ["GET", "/api/v1/catalog/products", "Paginated normalized products"],
   ["GET", "/api/v1/catalog/products/:slug", "Product detail"],
-  ["POST", "/api/v1/cart/:id/items", "Add item with server recalculation"],
+  ["GET", "/api/v1/cart/:id/token", "Issue signed cart token for protected cart reads and mutations"],
+  ["POST", "/api/v1/cart/:id/items", "Add item with server recalculation and x-aether-cart-token"],
   ["POST", "/api/v1/checkout/session", "Create Stripe test checkout"],
   ["POST", "/api/v1/contact", "Log contact and queue Resend email"],
   ["POST", "/api/v1/webhooks/stripe", "Signed idempotent Stripe webhook"]

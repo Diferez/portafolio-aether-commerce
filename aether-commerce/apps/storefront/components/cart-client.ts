@@ -5,6 +5,7 @@ import type { Cart, CartItem, Product } from "@aether/schemas";
 import { apiBaseUrl } from "./config";
 
 const cartIdKey = "aether.cartId";
+const cartTokenKey = "aether.cartToken";
 const localCartKey = "aether.localCartItems";
 const cartApiTimeoutMs = 1200;
 
@@ -25,6 +26,33 @@ export function getCartId() {
   const next = crypto.randomUUID();
   window.localStorage.setItem(cartIdKey, next);
   return next;
+}
+
+export async function getCartToken() {
+  const existing = window.sessionStorage.getItem(cartTokenKey);
+  if (existing) return existing;
+  const id = getCartId();
+
+  try {
+    const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/token`);
+    const payload = (await response.json()) as { success?: boolean; data?: { token?: string } };
+    const token = payload.data?.token;
+    if (!response.ok || !payload.success || !token) {
+      throw new Error("Cart token unavailable.");
+    }
+    window.sessionStorage.setItem(cartTokenKey, token);
+    return token;
+  } catch {
+    return "";
+  }
+}
+
+async function cartMutationHeaders() {
+  const token = await getCartToken();
+  return {
+    "content-type": "application/json",
+    ...(token ? { "x-aether-cart-token": token } : {})
+  };
 }
 
 function productToCartItem(product: Product): CartItem {
@@ -103,7 +131,8 @@ export async function removeProductFromCart(itemId: string) {
 
   try {
     const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/items/${encodeURIComponent(itemId)}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: await cartMutationHeaders()
     });
     const payload = (await response.json()) as { success?: boolean };
     if (!response.ok || !payload.success) {
@@ -123,7 +152,7 @@ export async function addProductToCart(product: Product) {
   try {
     const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/items`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: await cartMutationHeaders(),
       body: JSON.stringify({
         productId: item.slug,
         variantId: item.variantId,
@@ -140,6 +169,25 @@ export async function addProductToCart(product: Product) {
   }
 }
 
+export async function addProductReferenceToCart(input: { slug: string; variantId?: string | null; quantity?: number }) {
+  const id = getCartId();
+  const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/items`, {
+    method: "POST",
+    headers: await cartMutationHeaders(),
+    body: JSON.stringify({
+      productId: input.slug,
+      variantId: input.variantId || undefined,
+      quantity: input.quantity ?? 1
+    })
+  });
+  const payload = (await response.json()) as { success?: boolean; data?: Cart };
+  if (!response.ok || !payload.success || !payload.data) {
+    throw new Error("Cart API rejected item");
+  }
+  writeLocalItems(payload.data.items);
+  return "synced" as const;
+}
+
 export async function syncLocalCartToApi() {
   const id = getCartId();
   const items = readLocalItems();
@@ -147,7 +195,7 @@ export async function syncLocalCartToApi() {
   for (const item of items) {
     const response = await fetch(`${apiBaseUrl}/api/v1/cart/${id}/items`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: await cartMutationHeaders(),
       body: JSON.stringify({
         productId: item.slug,
         variantId: item.variantId,
@@ -158,5 +206,18 @@ export async function syncLocalCartToApi() {
     if (!response.ok || !payload.success) {
       throw new Error("Could not sync local cart.");
     }
+  }
+}
+
+export async function applyCartCoupon(code: string) {
+  const id = getCartId();
+  const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/coupon`, {
+    method: "POST",
+    headers: await cartMutationHeaders(),
+    body: JSON.stringify({ code })
+  });
+  const payload = (await response.json()) as { success?: boolean };
+  if (!response.ok || !payload.success) {
+    throw new Error("Could not apply coupon.");
   }
 }

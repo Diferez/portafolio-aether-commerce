@@ -7,8 +7,9 @@ export function generateStaticParams() {
   return demoProducts.map((product) => ({ slug: product.slug }));
 }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = demoProducts.find((candidate) => candidate.slug === params.slug) ?? demoProducts[0]!;
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const product = demoProducts.find((candidate) => candidate.slug === slug) ?? demoProducts[0]!;
 
   return (
     <main className="aether-shell py-8">

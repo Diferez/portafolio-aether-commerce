@@ -81,12 +81,15 @@ export function createAetherClient(options: AetherClientOptions) {
     product(slug: string) {
       return request<Product>(`/api/v1/catalog/products/${encodeURIComponent(slug)}`);
     },
-    getCart(cartId: string) {
-      return request<Cart>(`/api/v1/cart/${encodeURIComponent(cartId)}`);
+    getCart(cartId: string, cartToken: string) {
+      return request<Cart>(`/api/v1/cart/${encodeURIComponent(cartId)}`, {
+        headers: { "x-aether-cart-token": cartToken }
+      });
     },
-    addCartItem(cartId: string, item: CartItemInput) {
+    addCartItem(cartId: string, item: CartItemInput, cartToken: string) {
       return request<Cart>(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, {
         method: "POST",
+        headers: { "x-aether-cart-token": cartToken },
         body: JSON.stringify(item)
       });
     },

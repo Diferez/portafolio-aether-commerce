@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { addressSchema, cartItemInputSchema, contactMessageSchema } from "@aether/schemas";
 import type { AppBindings } from "../types";
 import { collection, fail, ok } from "../http";
-import { addItem, applyCoupon, readCart, writeCart } from "../services/cart";
+import { addItem, applyCoupon, readCart, updateItemQuantity, writeCart } from "../services/cart";
 
 const profileSchema = z.object({
   name: z.string().min(2).max(120).optional(),
@@ -54,15 +54,9 @@ userRoutes.patch(
   "/cart/items/:id",
   zValidator("json", z.object({ quantity: z.number().int().min(1).max(25) })),
   async (c) => {
-    const cart = await readCart(c.env, actorId(c));
     const itemId = c.req.param("id");
     const quantity = c.req.valid("json").quantity;
-    const items = cart.items.map((item) =>
-      item.productId === itemId || item.variantId === itemId
-        ? { ...item, quantity, lineTotal: item.finalUnitPrice * quantity }
-        : item
-    );
-    return ok(c, await writeCart(c.env, { ...cart, items }));
+    return ok(c, await updateItemQuantity(c.env, actorId(c), itemId, quantity));
   }
 );
 

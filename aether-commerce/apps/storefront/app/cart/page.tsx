@@ -7,10 +7,12 @@ import type { Cart } from "@aether/schemas";
 import { apiBaseUrl, storefrontPath } from "../../components/config";
 import {
   getCartId,
+  applyCartCoupon,
   readLocalCart,
   readLocalCartItems,
   removeProductFromCart,
-  syncLocalCartToApi
+  syncLocalCartToApi,
+  getCartToken
 } from "../../components/cart-client";
 import { getCurrentCustomer } from "../../components/customer-client";
 import { useLanguage } from "../../components/LanguageProvider";
@@ -41,8 +43,14 @@ export default function CartPage() {
     }
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/v1/cart/${id}`);
+      const token = await getCartToken();
+      const response = await fetch(`${apiBaseUrl}/api/v1/cart/${id}`, {
+        headers: token ? { "x-aether-cart-token": token } : {}
+      });
       const payload = (await response.json()) as { success: boolean; data?: Cart };
+      if (!response.ok || !payload.success) {
+        throw new Error("Cart API rejected read.");
+      }
       const nextCart = payload.data?.items.length ? payload.data : localCart.items.length ? localCart : payload.data;
       setCart(nextCart ?? null);
       setStatus(payload.data?.items.length ? t.cartSynced : localCart.items.length ? t.cartSavedLocal : t.cartUnavailable);
@@ -61,13 +69,8 @@ export default function CartPage() {
   }, [t.cartSavedLocal, t.startApiSyncCart]);
 
   async function applyCoupon() {
-    const id = getCartId();
     try {
-      await fetch(`${apiBaseUrl}/api/v1/cart/${id}/coupon`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code: "AETHER10" })
-      });
+      await applyCartCoupon("AETHER10");
       await refresh();
     } catch {
       setStatus(t.startApiApplyCoupon);
