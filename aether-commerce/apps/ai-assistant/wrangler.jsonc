@@ -1,9 +1,8 @@
 {
   "$schema": "../../../node_modules/wrangler/config-schema.json",
   "name": "aether-ai",
-  "main": "worker.py",
+  "main": "worker.ts",
   "compatibility_date": "2026-07-21",
-  "compatibility_flags": ["python_workers"],
   "workers_dev": true,
   "observability": {
     "enabled": true,

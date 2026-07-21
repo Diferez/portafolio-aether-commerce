@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy Python Worker
+    name: Deploy Worker
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: production
@@ -31,13 +31,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure Python
-        uses: actions/setup-python@v5
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.13"
-
-      - name: Install uv
-        run: python -m pip install uv
+          node-version: 22
 
       - name: Validate required secrets
         run: |
@@ -48,7 +45,7 @@ jobs:
 
       - name: Deploy AI assistant Worker
         working-directory: aether-commerce/apps/ai-assistant
-        run: python -m uv tool run --from workers-py pywrangler deploy --keep-vars
+        run: npx wrangler deploy --config wrangler.jsonc --keep-vars
 
       - name: Configure AI assistant secrets
         working-directory: aether-commerce/apps/ai-assistant

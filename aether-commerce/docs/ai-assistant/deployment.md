@@ -62,22 +62,22 @@ npm run deploy:preflight
 ```
 
 The preflight checks required GitHub Actions variable and secret names through GitHub CLI without printing secret values. It accepts both repository-level configuration and the `production` GitHub environment configuration used by the deployment workflow.
-It also warns when AI assistant production/evaluation settings are incomplete, including `NEXT_PUBLIC_AETHER_AI_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL` and `AI_EVAL_MAX_CASES`. Those AI checks are warnings because the Python assistant is deployed separately from the Cloudflare storefront/API.
+It also warns when AI assistant production/evaluation settings are incomplete, including `NEXT_PUBLIC_AETHER_AI_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL` and `AI_EVAL_MAX_CASES`. Those AI checks are warnings because the assistant is deployed separately from the Cloudflare storefront/API.
 
-When deploying through GitHub Actions, configure `NEXT_PUBLIC_AETHER_AI_URL` as a repository/environment variable only after the Python assistant is reachable. The production workflow passes that value into the storefront build and verifies `/healthz` when the variable is present. The workflow also fails early if the Cloudflare secrets are missing, before running expensive build and deploy steps.
+When deploying through GitHub Actions, configure `NEXT_PUBLIC_AETHER_AI_URL` as a repository/environment variable only after the assistant is reachable. The production workflow passes that value into the storefront build and verifies `/healthz` when the variable is present. The workflow also fails early if the Cloudflare secrets are missing, before running expensive build and deploy steps.
 
 ## Cloudflare Free Deployment Path
 
-The free-tier deployment target for the assistant is a Cloudflare Python Worker named `aether-ai`.
+The free-tier deployment target for the assistant is a Cloudflare Worker named `aether-ai`.
 
-- `wrangler.jsonc` enables the `python_workers` compatibility flag.
-- `worker.py` adapts the existing FastAPI app to the Workers ASGI runtime.
-- `pyproject.toml` is the Cloudflare Python Worker package manifest.
+- `wrangler.jsonc` deploys `worker.ts` with standard Workers runtime support.
+- `worker.ts` exposes the public assistant endpoints used by the storefront widget and calls Gemini through REST.
+- The full Python/FastAPI assistant remains available for local Docker/container validation.
 - `requirements-docker.txt` is kept for Docker/local/container validation only.
-- The Worker build uses the REST Gemini adapter in `app/llm/gemini_rest.py` and a local graph runner fallback when LangGraph packages are not available in Cloudflare Python Workers. The Docker-only dependency file can keep provider SDKs and LangGraph for local/container validation.
+- The Worker build avoids Python packages that are not compatible with Cloudflare Python Worker packaging on the free path. The Docker-only dependency file can keep provider SDKs and LangGraph for local/container validation.
 - Supabase must be configured as a private `DATABASE_URL` secret. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for assistant persistence.
 
-The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with `pywrangler` from Linux because local Windows Pyodide packaging can fail before upload.
+The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with Wrangler.
 
 Local run:
 

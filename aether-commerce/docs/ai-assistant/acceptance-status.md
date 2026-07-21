@@ -63,15 +63,14 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - GitHub `production` environment variables now include `GEMINI_MODEL=gemini-3.5-flash` and `AI_EVAL_MAX_CASES=10`.
 - GitHub `production` environment variables now include `NEXT_PUBLIC_AETHER_AI_URL=https://aether-ai.pickofwow.workers.dev`.
 - Direct Gemini model lookup against the official Gemini API passed for `models/gemini-3.5-flash` with supported generation methods `generateContent`, `countTokens`, `createCachedContent` and `batchGenerateContent`.
-- The Cloudflare Python Worker package now uses the REST Gemini adapter instead of `langchain-google-genai`, avoiding the unsupported Google `grpcio` dependency chain during Worker deployment.
-- The Cloudflare Python Worker can run the assistant graph through the local fallback runner, avoiding LangGraph transitive packages that require unsupported native wheels such as `msgpack`.
+- The Cloudflare free-tier deployment now uses a lightweight TypeScript Worker with Gemini REST, avoiding unsupported Python Worker native dependencies such as `grpcio`, `msgpack` and `pydantic-core`.
 - `.github/workflows/ai-assistant-image.yml` exists to build, smoke and publish the assistant Docker image to GitHub Container Registry.
 - Runtime storage schema indexes are now aligned with `migrations/0001_initial.sql` and covered by `tests/test_migrations.py` plus `python tests/run_direct.py`.
 - Assistant product-card add-to-cart now sends only slug, variant and quantity to the cart API and syncs local cart state from the server-validated cart response.
 - Assistant streaming UI now renders product cards, cart summaries and clarification prompts from structured SSE events before the final `assistant.completed` payload.
 - Streaming cart updates now render a cart summary with an explicit open-cart action as soon as `assistant.cart_updated` arrives.
 - Malformed streaming cart summaries are ignored by the widget instead of being rendered as trusted cart state.
-- Cloudflare Python Worker deployment files now exist for the free-tier assistant target: `worker.py`, `wrangler.jsonc`, and `.github/workflows/deploy-ai-assistant-cloudflare.yml`.
+- Cloudflare Worker deployment files now exist for the free-tier assistant target: `worker.ts`, `wrangler.jsonc`, and `.github/workflows/deploy-ai-assistant-cloudflare.yml`.
 
 ## Fixes Applied On 2026-07-21
 
@@ -108,7 +107,7 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - Added E2E coverage proving `assistant.products` streaming events render structured product cards without waiting for the final completed response.
 - Added E2E coverage proving `assistant.cart_updated` streaming events render subtotal/item count and expose the cart navigation action.
 - Added E2E coverage proving malformed `assistant.cart_updated` payloads do not render cart totals or cart navigation actions.
-- Added a Cloudflare Python Worker deployment path using `pywrangler`; Docker dependencies moved to `requirements-docker.txt` so Cloudflare packaging uses `pyproject.toml`.
+- Added a Cloudflare Worker deployment path using Wrangler and `worker.ts`; Docker dependencies remain in `requirements-docker.txt` for local/container validation of the full Python assistant.
 
 ## Pending Evidence Before Marking Complete
 
