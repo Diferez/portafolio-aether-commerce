@@ -50,6 +50,13 @@ jobs:
         working-directory: aether-commerce/apps/ai-assistant
         run: python -m uv tool run --from workers-py pywrangler deploy --keep-vars
 
+      - name: Configure AI assistant secrets
+        working-directory: aether-commerce/apps/ai-assistant
+        run: |
+          node -e "const fs=require('fs'); const keys=['GEMINI_API_KEY','DATABASE_URL','AETHER_CART_TOKEN_SECRET','GEMINI_FALLBACK_MODEL']; const out={}; for (const key of keys) if (process.env[key]) out[key]=process.env[key]; fs.writeFileSync('.ai-secrets.json', JSON.stringify(out));"
+          npx wrangler secret bulk .ai-secrets.json --config wrangler.jsonc
+          rm .ai-secrets.json
+
       - name: Smoke public health
         run: |
           curl --fail --retry 5 --retry-delay 3 https://aether-ai.pickofwow.workers.dev/healthz
