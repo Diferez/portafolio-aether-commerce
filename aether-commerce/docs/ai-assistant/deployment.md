@@ -75,7 +75,7 @@ The free-tier deployment target for the assistant is a Cloudflare Worker named `
 - The full Python/FastAPI assistant remains available for local Docker/container validation.
 - `requirements-docker.txt` is kept for Docker/local/container validation only.
 - The Worker build avoids Python packages that are not compatible with Cloudflare Python Worker packaging on the free path. The Docker-only dependency file can keep provider SDKs and LangGraph for local/container validation.
-- The Cloudflare Worker deployment uses the existing Aether D1 database through the `DB` binding generated from `AETHER_D1_DATABASE_ID`. Conversation tables are applied by `apps/api/migrations/0005_ai_assistant.sql`.
+- The Cloudflare Worker deployment uses the existing Aether D1 database through the `DB` binding generated from `AETHER_D1_DATABASE_ID`. Conversation tables are applied by `apps/api/migrations/0005_ai_assistant.sql`; short-window rate-limit buckets are applied by `apps/api/migrations/0006_ai_rate_limits.sql`.
 - Supabase can still be configured as a private `DATABASE_URL` secret for the Docker/FastAPI deployment path. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for server-side assistant persistence.
 
 The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with Wrangler.
@@ -189,7 +189,7 @@ The assistant image is built with a multi-stage Dockerfile and runs as a non-roo
 
 Catalog and product detail reads use a short in-memory cache controlled by `AI_CATALOG_CACHE_TTL_SECONDS`. Set it to `0` to disable caching. Cart reads, cart mutations, actor lookup, authorization and stock-changing operations are never cached; the Aether Worker API remains the source of truth.
 
-Daily request usage is stored in `ai_usage_daily`. Configure `AI_DAILY_REQUEST_BUDGET` before public launch if the Gemini project has a strict quota or billing cap.
+Daily request usage is stored in `ai_usage_daily`. Short-window limits for IP, session, authenticated token, project and conversation are stored as hashed buckets in `ai_rate_limit_buckets`. Configure `AI_DAILY_REQUEST_BUDGET` before public launch if the Gemini project has a strict quota or billing cap.
 
 Set `AI_STORE_CONVERSATIONS=false` for a stricter privacy mode that disables stored conversation history. In that mode, the assistant still works for single-turn search/help/cart actions, but it cannot use previous product lists to resolve follow-up references across messages.
 

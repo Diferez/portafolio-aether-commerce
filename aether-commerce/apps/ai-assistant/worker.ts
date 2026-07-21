@@ -9,6 +9,8 @@ type Env = {
   GEMINI_MAX_OUTPUT_TOKENS?: string;
   AI_MUTATIONS_ENABLED?: string;
   AI_OPERATIONS_TOKEN?: string;
+  AI_RATE_LIMIT_MESSAGES_PER_MINUTE?: string;
+  AI_RATE_LIMIT_MESSAGES_PER_HOUR?: string;
   AI_RATE_LIMIT_ANONYMOUS_PER_DAY?: string;
   AI_RATE_LIMIT_AUTHENTICATED_PER_DAY?: string;
   AI_DAILY_REQUEST_BUDGET?: string;
@@ -356,9 +358,19 @@ async function getAuditEvents(request: Request, env: Env, url: URL): Promise<Ass
 async function enforceMessageUsage(request: Request, env: Env): Promise<AssistantHttpResult | null> {
   if (env.AI_ASSISTANT_ENABLED === "false") return null;
   if (!env.DB) return null;
+  const body = (await request.clone().json().catch(() => ({}))) as AssistantRequest;
   const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || request.headers.get("x-aether-cart-id") || "anonymous");
+  const scopeHashes = await rateLimitScopes(request, sessionHash, body.thread_id || null);
+  const minuteLimit = numberEnv(env.AI_RATE_LIMIT_MESSAGES_PER_MINUTE);
+  const hourLimit = numberEnv(env.AI_RATE_LIMIT_MESSAGES_PER_HOUR);
+  const shortLimit = await enforceShortWindowLimits(env, scopeHashes, minuteLimit, hourLimit);
+  if (shortLimit) {
+    await incrementDailyUsage(env, usageDay(), "rate_limit_errors", { request_count: 1 });
+    return shortLimit;
+  }
   const day = usageDay();
-  const sessionLimit = numberEnv(env.AI_RATE_LIMIT_ANONYMOUS_PER_DAY);
+  const hasAuthenticatedActor = Boolean(request.headers.get("authorization"));
+  const sessionLimit = numberEnv(hasAuthenticatedActor ? env.AI_RATE_LIMIT_AUTHENTICATED_PER_DAY : env.AI_RATE_LIMIT_ANONYMOUS_PER_DAY);
   const projectLimit = numberEnv(env.AI_DAILY_REQUEST_BUDGET);
   const sessionUsage = await getDailyUsage(env, day, sessionHash);
   if (sessionLimit !== null && sessionUsage >= sessionLimit) {
@@ -385,6 +397,83 @@ async function enforceMessageUsage(request: Request, env: Env): Promise<Assistan
   await incrementDailyUsage(env, day, sessionHash, { request_count: 1 });
   await incrementDailyUsage(env, day, "project", { request_count: 1 });
   return null;
+}
+
+async function rateLimitScopes(request: Request, sessionHash: string, threadId: string | null): Promise<string[]> {
+  const rawScopes = ["project", `session:${sessionHash}`];
+  const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  if (ip) rawScopes.push(`ip:${ip}`);
+  const authorization = request.headers.get("authorization");
+  if (authorization) rawScopes.push(`user:${authorization}`);
+  if (threadId) rawScopes.push(`conversation:${threadId}`);
+  return Promise.all(rawScopes.map(stableHash));
+}
+
+async function enforceShortWindowLimits(
+  env: Env,
+  scopeHashes: string[],
+  minuteLimit: number | null,
+  hourLimit: number | null
+): Promise<AssistantHttpResult | null> {
+  const now = new Date();
+  const windows = [
+    {
+      limit: minuteLimit,
+      key: `minute:${now.toISOString().slice(0, 16)}`,
+      expiresAt: new Date(now.getTime() + 2 * 60 * 1000).toISOString(),
+      code: "minute_rate_limit_exceeded",
+      message: "El asistente alcanzo el limite de mensajes por minuto. Intenta de nuevo en un momento.",
+    },
+    {
+      limit: hourLimit,
+      key: `hour:${now.toISOString().slice(0, 13)}`,
+      expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(),
+      code: "hour_rate_limit_exceeded",
+      message: "El asistente alcanzo el limite de mensajes por hora. Intenta de nuevo mas tarde.",
+    },
+  ];
+  for (const window of windows) {
+    if (window.limit === null) continue;
+    for (const scopeHash of scopeHashes) {
+      const allowed = await checkRateBucket(env, scopeHash, window.key, window.limit);
+      if (!allowed) {
+        return { status: 429, payload: { success: false, error: { code: window.code, message: window.message } } };
+      }
+    }
+    for (const scopeHash of scopeHashes) {
+      await incrementRateBucket(env, scopeHash, window.key, window.expiresAt);
+    }
+  }
+  return null;
+}
+
+async function checkRateBucket(
+  env: Env,
+  scopeHash: string,
+  windowKey: string,
+  limit: number
+): Promise<boolean> {
+  if (!env.DB) return true;
+  const current = await env.DB
+    .prepare("select request_count from ai_rate_limit_buckets where scope_hash = ? and window_key = ?")
+    .bind(scopeHash, windowKey)
+    .first<{ request_count: number }>();
+  return Number(current?.request_count || 0) < limit;
+}
+
+async function incrementRateBucket(env: Env, scopeHash: string, windowKey: string, expiresAt: string): Promise<void> {
+  if (!env.DB) return;
+  await env.DB
+    .prepare(
+      `insert into ai_rate_limit_buckets (id, scope_hash, window_key, request_count, expires_at, created_at, updated_at)
+       values (?, ?, ?, 1, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       on conflict(scope_hash, window_key) do update set
+         request_count = request_count + 1,
+         expires_at = excluded.expires_at,
+         updated_at = CURRENT_TIMESTAMP`
+    )
+    .bind(crypto.randomUUID(), scopeHash, windowKey, expiresAt)
+    .run();
 }
 
 async function renderMetrics(env: Env): Promise<string> {
@@ -414,6 +503,7 @@ async function renderMetrics(env: Env): Promise<string> {
   const blockedMutations = (audit.results || [])
     .filter((row) => row.execution_status === "blocked")
     .reduce((total, row) => total + Number(row.count || 0), 0);
+  const activeBuckets = await getActiveRateLimitBuckets(env);
   const dailyBudget = numberEnv(env.AI_DAILY_REQUEST_BUDGET);
   const budgetRatio = dailyBudget && dailyBudget > 0 ? Math.min(1, projectRequests / dailyBudget) : 0;
   return [
@@ -428,6 +518,7 @@ async function renderMetrics(env: Env): Promise<string> {
     `ai_tool_calls_total ${projectToolCalls}`,
     "ai_tool_errors_total 0",
     `ai_rate_limit_errors_total ${rateErrors}`,
+    `ai_rate_limit_buckets_active ${activeBuckets}`,
     `ai_cart_mutations_total ${cartMutations}`,
     `ai_cart_mutation_failures_total ${cartMutationFailures}`,
     "ai_clarifications_total 0",
@@ -440,6 +531,18 @@ async function renderMetrics(env: Env): Promise<string> {
     `ai_daily_budget_threshold_95_reached ${budgetRatio >= 0.95 ? 1 : 0}`,
     "",
   ].join("\n");
+}
+
+async function getActiveRateLimitBuckets(env: Env): Promise<number> {
+  if (!env.DB) return 0;
+  try {
+    const row = await env.DB
+      .prepare("select count(*) as count from ai_rate_limit_buckets where expires_at > datetime('now')")
+      .first<{ count: number }>();
+    return Number(row?.count || 0);
+  } catch {
+    return 0;
+  }
 }
 
 async function getDailyUsage(env: Env, day: string, userOrSessionHash: string): Promise<number> {
