@@ -8,6 +8,7 @@ type Env = {
   GEMINI_TEMPERATURE?: string;
   GEMINI_MAX_OUTPUT_TOKENS?: string;
   AI_MUTATIONS_ENABLED?: string;
+  AI_OPERATIONS_TOKEN?: string;
 };
 
 type D1Database = {
@@ -101,6 +102,10 @@ export default {
       const result = await deleteConversation(request, env, decodeURIComponent(conversationMatch[1]));
       return json(request, env, result.payload, result.status);
     }
+    if (request.method === "GET" && url.pathname === "/v1/internal/audit/events") {
+      const result = await getAuditEvents(request, env, url);
+      return json(request, env, result.payload, result.status);
+    }
 
     return json(request, env, { error: "not_found" }, 404);
   },
@@ -130,6 +135,29 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
     await persistConversationMessage(env, threadId, sessionHash, locale, "assistant", payload.message, payload);
     return payload;
   };
+  const audit = async (
+    toolName: string,
+    normalizedArguments: string,
+    targetEntityId: string | null,
+    authorizationResult: "allowed" | "denied",
+    executionStatus: "succeeded" | "failed" | "blocked",
+    errorCode: string | null = null
+  ): Promise<string> => {
+    const key = await idempotencyKey(requestId, toolName, normalizedArguments);
+    await persistAuditEvent(env, {
+      request_id: requestId,
+      thread_id: threadId,
+      user_or_session_hash: sessionHash,
+      tool_name: toolName,
+      normalized_arguments: normalizedArguments,
+      target_entity_id: targetEntityId,
+      idempotency_key: key,
+      authorization_result: authorizationResult,
+      execution_status: executionStatus,
+      error_code: errorCode,
+    });
+    return key;
+  };
 
   if (intent === "GET_CART" || intent === "CHECKOUT_REQUEST") {
     const cart = cartId && cartToken ? await fetchCart(env, cartId, cartToken) : null;
@@ -158,36 +186,50 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
 
   if (intent === "REMOVE_FROM_CART" || intent === "UPDATE_CART_ITEM" || intent === "CLEAR_CART") {
     if (env.AI_MUTATIONS_ENABLED === "false") {
+      await audit(intent.toLowerCase(), "mutations_disabled", null, "denied", "blocked", "mutations_disabled");
       return finish(responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, [], null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (!cartId || !cartToken) {
+      await audit(intent.toLowerCase(), "cart_token_missing", null, "denied", "blocked", "cart_token_missing");
       return finish(responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, [], null, "ASK_CLARIFICATION", "PENDING"));
     }
     const cart = await fetchCart(env, cartId, cartToken);
     if (!cart) {
+      await audit(intent.toLowerCase(), `cart:${cartId}`, cartId, "denied", "blocked", "cart_unavailable");
       return finish(responsePayload(requestId, threadId, spanish ? "No pude consultar tu carrito. No realice ningun cambio." : "I could not read your cart. No changes were made.", intent, [], null, "ASK_CLARIFICATION", "FAILED"));
     }
     if (intent === "CLEAR_CART") {
       if (!hasClearCartConfirmation(message)) {
+        await audit("clear_cart", `cart:${cartId}:confirmation_missing`, cartId, "denied", "blocked", "confirmation_required");
         return finish(responsePayload(requestId, threadId, spanish ? "Para vaciar todo el carrito necesito una confirmacion explicita." : "To clear the entire cart I need explicit confirmation.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
       }
-      const updated = await clearCart(env, cartId, cartToken, cart);
+      const idem = await idempotencyKey(requestId, "clear_cart", `cart:${cartId}:confirmed`);
+      const updated = await clearCart(env, cartId, cartToken, cart, idem);
+      await audit("clear_cart", `cart:${cartId}:confirmed`, cartId, "allowed", updated ? "succeeded" : "failed", updated ? null : "cart_update_failed");
       return finish(responsePayload(requestId, threadId, spanish ? "Listo. Vacie el carrito." : "Done. I cleared the cart.", intent, [], updated || cart, updated ? "CART_CLEARED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
     }
     const item = resolveCartItem(cart, message);
     if (!item) {
+      await audit(intent.toLowerCase(), `cart:${cartId}:item_ambiguous`, cartId, "denied", "blocked", "item_ambiguous");
       return finish(responsePayload(requestId, threadId, spanish ? "Necesito saber exactamente que producto del carrito quieres cambiar." : "I need to know exactly which cart item you want to change.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
     }
     const itemId = String(item.slug || item.variantId || item.productId || "");
     if (intent === "REMOVE_FROM_CART") {
-      const updated = await removeCartItem(env, cartId, cartToken, itemId);
+      const normalizedArguments = `cart:${cartId}:item:${itemId}`;
+      const idem = await idempotencyKey(requestId, "remove_from_cart", normalizedArguments);
+      const updated = await removeCartItem(env, cartId, cartToken, itemId, idem);
+      await audit("remove_from_cart", normalizedArguments, itemId, "allowed", updated ? "succeeded" : "failed", updated ? null : "cart_update_failed");
       return finish(responsePayload(requestId, threadId, spanish ? "Listo. Quite el producto del carrito." : "Done. I removed the item from your cart.", intent, [], updated || cart, updated ? "CART_ITEM_REMOVED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
     }
     const quantity = extractQuantity(message);
     if (!quantity) {
+      await audit("update_cart_item", `cart:${cartId}:item:${itemId}:quantity_missing`, itemId, "denied", "blocked", "quantity_missing");
       return finish(responsePayload(requestId, threadId, spanish ? "Indica una cantidad entre 1 y 25 para actualizar el carrito." : "Tell me a quantity from 1 to 25 to update the cart.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
     }
-    const updated = await updateCartItem(env, cartId, cartToken, itemId, quantity);
+    const normalizedArguments = `cart:${cartId}:item:${itemId}:quantity:${quantity}`;
+    const idem = await idempotencyKey(requestId, "update_cart_item", normalizedArguments);
+    const updated = await updateCartItem(env, cartId, cartToken, itemId, quantity, idem);
+    await audit("update_cart_item", normalizedArguments, itemId, "allowed", updated ? "succeeded" : "failed", updated ? null : "cart_update_failed");
     return finish(responsePayload(requestId, threadId, spanish ? `Listo. Actualice la cantidad a ${quantity}.` : `Done. I updated the quantity to ${quantity}.`, intent, [], updated || cart, updated ? "CART_ITEM_UPDATED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
   }
 
@@ -195,17 +237,24 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   const products = contextProduct ? [contextProduct] : await searchProducts(env, message);
   if (intent === "ADD_TO_CART") {
     if (env.AI_MUTATIONS_ENABLED === "false") {
+      await audit("add_to_cart", "mutations_disabled", null, "denied", "blocked", "mutations_disabled");
       return finish(responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (!cartId || !cartToken) {
+      await audit("add_to_cart", "cart_token_missing", null, "denied", "blocked", "cart_token_missing");
       return finish(responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (products.length !== 1) {
+      await audit("add_to_cart", `cart:${cartId}:product_ambiguous:${products.length}`, cartId, "denied", "blocked", "product_ambiguous");
       return finish(responsePayload(requestId, threadId, spanish ? "Encontre varias opciones. Dime cual quieres agregar antes de modificar el carrito." : "I found multiple options. Tell me which one to add before I change the cart.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     const product = products[0];
     if (product) {
-      const cart = await addToCart(env, cartId, cartToken, product, extractQuantity(message) || 1);
+      const quantity = extractQuantity(message) || 1;
+      const normalizedArguments = `cart:${cartId}:product:${product.product_id}:variant:${product.variant_id || ""}:quantity:${quantity}`;
+      const idem = await idempotencyKey(requestId, "add_to_cart", normalizedArguments);
+      const cart = await addToCart(env, cartId, cartToken, product, quantity, idem);
+      await audit("add_to_cart", normalizedArguments, product.product_id, "allowed", cart ? "succeeded" : "failed", cart ? null : "cart_update_failed");
       if (cart) {
         return finish(responsePayload(requestId, threadId, spanish ? "Listo. Agregue el producto al carrito." : "Done. I added the product to your cart.", intent, [product], cart, "CART_ITEM_ADDED", "SUCCEEDED"));
       }
@@ -278,6 +327,24 @@ async function deleteConversation(request: Request, env: Env, threadId: string):
   return { status: 200, payload: { success: true, data: { thread_id: threadId, deleted: true } } };
 }
 
+async function getAuditEvents(request: Request, env: Env, url: URL): Promise<AssistantHttpResult> {
+  if (!env.AI_OPERATIONS_TOKEN) return { status: 404, payload: { success: false, error: "not_found" } };
+  if (request.headers.get("x-aether-operations-token") !== env.AI_OPERATIONS_TOKEN) {
+    return { status: 403, payload: { success: false, error: "forbidden" } };
+  }
+  if (!env.DB) return { status: 503, payload: { success: false, error: "persistence_unavailable" } };
+  const threadId = url.searchParams.get("thread_id");
+  const requestId = url.searchParams.get("request_id");
+  if (!threadId && !requestId) {
+    return { status: 400, payload: { success: false, error: "thread_id_or_request_id_required" } };
+  }
+  const query = threadId
+    ? "select event_id, request_id, thread_id, user_or_session_hash, tool_name, normalized_arguments, target_entity_id, idempotency_key, authorization_result, execution_status, error_code, created_at from ai_action_audit where thread_id = ? order by created_at desc limit 50"
+    : "select event_id, request_id, thread_id, user_or_session_hash, tool_name, normalized_arguments, target_entity_id, idempotency_key, authorization_result, execution_status, error_code, created_at from ai_action_audit where request_id = ? order by created_at desc limit 50";
+  const rows = await env.DB.prepare(query).bind(threadId || requestId).all<Record<string, unknown>>();
+  return { status: 200, payload: { success: true, data: rows.results || [] } };
+}
+
 async function persistConversationMessage(
   env: Env,
   threadId: string,
@@ -302,9 +369,53 @@ async function persistConversationMessage(
     .run();
 }
 
+async function persistAuditEvent(
+  env: Env,
+  event: {
+    request_id: string;
+    thread_id: string;
+    user_or_session_hash: string;
+    tool_name: string;
+    normalized_arguments: string;
+    target_entity_id: string | null;
+    idempotency_key: string;
+    authorization_result: string;
+    execution_status: string;
+    error_code: string | null;
+  }
+): Promise<void> {
+  if (!env.DB) return;
+  await env.DB
+    .prepare(
+      `insert into ai_action_audit (
+         event_id, request_id, thread_id, user_or_session_hash, tool_name,
+         normalized_arguments, target_entity_id, idempotency_key,
+         authorization_result, execution_status, error_code, created_at
+       ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+    )
+    .bind(
+      crypto.randomUUID(),
+      event.request_id,
+      event.thread_id,
+      event.user_or_session_hash,
+      event.tool_name,
+      event.normalized_arguments,
+      event.target_entity_id,
+      event.idempotency_key,
+      event.authorization_result,
+      event.execution_status,
+      event.error_code
+    )
+    .run();
+}
+
 async function stableHash(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(value));
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function idempotencyKey(requestId: string, toolName: string, normalizedArguments: string): Promise<string> {
+  return `ai_${await stableHash(`${requestId}:${toolName}:${normalizedArguments}`)}`;
 }
 
 function redactPii(value: string): string {
@@ -431,43 +542,43 @@ async function fetchCart(env: Env, cartId: string, cartToken: string): Promise<R
   };
 }
 
-async function addToCart(env: Env, cartId: string, cartToken: string, product: AssistantProduct, quantity: number): Promise<Record<string, unknown> | null> {
+async function addToCart(env: Env, cartId: string, cartToken: string, product: AssistantProduct, quantity: number, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
   const slug = product.product_url.split("slug=")[1]?.split("&")[0] || product.product_id;
   const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, env.AETHER_API_BASE_URL), {
     method: "POST",
-    headers: { "content-type": "application/json", "x-aether-cart-token": cartToken },
+    headers: { "content-type": "application/json", "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
     body: JSON.stringify({ productId: decodeURIComponent(slug), variantId: product.variant_id || undefined, quantity }),
   }, 5000);
   if (!response.ok) return null;
   return fetchCart(env, cartId, cartToken);
 }
 
-async function removeCartItem(env: Env, cartId: string, cartToken: string, itemId: string): Promise<Record<string, unknown> | null> {
+async function removeCartItem(env: Env, cartId: string, cartToken: string, itemId: string, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
   const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
     method: "DELETE",
-    headers: { "x-aether-cart-token": cartToken },
+    headers: { "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
   }, 5000);
   if (!response.ok) return null;
   return toCartSummary(await response.json());
 }
 
-async function updateCartItem(env: Env, cartId: string, cartToken: string, itemId: string, quantity: number): Promise<Record<string, unknown> | null> {
+async function updateCartItem(env: Env, cartId: string, cartToken: string, itemId: string, quantity: number, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
   const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
     method: "PATCH",
-    headers: { "content-type": "application/json", "x-aether-cart-token": cartToken },
+    headers: { "content-type": "application/json", "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
     body: JSON.stringify({ quantity }),
   }, 5000);
   if (!response.ok) return null;
   return toCartSummary(await response.json());
 }
 
-async function clearCart(env: Env, cartId: string, cartToken: string, cart: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+async function clearCart(env: Env, cartId: string, cartToken: string, cart: Record<string, unknown>, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
   const items = Array.isArray(cart.items) ? cart.items : [];
   let latest: Record<string, unknown> | null = cart;
   for (const entry of items) {
     const item = entry as Record<string, unknown>;
     const itemId = String(item.slug || item.variantId || item.productId || "");
-    if (itemId) latest = await removeCartItem(env, cartId, cartToken, itemId);
+    if (itemId) latest = await removeCartItem(env, cartId, cartToken, itemId, idempotencyKeyValue);
   }
   return latest;
 }
@@ -582,7 +693,7 @@ function corsHeaders(request: Request, env: Env): Record<string, string> {
   return {
     "access-control-allow-origin": allowOrigin,
     "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",
-    "access-control-allow-headers": "content-type,x-aether-cart-id,x-aether-session-id,x-aether-cart-token",
+    "access-control-allow-headers": "content-type,x-aether-cart-id,x-aether-session-id,x-aether-cart-token,x-aether-operations-token",
     "vary": "Origin",
   };
 }
