@@ -64,6 +64,7 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - GitHub `production` environment variables now include `NEXT_PUBLIC_AETHER_AI_URL=https://aether-ai.pickofwow.workers.dev`.
 - Direct Gemini model lookup against the official Gemini API passed for `models/gemini-3.5-flash` with supported generation methods `generateContent`, `countTokens`, `createCachedContent` and `batchGenerateContent`.
 - The Cloudflare Python Worker package now uses the REST Gemini adapter instead of `langchain-google-genai`, avoiding the unsupported Google `grpcio` dependency chain during Worker deployment.
+- The Cloudflare Python Worker can run the assistant graph through the local fallback runner, avoiding LangGraph transitive packages that require unsupported native wheels such as `msgpack`.
 - `.github/workflows/ai-assistant-image.yml` exists to build, smoke and publish the assistant Docker image to GitHub Container Registry.
 - Runtime storage schema indexes are now aligned with `migrations/0001_initial.sql` and covered by `tests/test_migrations.py` plus `python tests/run_direct.py`.
 - Assistant product-card add-to-cart now sends only slug, variant and quantity to the cart API and syncs local cart state from the server-validated cart response.

@@ -8,8 +8,6 @@ dependencies = [
   "pydantic",
   "pydantic-settings",
   "httpx",
-  "langgraph",
-  "langchain",
   "python-json-logger",
   "opentelemetry-api",
   "opentelemetry-sdk",

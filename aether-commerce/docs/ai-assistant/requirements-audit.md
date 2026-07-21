@@ -17,7 +17,7 @@ This audit maps the original assistant requirements to current workspace evidenc
 | Python 3.12/3.13, FastAPI, Pydantic v2, LangGraph, LangChain, Gemini provider | Verified | `pyproject.toml`, `requirements-docker.txt`, `app/main.py`, `app/graph.py`, `app/llm/provider.py`, and the Cloudflare-safe REST Gemini adapter in `app/llm/gemini_rest.py`. |
 | Centralized model configuration | Verified | `app/llm/provider.py`, `.env.example`, and `tests/test_llm_provider.py`. |
 | Real Gemini availability | Verified | `GEMINI_API_KEY` exists in the GitHub production environment and direct official Gemini API model lookup passed for `models/gemini-3.5-flash`. The Worker runtime uses the official Gemini REST API path so Cloudflare packaging does not need the Google gRPC dependency chain. |
-| Required LangGraph nodes and bounded flow | Verified | `app/graph.py`, architecture Mermaid graph, and `tests/test_graph_cart.py` graph-structure coverage. |
+| Required LangGraph nodes and bounded flow | Verified | `app/graph.py`, architecture Mermaid graph, and `tests/test_graph_cart.py` graph-structure coverage. Cloudflare Workers use the same node sequence through a dependency-free local runner when LangGraph packages are not available. |
 | Typed state and structured intent classification | Verified | `app/schemas.py`, `app/intent.py`, and `app/llm/intent_classifier.py`. |
 | Product search, detail, variant and comparison tools | Verified | `app/tools.py`, `app/clients/aether.py`, and tool/contract tests. |
 | Cart read/add/update/remove/clear tools | Verified | `app/tools.py`, signed cart token support, idempotency keys, and cart graph tests. |

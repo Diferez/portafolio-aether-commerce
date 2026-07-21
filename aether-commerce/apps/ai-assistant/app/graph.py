@@ -2,7 +2,6 @@ import logging
 from typing import Any, TypedDict
 from uuid import uuid4
 
-from langgraph.graph import END, START, StateGraph
 from app.observability import metrics
 
 from app.clients.aether import AetherApiClient
@@ -19,6 +18,13 @@ from app.schemas import (
 from app.security import idempotency_key, redact_pii, request_id, stable_hash
 from app.storage import AssistantStorage
 from app.tools import AetherAssistantTools, CLEAR_CART_CONFIRMATION_TOKEN, ToolExecution
+
+try:
+    from langgraph.graph import END, START, StateGraph
+except ModuleNotFoundError:
+    END = "__end__"
+    START = "__start__"
+    StateGraph = None
 
 logger = logging.getLogger("aether.ai_assistant.graph")
 
@@ -52,6 +58,58 @@ class AssistantState(TypedDict, total=False):
     error_code: str | None
     error_message: str | None
     response: AssistantResponse
+
+
+class LocalAssistantWorkflow:
+    nodes = {
+        "__start__",
+        "validate_request",
+        "load_conversation_context",
+        "detect_intent",
+        "extract_constraints",
+        "route_intent",
+        "product_search",
+        "product_details",
+        "product_comparison",
+        "cart_read",
+        "cart_mutation_precheck",
+        "clarification",
+        "general_store_help",
+        "unsupported_request",
+        "execute_authorized_tool",
+        "validate_tool_result",
+        "compose_response",
+        "persist_audit_event",
+    }
+
+    def __init__(self, assistant: "AssistantGraph") -> None:
+        self.assistant = assistant
+
+    async def ainvoke(self, state: AssistantState, config: dict[str, Any] | None = None) -> AssistantState:
+        state = await self.assistant._validate_request(state)
+        state = await self.assistant._load_context(state)
+        state = await self.assistant._detect_intent(state)
+        state = await self.assistant._extract_constraints(state)
+        state = await self.assistant._route_intent(state)
+
+        route = state.get("pending_action", {}).get("node", "unsupported_request")
+        routed_nodes = {
+            "product_search": self.assistant._product_search,
+            "product_details": self.assistant._product_details,
+            "product_comparison": self.assistant._product_comparison,
+            "cart_read": self.assistant._cart_read,
+            "cart_mutation_precheck": self.assistant._cart_mutation_precheck,
+            "clarification": self.assistant._clarification,
+            "general_store_help": self.assistant._general_store_help,
+            "unsupported_request": self.assistant._unsupported,
+        }
+        state = await routed_nodes.get(str(route), self.assistant._unsupported)(state)
+        if route in {"product_search", "product_details", "product_comparison", "cart_read", "cart_mutation_precheck"}:
+            state = await self.assistant._execute_authorized_tool(state)
+            state = await self.assistant._validate_tool_result(state)
+        state = await self.assistant._compose_response(state)
+        state = await self.assistant._persist_audit_event(state)
+        return state
 
 
 class AssistantGraph:
@@ -159,7 +217,10 @@ class AssistantGraph:
             },
         )
 
-    def _build_graph(self) -> StateGraph:
+    def _build_graph(self):
+        if StateGraph is None:
+            return LocalAssistantWorkflow(self)
+
         graph = StateGraph(AssistantState)
         graph.add_node("validate_request", self._validate_request)
         graph.add_node("load_conversation_context", self._load_context)
