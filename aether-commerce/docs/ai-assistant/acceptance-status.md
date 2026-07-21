@@ -29,7 +29,7 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - `python -m compileall app scripts`: passed.
 - `python tests/run_direct.py`: passed.
 - `python scripts/security_scan.py`: passed.
-- `npm run deploy:preflight`: now passes after reading required Cloudflare secrets from the GitHub `production` environment. It still warns that `NEXT_PUBLIC_AETHER_AI_URL` is missing because the Python assistant does not yet have a public URL.
+- `npm run deploy:preflight`: now passes after reading required Cloudflare secrets and assistant settings from the GitHub `production` environment.
 - `python -m app.evaluation`: passed on 100 deterministic cases:
   - intent accuracy: 1.0
   - tool selection accuracy: 1.0
@@ -59,7 +59,9 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - Docker image build and container smoke test are now verified locally from this workspace. CI and production workflows also include Docker checks and clean up the test container on failure.
 - `PYTHONPYCACHEPREFIX=F:\Freelance\Portafolio\tmp\pycache-check python -m compileall app tests scripts`: passed, avoiding stale locked Windows `__pycache__` files.
 - GitHub `production` environment secrets now include `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `GEMINI_API_KEY`; only secret names were verified.
+- GitHub `production` environment secrets now also include `DATABASE_URL` and `AETHER_CART_TOKEN_SECRET`; only secret names were verified.
 - GitHub `production` environment variables now include `GEMINI_MODEL=gemini-3.5-flash` and `AI_EVAL_MAX_CASES=10`.
+- GitHub `production` environment variables now include `NEXT_PUBLIC_AETHER_AI_URL=https://aether-ai.pickofwow.workers.dev`.
 - Direct Gemini model lookup against the official Gemini API passed for `models/gemini-3.5-flash` with supported generation methods `generateContent`, `countTokens`, `createCachedContent` and `batchGenerateContent`.
 - `.github/workflows/ai-assistant-image.yml` exists to build, smoke and publish the assistant Docker image to GitHub Container Registry.
 - Runtime storage schema indexes are now aligned with `migrations/0001_initial.sql` and covered by `tests/test_migrations.py` plus `python tests/run_direct.py`.
@@ -67,6 +69,7 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - Assistant streaming UI now renders product cards, cart summaries and clarification prompts from structured SSE events before the final `assistant.completed` payload.
 - Streaming cart updates now render a cart summary with an explicit open-cart action as soon as `assistant.cart_updated` arrives.
 - Malformed streaming cart summaries are ignored by the widget instead of being rendered as trusted cart state.
+- Cloudflare Python Worker deployment files now exist for the free-tier assistant target: `worker.py`, `wrangler.jsonc`, and `.github/workflows/deploy-ai-assistant-cloudflare.yml`.
 
 ## Fixes Applied On 2026-07-21
 
@@ -103,10 +106,11 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - Added E2E coverage proving `assistant.products` streaming events render structured product cards without waiting for the final completed response.
 - Added E2E coverage proving `assistant.cart_updated` streaming events render subtotal/item count and expose the cart navigation action.
 - Added E2E coverage proving malformed `assistant.cart_updated` payloads do not render cart totals or cart navigation actions.
+- Added a Cloudflare Python Worker deployment path using `pywrangler`; Docker dependencies moved to `requirements-docker.txt` so Cloudflare packaging uses `pyproject.toml`.
 
 ## Pending Evidence Before Marking Complete
 
-- `NEXT_PUBLIC_AETHER_AI_URL` is not configured because the Python assistant service has not been deployed to a public URL yet.
+- `NEXT_PUBLIC_AETHER_AI_URL` is configured, but `https://aether-ai.pickofwow.workers.dev` has not yet been proven reachable by a completed Cloudflare deploy.
 - GHCR image publication has not been proven by a completed GitHub Actions run yet.
 - Limited LangChain/Gemini classifier evaluation still timed out in this Windows workspace even though direct Gemini model lookup succeeded; CI/manual evaluation should be rerun from Linux or the deployed runtime.
 - Staging deployment of the AI assistant service has not been proven from this workspace.

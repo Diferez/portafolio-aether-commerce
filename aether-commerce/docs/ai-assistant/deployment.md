@@ -66,12 +66,24 @@ It also warns when AI assistant production/evaluation settings are incomplete, i
 
 When deploying through GitHub Actions, configure `NEXT_PUBLIC_AETHER_AI_URL` as a repository/environment variable only after the Python assistant is reachable. The production workflow passes that value into the storefront build and verifies `/healthz` when the variable is present. The workflow also fails early if the Cloudflare secrets are missing, before running expensive build and deploy steps.
 
+## Cloudflare Free Deployment Path
+
+The free-tier deployment target for the assistant is a Cloudflare Python Worker named `aether-ai`.
+
+- `wrangler.jsonc` enables the `python_workers` compatibility flag.
+- `worker.py` adapts the existing FastAPI app to the Workers ASGI runtime.
+- `pyproject.toml` is the Cloudflare Python Worker package manifest.
+- `requirements-docker.txt` is kept for Docker/local/container validation only.
+- Supabase must be configured as a private `DATABASE_URL` secret. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for assistant persistence.
+
+The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with `pywrangler` from Linux because local Windows Pyodide packaging can fail before upload.
+
 Local run:
 
 ```bash
 cd aether-commerce/apps/ai-assistant
 python -m venv .venv
-pip install -r requirements.txt
+pip install -r requirements-docker.txt
 uvicorn app.main:app --reload --port 8090
 ```
 

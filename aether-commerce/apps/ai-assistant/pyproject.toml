@@ -2,23 +2,25 @@
 name = "aether-ai-assistant"
 version = "0.1.0"
 description = "Aether sales assistant service powered by FastAPI, LangGraph and Gemini."
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
-  "fastapi>=0.115.0",
-  "uvicorn[standard]>=0.32.0",
-  "pydantic>=2.10.0",
-  "pydantic-settings>=2.6.0",
-  "httpx>=0.28.0",
-  "langgraph>=0.2.60",
-  "langchain>=0.3.13",
-  "langchain-google-genai>=2.0.7",
-  "python-json-logger>=2.0.7",
-  "psycopg[binary]>=3.2.3",
-  "redis>=5.2.0",
-  "opentelemetry-api>=1.30.0",
-  "opentelemetry-sdk>=1.30.0",
-  "opentelemetry-instrumentation-fastapi>=0.51b0",
-  "opentelemetry-exporter-otlp>=1.30.0",
+  "fastapi",
+  "pydantic",
+  "pydantic-settings",
+  "httpx",
+  "langgraph",
+  "langchain",
+  "langchain-google-genai",
+  "python-json-logger",
+  "opentelemetry-api",
+  "opentelemetry-sdk",
+  "opentelemetry-instrumentation-fastapi"
+]
+
+[dependency-groups]
+dev = [
+  "workers-py",
+  "workers-runtime-sdk"
 ]
 
 [project.optional-dependencies]

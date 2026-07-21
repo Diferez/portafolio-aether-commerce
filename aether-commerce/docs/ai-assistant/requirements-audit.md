@@ -14,7 +14,7 @@ This audit maps the original assistant requirements to current workspace evidenc
 | --- | --- | --- |
 | Repository inspection before implementation | Verified | `docs/ai-assistant/architecture-analysis.md` documents the existing Aether frontend, Worker API, D1 schema, cart, auth/session model, deployment and test surfaces. |
 | Decoupled AI service | Verified | `apps/ai-assistant` is a standalone FastAPI service integrated with Aether through HTTP clients and storefront configuration. |
-| Python 3.12, FastAPI, Pydantic v2, LangGraph, LangChain, Gemini provider | Verified | `pyproject.toml`, `requirements.txt`, `app/main.py`, `app/graph.py`, and `app/llm/provider.py`. |
+| Python 3.12/3.13, FastAPI, Pydantic v2, LangGraph, LangChain, Gemini provider | Verified | `pyproject.toml`, `requirements-docker.txt`, `app/main.py`, `app/graph.py`, and `app/llm/provider.py`. |
 | Centralized model configuration | Verified | `app/llm/provider.py`, `.env.example`, and `tests/test_llm_provider.py`. |
 | Real Gemini availability | Verified | `GEMINI_API_KEY` exists in the GitHub production environment and direct official Gemini API model lookup passed for `models/gemini-3.5-flash`. The limited LangChain classifier evaluation still timed out in this Windows workspace and should be rerun from Linux or the deployed runtime. |
 | Required LangGraph nodes and bounded flow | Verified | `app/graph.py`, architecture Mermaid graph, and `tests/test_graph_cart.py` graph-structure coverage. |

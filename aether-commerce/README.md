@@ -41,7 +41,7 @@ site in the repository root.
 ```bash
 cd apps/ai-assistant
 python -m venv .venv
-pip install -r requirements.txt
+pip install -r requirements-docker.txt
 uvicorn app.main:app --reload --port 8090
 ```
 

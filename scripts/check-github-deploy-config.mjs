@@ -23,7 +23,8 @@ const recommendedVariables = [
 ];
 
 const requiredSecrets = ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"];
-const assistantRecommendedSecrets = ["GEMINI_API_KEY"];
+const assistantRecommendedSecrets = [];
+const assistantProductionSecrets = ["GEMINI_API_KEY", "AETHER_CART_TOKEN_SECRET", "DATABASE_URL"];
 
 const assistantProductionVariables = [
   "NEXT_PUBLIC_AETHER_AI_URL"
@@ -75,6 +76,7 @@ function main() {
   const missingRecommendedVariables = missingFrom(recommendedVariables, variables);
   const missingAssistantProductionVariables = missingFrom(assistantProductionVariables, variables);
   const missingAssistantRecommendedSecrets = missingFrom(assistantRecommendedSecrets, secrets);
+  const missingAssistantProductionSecrets = missingFrom(assistantProductionSecrets, secrets);
 
   if (missingVariables.length || missingSecrets.length) {
     if (missingVariables.length) {
@@ -90,12 +92,15 @@ function main() {
     console.warn(`Missing optional/recommended GitHub variables: ${missingRecommendedVariables.join(", ")}`);
   }
 
-  if (missingAssistantProductionVariables.length || missingAssistantRecommendedSecrets.length) {
+  if (missingAssistantProductionVariables.length || missingAssistantProductionSecrets.length || missingAssistantRecommendedSecrets.length) {
     console.warn(
       [
         "AI assistant production/evaluation is not fully configured.",
         missingAssistantProductionVariables.length
           ? `Missing assistant variables: ${missingAssistantProductionVariables.join(", ")}.`
+          : "",
+        missingAssistantProductionSecrets.length
+          ? `Missing assistant production secrets: ${missingAssistantProductionSecrets.join(", ")}.`
           : "",
         missingAssistantRecommendedSecrets.length
           ? `Missing assistant secrets: ${missingAssistantRecommendedSecrets.join(", ")}.`
