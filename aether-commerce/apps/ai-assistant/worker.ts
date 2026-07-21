@@ -170,7 +170,7 @@ async function classifyIntent(message: string, env: Env): Promise<string> {
   if (!env.GEMINI_API_KEY) return fallback;
   try {
     const model = env.GEMINI_MODEL || "gemini-3.5-flash";
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
+    const response = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -188,7 +188,7 @@ async function classifyIntent(message: string, env: Env): Promise<string> {
           responseMimeType: "application/json",
         },
       }),
-    });
+    }, 2500);
     if (!response.ok) return fallback;
     const data = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
     const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
@@ -215,16 +215,16 @@ async function searchProducts(env: Env, message: string): Promise<AssistantProdu
   apiUrl.searchParams.set("pageSize", "5");
   apiUrl.searchParams.set("inStock", "true");
   if (query) apiUrl.searchParams.set("q", query);
-  const response = await fetch(apiUrl);
+  const response = await fetchWithTimeout(apiUrl, undefined, 5000);
   if (!response.ok) return [];
   const payload = (await response.json()) as { data?: unknown[] };
   return (payload.data || []).map(toAssistantProduct).filter(Boolean).slice(0, 5) as AssistantProduct[];
 }
 
 async function fetchCart(env: Env, cartId: string, cartToken: string): Promise<Record<string, unknown> | null> {
-  const response = await fetch(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}`, env.AETHER_API_BASE_URL), {
+  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}`, env.AETHER_API_BASE_URL), {
     headers: { "x-aether-cart-token": cartToken },
-  });
+  }, 5000);
   if (!response.ok) return null;
   const payload = (await response.json()) as { data?: { items?: unknown[]; totals?: { subtotal?: number; currency?: string } } };
   const cart = payload.data;
@@ -239,11 +239,11 @@ async function fetchCart(env: Env, cartId: string, cartToken: string): Promise<R
 
 async function addToCart(env: Env, cartId: string, cartToken: string, product: AssistantProduct): Promise<Record<string, unknown> | null> {
   const slug = product.product_url.split("slug=")[1]?.split("&")[0] || product.product_id;
-  const response = await fetch(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, env.AETHER_API_BASE_URL), {
+  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, env.AETHER_API_BASE_URL), {
     method: "POST",
     headers: { "content-type": "application/json", "x-aether-cart-token": cartToken },
     body: JSON.stringify({ productId: decodeURIComponent(slug), variantId: product.variant_id || undefined, quantity: 1 }),
-  });
+  }, 5000);
   if (!response.ok) return null;
   return fetchCart(env, cartId, cartToken);
 }
@@ -272,6 +272,10 @@ function extractQuery(message: string): string {
     .replace(/agrega|anade|añade|add|busca|buscar|show|find|recomienda|recommend|producto|product|oferta|deal/gi, "")
     .trim()
     .slice(0, 80);
+}
+
+function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
+  return fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
 }
 
 function responsePayload(
