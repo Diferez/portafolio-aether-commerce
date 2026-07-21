@@ -75,7 +75,8 @@ The free-tier deployment target for the assistant is a Cloudflare Worker named `
 - The full Python/FastAPI assistant remains available for local Docker/container validation.
 - `requirements-docker.txt` is kept for Docker/local/container validation only.
 - The Worker build avoids Python packages that are not compatible with Cloudflare Python Worker packaging on the free path. The Docker-only dependency file can keep provider SDKs and LangGraph for local/container validation.
-- Supabase must be configured as a private `DATABASE_URL` secret. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for assistant persistence.
+- The Cloudflare Worker deployment uses the existing Aether D1 database through the `DB` binding generated from `AETHER_D1_DATABASE_ID`. Conversation tables are applied by `apps/api/migrations/0005_ai_assistant.sql`.
+- Supabase can still be configured as a private `DATABASE_URL` secret for the Docker/FastAPI deployment path. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are client-safe values and are not enough for server-side assistant persistence.
 
 The GitHub workflow `.github/workflows/deploy-ai-assistant-cloudflare.yml` deploys the Worker with Wrangler.
 

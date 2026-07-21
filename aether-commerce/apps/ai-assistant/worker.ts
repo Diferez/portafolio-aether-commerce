@@ -1,5 +1,6 @@
 type Env = {
   AETHER_API_BASE_URL: string;
+  DB?: D1Database;
   AI_ASSISTANT_ENABLED?: string;
   AI_CORS_ALLOWED_ORIGINS?: string;
   GEMINI_API_KEY?: string;
@@ -7,6 +8,17 @@ type Env = {
   GEMINI_TEMPERATURE?: string;
   GEMINI_MAX_OUTPUT_TOKENS?: string;
   AI_MUTATIONS_ENABLED?: string;
+};
+
+type D1Database = {
+  prepare(query: string): D1PreparedStatement;
+};
+
+type D1PreparedStatement = {
+  bind(...values: unknown[]): D1PreparedStatement;
+  first<T = Record<string, unknown>>(): Promise<T | null>;
+  all<T = Record<string, unknown>>(): Promise<{ results?: T[] }>;
+  run(): Promise<unknown>;
 };
 
 type AssistantProduct = {
@@ -80,6 +92,15 @@ export default {
     if (request.method === "POST" && url.pathname === "/v1/assistant/messages/stream") {
       return streamAssistant(request, env);
     }
+    const conversationMatch = url.pathname.match(/^\/v1\/assistant\/conversations\/([^/]+)$/);
+    if (conversationMatch && request.method === "GET") {
+      const result = await getConversation(request, env, decodeURIComponent(conversationMatch[1]));
+      return json(request, env, result.payload, result.status);
+    }
+    if (conversationMatch && request.method === "DELETE") {
+      const result = await deleteConversation(request, env, decodeURIComponent(conversationMatch[1]));
+      return json(request, env, result.payload, result.status);
+    }
 
     return json(request, env, { error: "not_found" }, 404);
   },
@@ -95,15 +116,25 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   const cartId = request.headers.get("x-aether-cart-id") || "";
   const cartToken = request.headers.get("x-aether-cart-token") || "";
   const intent = await classifyIntent(message, env);
+  const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || cartId || "anonymous");
 
   if (env.AI_ASSISTANT_ENABLED === "false") {
     return responsePayload(requestId, threadId, spanish ? "El asistente esta desactivado temporalmente." : "The assistant is temporarily disabled.", "UNSUPPORTED");
   }
 
+  await persistConversationMessage(env, threadId, sessionHash, locale, "user", redactPii(message), {
+    request_id: requestId,
+    client_context: body.client_context || {},
+  });
+  const finish = async (payload: AssistantResponse): Promise<AssistantResponse> => {
+    await persistConversationMessage(env, threadId, sessionHash, locale, "assistant", payload.message, payload);
+    return payload;
+  };
+
   if (intent === "GET_CART" || intent === "CHECKOUT_REQUEST") {
     const cart = cartId && cartToken ? await fetchCart(env, cartId, cartToken) : null;
     if (!cart) {
-      return responsePayload(
+      return finish(responsePayload(
         requestId,
         threadId,
         spanish ? "Necesito validar tu carrito antes de consultarlo. Vuelve a abrir la tienda e intenta de nuevo." : "I need to validate your cart before reading it. Reopen the store and try again.",
@@ -112,7 +143,7 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
         null,
         "ASK_CLARIFICATION",
         "PENDING"
-      );
+      ));
     }
     const reply =
       intent === "CHECKOUT_REQUEST"
@@ -122,69 +153,173 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
         : spanish
           ? `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s).`
           : `Your cart has ${Number(cart.item_count || 0)} item(s).`;
-    return responsePayload(requestId, threadId, reply, intent, [], cart, intent === "CHECKOUT_REQUEST" ? "OPEN_CHECKOUT" : "OPEN_CART", "SUCCEEDED");
+    return finish(responsePayload(requestId, threadId, reply, intent, [], cart, intent === "CHECKOUT_REQUEST" ? "OPEN_CHECKOUT" : "OPEN_CART", "SUCCEEDED"));
   }
 
   if (intent === "REMOVE_FROM_CART" || intent === "UPDATE_CART_ITEM" || intent === "CLEAR_CART") {
     if (env.AI_MUTATIONS_ENABLED === "false") {
-      return responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, [], null, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, [], null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (!cartId || !cartToken) {
-      return responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, [], null, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, [], null, "ASK_CLARIFICATION", "PENDING"));
     }
     const cart = await fetchCart(env, cartId, cartToken);
     if (!cart) {
-      return responsePayload(requestId, threadId, spanish ? "No pude consultar tu carrito. No realice ningun cambio." : "I could not read your cart. No changes were made.", intent, [], null, "ASK_CLARIFICATION", "FAILED");
+      return finish(responsePayload(requestId, threadId, spanish ? "No pude consultar tu carrito. No realice ningun cambio." : "I could not read your cart. No changes were made.", intent, [], null, "ASK_CLARIFICATION", "FAILED"));
     }
     if (intent === "CLEAR_CART") {
       if (!hasClearCartConfirmation(message)) {
-        return responsePayload(requestId, threadId, spanish ? "Para vaciar todo el carrito necesito una confirmacion explicita." : "To clear the entire cart I need explicit confirmation.", intent, [], cart, "ASK_CLARIFICATION", "PENDING");
+        return finish(responsePayload(requestId, threadId, spanish ? "Para vaciar todo el carrito necesito una confirmacion explicita." : "To clear the entire cart I need explicit confirmation.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
       }
       const updated = await clearCart(env, cartId, cartToken, cart);
-      return responsePayload(requestId, threadId, spanish ? "Listo. Vacie el carrito." : "Done. I cleared the cart.", intent, [], updated || cart, updated ? "CART_CLEARED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED");
+      return finish(responsePayload(requestId, threadId, spanish ? "Listo. Vacie el carrito." : "Done. I cleared the cart.", intent, [], updated || cart, updated ? "CART_CLEARED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
     }
     const item = resolveCartItem(cart, message);
     if (!item) {
-      return responsePayload(requestId, threadId, spanish ? "Necesito saber exactamente que producto del carrito quieres cambiar." : "I need to know exactly which cart item you want to change.", intent, [], cart, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Necesito saber exactamente que producto del carrito quieres cambiar." : "I need to know exactly which cart item you want to change.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
     }
     const itemId = String(item.slug || item.variantId || item.productId || "");
     if (intent === "REMOVE_FROM_CART") {
       const updated = await removeCartItem(env, cartId, cartToken, itemId);
-      return responsePayload(requestId, threadId, spanish ? "Listo. Quite el producto del carrito." : "Done. I removed the item from your cart.", intent, [], updated || cart, updated ? "CART_ITEM_REMOVED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED");
+      return finish(responsePayload(requestId, threadId, spanish ? "Listo. Quite el producto del carrito." : "Done. I removed the item from your cart.", intent, [], updated || cart, updated ? "CART_ITEM_REMOVED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
     }
     const quantity = extractQuantity(message);
     if (!quantity) {
-      return responsePayload(requestId, threadId, spanish ? "Indica una cantidad entre 1 y 25 para actualizar el carrito." : "Tell me a quantity from 1 to 25 to update the cart.", intent, [], cart, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Indica una cantidad entre 1 y 25 para actualizar el carrito." : "Tell me a quantity from 1 to 25 to update the cart.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
     }
     const updated = await updateCartItem(env, cartId, cartToken, itemId, quantity);
-    return responsePayload(requestId, threadId, spanish ? `Listo. Actualice la cantidad a ${quantity}.` : `Done. I updated the quantity to ${quantity}.`, intent, [], updated || cart, updated ? "CART_ITEM_UPDATED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED");
+    return finish(responsePayload(requestId, threadId, spanish ? `Listo. Actualice la cantidad a ${quantity}.` : `Done. I updated the quantity to ${quantity}.`, intent, [], updated || cart, updated ? "CART_ITEM_UPDATED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
   }
 
   const contextProduct = await currentContextProduct(env, body);
   const products = contextProduct ? [contextProduct] : await searchProducts(env, message);
   if (intent === "ADD_TO_CART") {
     if (env.AI_MUTATIONS_ENABLED === "false") {
-      return responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, products, null, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Los cambios del carrito estan desactivados temporalmente." : "Cart changes are temporarily disabled.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (!cartId || !cartToken) {
-      return responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, products, null, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Necesito validar tu carrito antes de actualizarlo." : "I need to validate your cart before updating it.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     if (products.length !== 1) {
-      return responsePayload(requestId, threadId, spanish ? "Encontre varias opciones. Dime cual quieres agregar antes de modificar el carrito." : "I found multiple options. Tell me which one to add before I change the cart.", intent, products, null, "ASK_CLARIFICATION", "PENDING");
+      return finish(responsePayload(requestId, threadId, spanish ? "Encontre varias opciones. Dime cual quieres agregar antes de modificar el carrito." : "I found multiple options. Tell me which one to add before I change the cart.", intent, products, null, "ASK_CLARIFICATION", "PENDING"));
     }
     const product = products[0];
     if (product) {
       const cart = await addToCart(env, cartId, cartToken, product, extractQuantity(message) || 1);
       if (cart) {
-        return responsePayload(requestId, threadId, spanish ? "Listo. Agregue el producto al carrito." : "Done. I added the product to your cart.", intent, [product], cart, "CART_ITEM_ADDED", "SUCCEEDED");
+        return finish(responsePayload(requestId, threadId, spanish ? "Listo. Agregue el producto al carrito." : "Done. I added the product to your cart.", intent, [product], cart, "CART_ITEM_ADDED", "SUCCEEDED"));
       }
     }
   }
 
   if (products.length > 0) {
-    return responsePayload(requestId, threadId, spanish ? "Encontre estas opciones reales en Aether." : "I found these real options in Aether.", intent, products);
+    return finish(responsePayload(requestId, threadId, spanish ? "Encontre estas opciones reales en Aether." : "I found these real options in Aether.", intent, products));
   }
-  return responsePayload(requestId, threadId, spanish ? "Puedo ayudarte a buscar productos reales y revisar tu carrito." : "I can help you search real products and review your cart.", intent);
+  return finish(responsePayload(requestId, threadId, spanish ? "Puedo ayudarte a buscar productos reales y revisar tu carrito." : "I can help you search real products and review your cart.", intent));
+}
+
+type AssistantHttpResult = {
+  status: number;
+  payload: Record<string, unknown>;
+};
+
+async function getConversation(request: Request, env: Env, threadId: string): Promise<AssistantHttpResult> {
+  if (!env.DB) return { status: 503, payload: { success: false, error: "persistence_unavailable" } };
+  const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || request.headers.get("x-aether-cart-id") || "anonymous");
+  const conversation = await env.DB.prepare("select id, session_hash, locale, status, created_at, updated_at from ai_conversations where id = ?").bind(threadId).first<{
+    id: string;
+    session_hash: string;
+    locale: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+  }>();
+  if (!conversation || conversation.status !== "active") return { status: 404, payload: { success: false, error: "conversation_not_found" } };
+  if (conversation.session_hash !== sessionHash) return { status: 403, payload: { success: false, error: "forbidden" } };
+  const rows = await env.DB.prepare("select id, role, content_redacted, payload_json, created_at from ai_messages where conversation_id = ? order by created_at asc").bind(threadId).all<{
+    id: string;
+    role: string;
+    content_redacted: string | null;
+    payload_json: string;
+    created_at: string;
+  }>();
+  return {
+    status: 200,
+    payload: {
+      success: true,
+      data: {
+        thread_id: conversation.id,
+        locale: conversation.locale,
+        created_at: conversation.created_at,
+        updated_at: conversation.updated_at,
+        messages: (rows.results || []).map((row) => ({
+          id: row.id,
+          role: row.role,
+          content: row.content_redacted,
+          payload: safeJson(row.payload_json),
+          created_at: row.created_at,
+        })),
+      },
+    },
+  };
+}
+
+async function deleteConversation(request: Request, env: Env, threadId: string): Promise<AssistantHttpResult> {
+  if (!env.DB) return { status: 503, payload: { success: false, error: "persistence_unavailable" } };
+  const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || request.headers.get("x-aether-cart-id") || "anonymous");
+  const conversation = await env.DB.prepare("select session_hash, status from ai_conversations where id = ?").bind(threadId).first<{
+    session_hash: string;
+    status: string;
+  }>();
+  if (!conversation || conversation.status !== "active") return { status: 404, payload: { success: false, error: "conversation_not_found" } };
+  if (conversation.session_hash !== sessionHash) return { status: 403, payload: { success: false, error: "forbidden" } };
+  await env.DB.prepare("update ai_conversations set status = 'deleted', updated_at = CURRENT_TIMESTAMP where id = ?").bind(threadId).run();
+  await env.DB.prepare("delete from ai_messages where conversation_id = ?").bind(threadId).run();
+  return { status: 200, payload: { success: true, data: { thread_id: threadId, deleted: true } } };
+}
+
+async function persistConversationMessage(
+  env: Env,
+  threadId: string,
+  sessionHash: string,
+  locale: string,
+  role: "user" | "assistant",
+  content: string,
+  payload: Record<string, unknown> | AssistantResponse
+): Promise<void> {
+  if (!env.DB) return;
+  await env.DB
+    .prepare(
+      `insert into ai_conversations (id, session_hash, locale, status, metadata_json, expires_at, created_at, updated_at)
+       values (?, ?, ?, 'active', '{}', datetime('now', '+30 days'), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       on conflict(id) do update set updated_at = CURRENT_TIMESTAMP, locale = excluded.locale`
+    )
+    .bind(threadId, sessionHash, locale)
+    .run();
+  await env.DB
+    .prepare("insert into ai_messages (id, conversation_id, role, content_redacted, payload_json, created_at) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
+    .bind(crypto.randomUUID(), threadId, role, content.slice(0, 4000), JSON.stringify(payload).slice(0, 12000))
+    .run();
+}
+
+async function stableHash(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(value));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function redactPii(value: string): string {
+  return value
+    .replace(/\b(?:\d[ -]*?){13,19}\b/g, "[redacted-card]")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted-email]")
+    .replace(/(?:\+?\d[\s().-]?){8,}/g, "[redacted-phone]");
+}
+
+function safeJson(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
 }
 
 async function streamAssistant(request: Request, env: Env): Promise<Response> {

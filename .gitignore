@@ -53,3 +53,4 @@ next-env.d.ts
 /outputs/
 /work/
 aether-commerce/apps/api/wrangler.production.json
+aether-commerce/apps/ai-assistant/wrangler.production.json

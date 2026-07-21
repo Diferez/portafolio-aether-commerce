@@ -22,6 +22,8 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL || secrets.DATABASE_URL }}
       AETHER_CART_TOKEN_SECRET: ${{ secrets.AETHER_CART_TOKEN_SECRET }}
+      AETHER_D1_DATABASE_ID: ${{ vars.AETHER_D1_DATABASE_ID }}
+      AETHER_D1_DATABASE_NAME: ${{ vars.AETHER_D1_DATABASE_NAME || 'aether-production' }}
       AETHER_API_BASE_URL: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
       AI_CORS_ALLOWED_ORIGINS: ${{ vars.APP_ORIGIN_STORE }}
       GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
@@ -42,16 +44,19 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN"
           test -n "$GEMINI_API_KEY"
           test -n "$AETHER_CART_TOKEN_SECRET"
+          test -n "$AETHER_D1_DATABASE_ID"
 
       - name: Deploy AI assistant Worker
-        working-directory: aether-commerce/apps/ai-assistant
-        run: npx wrangler deploy --config wrangler.jsonc --keep-vars
+        run: |
+          node scripts/write-aether-ai-wrangler-config.mjs
+          cd aether-commerce/apps/ai-assistant
+          npx wrangler deploy --config wrangler.production.json --keep-vars
 
       - name: Configure AI assistant secrets
         working-directory: aether-commerce/apps/ai-assistant
         run: |
           node -e "const fs=require('fs'); const keys=['GEMINI_API_KEY','DATABASE_URL','AETHER_CART_TOKEN_SECRET','GEMINI_FALLBACK_MODEL']; const out={}; for (const key of keys) if (process.env[key]) out[key]=process.env[key]; fs.writeFileSync('.ai-secrets.json', JSON.stringify(out));"
-          npx wrangler secret bulk .ai-secrets.json --config wrangler.jsonc
+          npx wrangler secret bulk .ai-secrets.json --config wrangler.production.json
           rm .ai-secrets.json
 
       - name: Smoke public health
