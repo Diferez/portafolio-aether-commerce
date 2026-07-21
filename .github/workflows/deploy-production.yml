@@ -183,7 +183,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL || secrets.DATABASE_URL }}
           AETHER_CART_TOKEN_SECRET: ${{ secrets.AETHER_CART_TOKEN_SECRET }}
           AI_OPERATIONS_TOKEN: ${{ secrets.AI_OPERATIONS_TOKEN }}
         run: |
