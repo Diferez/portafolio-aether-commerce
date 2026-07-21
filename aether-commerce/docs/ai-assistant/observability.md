@@ -2,6 +2,8 @@
 
 The assistant exposes Prometheus text metrics at `GET /metrics` and optional OTLP traces when `OTEL_ENABLED=true`.
 
+On the Cloudflare Worker deployment, `/metrics` is backed by D1 tables used by the assistant. It reports project-level request counts from `ai_usage_daily`, LLM classification attempts, audited cart tool calls, blocked mutations, rate-limit events, and daily budget gauges.
+
 ## Signals
 
 Use these signals as the minimum production dashboard:

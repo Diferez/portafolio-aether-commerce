@@ -9,6 +9,9 @@ type Env = {
   GEMINI_MAX_OUTPUT_TOKENS?: string;
   AI_MUTATIONS_ENABLED?: string;
   AI_OPERATIONS_TOKEN?: string;
+  AI_RATE_LIMIT_ANONYMOUS_PER_DAY?: string;
+  AI_RATE_LIMIT_AUTHENTICATED_PER_DAY?: string;
+  AI_DAILY_REQUEST_BUDGET?: string;
 };
 
 type D1Database = {
@@ -83,14 +86,18 @@ export default {
       });
     }
     if (url.pathname === "/metrics") {
-      return new Response("aether_ai_worker_ready 1\n", {
+      return new Response(await renderMetrics(env), {
         headers: { ...corsHeaders(request, env), "content-type": "text/plain; charset=utf-8" },
       });
     }
     if (request.method === "POST" && url.pathname === "/v1/assistant/messages") {
+      const limit = await enforceMessageUsage(request, env);
+      if (limit) return json(request, env, limit.payload, limit.status);
       return json(request, env, await handleAssistant(request, env));
     }
     if (request.method === "POST" && url.pathname === "/v1/assistant/messages/stream") {
+      const limit = await enforceMessageUsage(request, env);
+      if (limit) return json(request, env, limit.payload, limit.status);
       return streamAssistant(request, env);
     }
     const conversationMatch = url.pathname.match(/^\/v1\/assistant\/conversations\/([^/]+)$/);
@@ -120,12 +127,13 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   const message = String(body.message || "").slice(0, 4000);
   const cartId = request.headers.get("x-aether-cart-id") || "";
   const cartToken = request.headers.get("x-aether-cart-token") || "";
-  const intent = await classifyIntent(message, env);
   const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || cartId || "anonymous");
 
   if (env.AI_ASSISTANT_ENABLED === "false") {
     return responsePayload(requestId, threadId, spanish ? "El asistente esta desactivado temporalmente." : "The assistant is temporarily disabled.", "UNSUPPORTED");
   }
+
+  const intent = await classifyIntent(message, env, sessionHash);
 
   await persistConversationMessage(env, threadId, sessionHash, locale, "user", redactPii(message), {
     request_id: requestId,
@@ -345,6 +353,129 @@ async function getAuditEvents(request: Request, env: Env, url: URL): Promise<Ass
   return { status: 200, payload: { success: true, data: rows.results || [] } };
 }
 
+async function enforceMessageUsage(request: Request, env: Env): Promise<AssistantHttpResult | null> {
+  if (env.AI_ASSISTANT_ENABLED === "false") return null;
+  if (!env.DB) return null;
+  const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || request.headers.get("x-aether-cart-id") || "anonymous");
+  const day = usageDay();
+  const sessionLimit = numberEnv(env.AI_RATE_LIMIT_ANONYMOUS_PER_DAY);
+  const projectLimit = numberEnv(env.AI_DAILY_REQUEST_BUDGET);
+  const sessionUsage = await getDailyUsage(env, day, sessionHash);
+  if (sessionLimit !== null && sessionUsage >= sessionLimit) {
+    await incrementDailyUsage(env, day, "rate_limit_errors", { request_count: 1 });
+    return {
+      status: 429,
+      payload: {
+        success: false,
+        error: { code: "daily_session_limit_exceeded", message: "El asistente alcanzo el limite diario de esta sesion." },
+      },
+    };
+  }
+  const projectUsage = await getDailyUsage(env, day, "project");
+  if (projectLimit !== null && projectUsage >= projectLimit) {
+    await incrementDailyUsage(env, day, "rate_limit_errors", { request_count: 1 });
+    return {
+      status: 429,
+      payload: {
+        success: false,
+        error: { code: "daily_budget_exceeded", message: "El asistente alcanzo el presupuesto diario configurado." },
+      },
+    };
+  }
+  await incrementDailyUsage(env, day, sessionHash, { request_count: 1 });
+  await incrementDailyUsage(env, day, "project", { request_count: 1 });
+  return null;
+}
+
+async function renderMetrics(env: Env): Promise<string> {
+  if (!env.DB) return "aether_ai_worker_ready 1\nai_requests_total 0\n";
+  const day = usageDay();
+  const usage = await env.DB
+    .prepare(
+      "select user_or_session_hash, request_count, llm_call_count, tool_call_count from ai_usage_daily where usage_date = ?"
+    )
+    .bind(day)
+    .all<{ user_or_session_hash: string; request_count: number; llm_call_count: number; tool_call_count: number }>();
+  const audit = await env.DB
+    .prepare(
+      "select authorization_result, execution_status, count(*) as count from ai_action_audit group by authorization_result, execution_status"
+    )
+    .all<{ authorization_result: string; execution_status: string; count: number }>();
+  const projectRequests = Number((usage.results || []).find((row) => row.user_or_session_hash === "project")?.request_count || 0);
+  const projectLlmCalls = Number((usage.results || []).find((row) => row.user_or_session_hash === "project")?.llm_call_count || 0);
+  const projectToolCalls = Number((usage.results || []).find((row) => row.user_or_session_hash === "project")?.tool_call_count || 0);
+  const rateErrors = Number((usage.results || []).find((row) => row.user_or_session_hash === "rate_limit_errors")?.request_count || 0);
+  const cartMutations = (audit.results || [])
+    .filter((row) => row.authorization_result === "allowed" && row.execution_status === "succeeded")
+    .reduce((total, row) => total + Number(row.count || 0), 0);
+  const cartMutationFailures = (audit.results || [])
+    .filter((row) => row.authorization_result === "allowed" && row.execution_status === "failed")
+    .reduce((total, row) => total + Number(row.count || 0), 0);
+  const blockedMutations = (audit.results || [])
+    .filter((row) => row.execution_status === "blocked")
+    .reduce((total, row) => total + Number(row.count || 0), 0);
+  const dailyBudget = numberEnv(env.AI_DAILY_REQUEST_BUDGET);
+  const budgetRatio = dailyBudget && dailyBudget > 0 ? Math.min(1, projectRequests / dailyBudget) : 0;
+  return [
+    "aether_ai_worker_ready 1",
+    `ai_requests_total ${projectRequests}`,
+    "ai_requests_active 0",
+    "ai_request_duration_seconds 0",
+    `ai_llm_calls_total ${projectLlmCalls}`,
+    "ai_llm_duration_seconds 0",
+    "ai_llm_tokens_input_total 0",
+    "ai_llm_tokens_output_total 0",
+    `ai_tool_calls_total ${projectToolCalls}`,
+    "ai_tool_errors_total 0",
+    `ai_rate_limit_errors_total ${rateErrors}`,
+    `ai_cart_mutations_total ${cartMutations}`,
+    `ai_cart_mutation_failures_total ${cartMutationFailures}`,
+    "ai_clarifications_total 0",
+    "ai_fallback_total 0",
+    `ai_blocked_cart_mutations_total ${blockedMutations}`,
+    `ai_daily_budget_usage_ratio ${budgetRatio}`,
+    `ai_daily_budget_requests_remaining ${dailyBudget === null ? 0 : Math.max(0, dailyBudget - projectRequests)}`,
+    `ai_daily_budget_threshold_70_reached ${budgetRatio >= 0.7 ? 1 : 0}`,
+    `ai_daily_budget_threshold_85_reached ${budgetRatio >= 0.85 ? 1 : 0}`,
+    `ai_daily_budget_threshold_95_reached ${budgetRatio >= 0.95 ? 1 : 0}`,
+    "",
+  ].join("\n");
+}
+
+async function getDailyUsage(env: Env, day: string, userOrSessionHash: string): Promise<number> {
+  if (!env.DB) return 0;
+  const row = await env.DB
+    .prepare("select request_count from ai_usage_daily where usage_date = ? and user_or_session_hash = ?")
+    .bind(day, userOrSessionHash)
+    .first<{ request_count: number }>();
+  return Number(row?.request_count || 0);
+}
+
+async function incrementDailyUsage(
+  env: Env,
+  day: string,
+  userOrSessionHash: string,
+  increments: { request_count?: number; llm_call_count?: number; tool_call_count?: number } = {}
+): Promise<void> {
+  if (!env.DB) return;
+  const requestCount = increments.request_count || 0;
+  const llmCallCount = increments.llm_call_count || 0;
+  const toolCallCount = increments.tool_call_count || 0;
+  await env.DB
+    .prepare(
+      `insert into ai_usage_daily (
+         id, usage_date, user_or_session_hash, request_count, llm_call_count, tool_call_count, input_tokens, output_tokens, created_at, updated_at
+       ) values (?, ?, ?, ?, ?, ?, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       on conflict(usage_date, user_or_session_hash) do update set
+         request_count = request_count + excluded.request_count,
+         llm_call_count = llm_call_count + excluded.llm_call_count,
+         tool_call_count = tool_call_count + excluded.tool_call_count,
+         updated_at = CURRENT_TIMESTAMP`
+    )
+    .bind(crypto.randomUUID(), day, userOrSessionHash, requestCount, llmCallCount, toolCallCount)
+    .run();
+}
+
 async function persistConversationMessage(
   env: Env,
   threadId: string,
@@ -407,6 +538,8 @@ async function persistAuditEvent(
       event.error_code
     )
     .run();
+  await incrementDailyUsage(env, usageDay(), event.user_or_session_hash, { tool_call_count: 1 });
+  await incrementDailyUsage(env, usageDay(), "project", { tool_call_count: 1 });
 }
 
 async function stableHash(value: string): Promise<string> {
@@ -458,10 +591,14 @@ async function streamAssistant(request: Request, env: Env): Promise<Response> {
   });
 }
 
-async function classifyIntent(message: string, env: Env): Promise<string> {
+async function classifyIntent(message: string, env: Env, sessionHash?: string): Promise<string> {
   const fallback = heuristicIntent(message);
   if (!env.GEMINI_API_KEY) return fallback;
   try {
+    if (sessionHash) {
+      await incrementDailyUsage(env, usageDay(), sessionHash, { llm_call_count: 1 });
+      await incrementDailyUsage(env, usageDay(), "project", { llm_call_count: 1 });
+    }
     const model = env.GEMINI_MODEL || "gemini-3.5-flash";
     const response = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
       method: "POST",
@@ -490,6 +627,16 @@ async function classifyIntent(message: string, env: Env): Promise<string> {
   } catch {
     return fallback;
   }
+}
+
+function usageDay(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function numberEnv(value: string | undefined): number | null {
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function heuristicIntent(message: string): string {
