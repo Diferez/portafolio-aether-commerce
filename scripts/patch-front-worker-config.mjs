@@ -6,11 +6,14 @@ const config = JSON.parse(readFileSync(configPath, "utf8"));
 
 config.name = process.env.AETHER_FRONT_WORKER_NAME || "portafolio-aether-commerce";
 config.topLevelName = config.name;
+delete config.legacy_env;
+delete config.legacyEnv;
 config.vars = {
   ...(config.vars || {}),
   NEXT_PUBLIC_AETHER_API_URL: process.env.NEXT_PUBLIC_AETHER_API_URL || "",
   AETHER_API_ORIGIN: process.env.AETHER_API_ORIGIN || process.env.NEXT_PUBLIC_AETHER_API_URL || "",
-  AETHER_STOREFRONT_ORIGIN: process.env.AETHER_STOREFRONT_ORIGIN || ""
+  AETHER_STOREFRONT_ORIGIN: process.env.AETHER_STOREFRONT_ORIGIN || "",
+  NEXT_PUBLIC_AETHER_AI_URL: process.env.NEXT_PUBLIC_AETHER_AI_URL || ""
 };
 
 writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
