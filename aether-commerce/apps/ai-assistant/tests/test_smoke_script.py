@@ -29,7 +29,7 @@ def test_compose_exposes_local_dependencies_and_healthcheck() -> None:
     assert "healthcheck" in compose
 
 
-def test_acceptance_audit_reports_artifacts_and_known_blockers() -> None:
+def test_acceptance_audit_reports_artifacts_and_current_status() -> None:
     import importlib.util
 
     script = Path(__file__).resolve().parents[1] / "scripts" / "acceptance_audit.py"
@@ -39,9 +39,10 @@ def test_acceptance_audit_reports_artifacts_and_known_blockers() -> None:
     spec.loader.exec_module(module)
 
     report = module.build_report()
+    assert report["status"] == "passed"
     assert report["evaluation_cases"] >= 100
     assert report["missing_required_artifacts"] == []
     assert "Docker image build and container smoke test" not in report["active_production_blockers"]
     assert "repository secrets are still missing" not in report["active_production_blockers"]
-    assert "NEXT_PUBLIC_AETHER_AI_URL" in report["active_production_blockers"]
-    assert "Production deployment of the AI assistant service has not been proven" in report["active_production_blockers"]
+    assert "NEXT_PUBLIC_AETHER_AI_URL" not in report["active_production_blockers"]
+    assert "Production deployment of the AI assistant service has not been proven" not in report["active_production_blockers"]

@@ -101,7 +101,7 @@ def main() -> None:
         smoke.test_smoke_script_uses_expected_endpoints,
         smoke.test_dockerfile_keeps_runtime_non_root_and_healthchecked,
         smoke.test_compose_exposes_local_dependencies_and_healthcheck,
-        smoke.test_acceptance_audit_reports_artifacts_and_known_blockers,
+        smoke.test_acceptance_audit_reports_artifacts_and_current_status,
         security_scan.test_stable_hash_does_not_match_secret_patterns,
         api_contract_docs.test_ai_assistant_openapi_documents_required_endpoints,
         api_contract_docs.test_ai_assistant_openapi_documents_structured_response_contract,
