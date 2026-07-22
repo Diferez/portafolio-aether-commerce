@@ -189,7 +189,9 @@ The assistant image is built with a multi-stage Dockerfile and runs as a non-roo
 
 Catalog and product detail reads use a short in-memory cache controlled by `AI_CATALOG_CACHE_TTL_SECONDS`. Set it to `0` to disable caching. Cart reads, cart mutations, actor lookup, authorization and stock-changing operations are never cached; the Aether Worker API remains the source of truth.
 
-Daily request usage is stored in `ai_usage_daily`. Short-window limits for IP, session, authenticated token, project and conversation are stored as hashed buckets in `ai_rate_limit_buckets`. Configure `AI_DAILY_REQUEST_BUDGET` before public launch if the Gemini project has a strict quota or billing cap.
+Daily request usage is stored in `ai_usage_daily`. Short-window limits for IP, session, authenticated token, project and conversation are stored as hashed buckets in `ai_rate_limit_buckets`; expired buckets are pruned opportunistically after accepted assistant requests. Configure `AI_DAILY_REQUEST_BUDGET` before public launch if the Gemini project has a strict quota or billing cap.
+
+The Worker rejects messages longer than `AI_MAX_INPUT_CHARACTERS` before D1 counters or Gemini calls are consumed.
 
 Set `AI_STORE_CONVERSATIONS=false` for a stricter privacy mode that disables stored conversation history. In that mode, the assistant still works for single-turn search/help/cart actions, but it cannot use previous product lists to resolve follow-up references across messages.
 

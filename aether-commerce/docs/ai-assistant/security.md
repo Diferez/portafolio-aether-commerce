@@ -14,7 +14,7 @@
 - `AI_STORE_CONVERSATIONS=false` disables persisted conversations and message payloads. Mutable cart attempts are still audited without storing user message content.
 - Input length is enforced from `AI_MAX_INPUT_CHARACTERS` before the graph executes.
 - Checkout and payment collection are outside the assistant. Payment requests are redirected to Aether checkout.
-- Rate limiting runs across project, IP, session, conversation and principal scopes. Production should configure Redis so limits work across service replicas.
+- Rate limiting runs across project, IP, session, conversation and principal scopes. The Docker/FastAPI deployment should configure Redis so limits work across service replicas. The Cloudflare Worker deployment uses D1 hashed buckets for the same short-window controls on the free-tier path.
 - Conversations and audit records can use PostgreSQL in production through `DATABASE_URL`.
 - Cart reads and mutations from the assistant require a signed cart token. The storefront obtains it from the Worker API and the assistant validates it with the shared `AETHER_CART_TOKEN_SECRET`. Missing or mismatched cart tokens produce a clarification response instead of returning a potentially misleading empty cart.
 - Denied cart mutations are audited even when no tool is executed. Missing/invalid cart tokens, low mutation confidence and missing clear-cart confirmation produce blocked audit events.

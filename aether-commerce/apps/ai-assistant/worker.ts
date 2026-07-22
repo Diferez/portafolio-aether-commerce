@@ -3,6 +3,7 @@ type Env = {
   DB?: D1Database;
   AI_ASSISTANT_ENABLED?: string;
   AI_CORS_ALLOWED_ORIGINS?: string;
+  AI_MAX_INPUT_CHARACTERS?: string;
   GEMINI_API_KEY?: string;
   GEMINI_MODEL?: string;
   GEMINI_TEMPERATURE?: string;
@@ -126,7 +127,7 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   const threadId = body.thread_id || crypto.randomUUID();
   const locale = body.locale || "es-CO";
   const spanish = locale.toLowerCase().startsWith("es");
-  const message = String(body.message || "").slice(0, 4000);
+  const message = String(body.message || "").slice(0, inputCharacterLimit(env));
   const cartId = request.headers.get("x-aether-cart-id") || "";
   const cartToken = request.headers.get("x-aether-cart-token") || "";
   const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || cartId || "anonymous");
@@ -357,8 +358,21 @@ async function getAuditEvents(request: Request, env: Env, url: URL): Promise<Ass
 
 async function enforceMessageUsage(request: Request, env: Env): Promise<AssistantHttpResult | null> {
   if (env.AI_ASSISTANT_ENABLED === "false") return null;
-  if (!env.DB) return null;
   const body = (await request.clone().json().catch(() => ({}))) as AssistantRequest;
+  const maxInputCharacters = inputCharacterLimit(env);
+  if (String(body.message || "").length > maxInputCharacters) {
+    return {
+      status: 413,
+      payload: {
+        success: false,
+        error: {
+          code: "input_too_large",
+          message: `El mensaje supera el limite de ${maxInputCharacters} caracteres.`,
+        },
+      },
+    };
+  }
+  if (!env.DB) return null;
   const sessionHash = await stableHash(request.headers.get("x-aether-session-id") || request.headers.get("x-aether-cart-id") || "anonymous");
   const scopeHashes = await rateLimitScopes(request, sessionHash, body.thread_id || null);
   const minuteLimit = numberEnv(env.AI_RATE_LIMIT_MESSAGES_PER_MINUTE);
@@ -444,6 +458,7 @@ async function enforceShortWindowLimits(
       await incrementRateBucket(env, scopeHash, window.key, window.expiresAt);
     }
   }
+  await pruneExpiredRateBuckets(env);
   return null;
 }
 
@@ -474,6 +489,15 @@ async function incrementRateBucket(env: Env, scopeHash: string, windowKey: strin
     )
     .bind(crypto.randomUUID(), scopeHash, windowKey, expiresAt)
     .run();
+}
+
+async function pruneExpiredRateBuckets(env: Env): Promise<void> {
+  if (!env.DB) return;
+  try {
+    await env.DB.prepare("delete from ai_rate_limit_buckets where expires_at <= datetime('now')").run();
+  } catch {
+    // Metrics remain safe if a prior deployment has not applied the migration yet.
+  }
 }
 
 async function renderMetrics(env: Env): Promise<string> {
@@ -740,6 +764,10 @@ function numberEnv(value: string | undefined): number | null {
   if (!value) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function inputCharacterLimit(env: Env): number {
+  return numberEnv(env.AI_MAX_INPUT_CHARACTERS) || 4000;
 }
 
 function heuristicIntent(message: string): string {
