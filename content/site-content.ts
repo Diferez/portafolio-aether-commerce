@@ -180,75 +180,6 @@ export const content = {
         },
       ],
     },
-    experience: {
-      eyebrow: "Experiencia",
-      title: "Experiencia profesional en pagos, banca, cloud y productos web.",
-      description:
-        "Una línea de tiempo enfocada en responsabilidades confirmadas, sin métricas inventadas ni afirmaciones no verificadas.",
-      items: [
-        {
-          company: "Utopia Group",
-          role: "Software Engineer",
-          period: "2025-2026",
-          highlights: [
-            "Implementación y mantenimiento de servicios de pago integrados con Stripe.",
-            "Procesamiento de pagos, webhooks, reembolsos y suscripciones.",
-            "Mejora de la confiabilidad del backend y de operaciones de facturación seguras y escalables.",
-            "Mantenimiento de sistemas internos relacionados con pagos.",
-          ],
-        },
-        {
-          company: "SETI",
-          role: "Software Engineer",
-          period: "2021-2025",
-          projects: [
-            {
-              title: "Aplicación bancaria para Banistmo",
-              description:
-                "Trabajo como contratista externo en una aplicación bancaria basada en microservicios.",
-              highlights: [
-                "AWS Lambda, Node.js y Angular.",
-                "Administración de pipelines de CI/CD mediante Azure DevOps.",
-                "Desarrollo y mantenimiento de servicios y funcionalidades empresariales.",
-              ],
-            },
-            {
-              title: "Plataforma SaaS de pagos flexibles",
-              description:
-                "Plataforma fintech y de administración de propiedades para dividir pagos de alquiler o reservas en cuotas personalizables sin intereses.",
-              highlights: [
-                "Integración con sistemas de administración de propiedades.",
-                "Frontend en Next.js desplegado en Vercel.",
-                "Backend serverless en Google Cloud con Firestore, Cloud Functions y Stripe.",
-                "Flujos de pago y procesos transaccionales.",
-              ],
-            },
-            {
-              title: "Plataforma cloud de operaciones financieras",
-              description:
-                "Aplicación escalable para operaciones financieras con APIs, interfaces de usuario, autenticación y flujos transaccionales.",
-              highlights: [
-                "AWS, SST Framework y Amazon RDS.",
-                "Pipelines de despliegue e infraestructura como código.",
-                "Separación entre frontend, backend e infraestructura.",
-              ],
-            },
-          ],
-        },
-        {
-          company: "Talos",
-          role: "Junior Software Engineer",
-          period: "2020-2021",
-          highlights: [
-            "Participación en el desarrollo de una aplicación eCommerce.",
-            "Desarrollo con React y Angular.",
-            "Construcción y mejora de interfaces de usuario.",
-            "Optimización del rendimiento de la aplicación.",
-            "Trabajo dentro de un equipo de ingeniería de software.",
-          ],
-        },
-      ],
-    },
     caseStudies: {
       eyebrow: "Casos de estudio",
       title:
@@ -726,7 +657,6 @@ export const content = {
       items: [
         { label: "Home", href: "#home" },
         { label: "Services", href: "#services" },
-        { label: "Experience", href: "#experience" },
         { label: "Projects", href: "#projects" },
         { label: "Artificial intelligence", href: "#ai" },
         { label: "Technologies", href: "#technologies" },
@@ -863,75 +793,6 @@ export const content = {
           description:
             "Custom product development, specialized platforms, and guidance from idea to launch.",
           icon: "individual",
-        },
-      ],
-    },
-    experience: {
-      eyebrow: "Experience",
-      title: "Professional experience across payments, banking, cloud, and web products.",
-      description:
-        "A timeline focused on confirmed responsibilities, without invented metrics or unsupported claims.",
-      items: [
-        {
-          company: "Utopia Group",
-          role: "Software Engineer",
-          period: "2025-2026",
-          highlights: [
-            "Implementation and maintenance of payment services integrated with Stripe.",
-            "Payment processing, webhooks, refunds, and subscriptions.",
-            "Improved backend reliability and safe, scalable billing operations.",
-            "Maintenance of internal systems related to payments.",
-          ],
-        },
-        {
-          company: "SETI",
-          role: "Software Engineer",
-          period: "2021-2025",
-          projects: [
-            {
-              title: "Banking application for Banistmo",
-              description:
-                "External contractor work on a banking application based on microservices.",
-              highlights: [
-                "AWS Lambda, Node.js, and Angular.",
-                "CI/CD pipeline administration through Azure DevOps.",
-                "Development and maintenance of enterprise services and features.",
-              ],
-            },
-            {
-              title: "Flexible Payments SaaS Platform",
-              description:
-                "Fintech and property management platform for splitting rent or reservation payments into customizable interest-free installments.",
-              highlights: [
-                "Integration with property management systems.",
-                "Frontend built with Next.js and deployed on Vercel.",
-                "Serverless backend on Google Cloud with Firestore, Cloud Functions, and Stripe.",
-                "Payment flows and transactional processes.",
-              ],
-            },
-            {
-              title: "Cloud Financial Operations Platform",
-              description:
-                "Scalable application for financial operations with APIs, user interfaces, authentication, and transactional flows.",
-              highlights: [
-                "AWS, SST Framework, and Amazon RDS.",
-                "Deployment pipelines and infrastructure as code.",
-                "Separation between frontend, backend, and infrastructure.",
-              ],
-            },
-          ],
-        },
-        {
-          company: "Talos",
-          role: "Junior Software Engineer",
-          period: "2020-2021",
-          highlights: [
-            "Participation in the development of an eCommerce application.",
-            "Development with React and Angular.",
-            "Building and improving user interfaces.",
-            "Application performance optimization.",
-            "Work within a software engineering team.",
-          ],
         },
       ],
     },

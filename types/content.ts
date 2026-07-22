@@ -133,12 +133,6 @@ export type LandingContent = {
     description: string;
     items: readonly CardItem[];
   };
-  experience: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    items: readonly TimelineItem[];
-  };
   caseStudies: {
     eyebrow: string;
     title: string;

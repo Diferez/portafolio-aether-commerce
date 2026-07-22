@@ -70,7 +70,6 @@ function sectionIds(locale: Locale) {
     ? {
         home: "inicio",
         services: "servicios",
-        experience: "experiencia",
         projects: "proyectos",
         technologies: "tecnologias",
         ai: "ia",
@@ -79,7 +78,6 @@ function sectionIds(locale: Locale) {
     : {
         home: "home",
         services: "services",
-        experience: "experience",
         projects: "projects",
         technologies: "technologies",
         ai: "ai",
@@ -208,10 +206,6 @@ export function LandingPage({ content }: LandingPageProps) {
                 <p className="hero-description">{content.hero.description}</p>
               </Reveal>
               <Reveal className="hero-actions" delay={0.24}>
-                <a className="ghost-button" href={`#${ids.experience}`}>
-                  {content.hero.primaryCta}
-                  <ArrowRight aria-hidden="true" size={18} />
-                </a>
                 <a className="secondary-button" href={`#${ids.contact}`}>
                   {content.hero.secondaryCta}
                 </a>
@@ -269,7 +263,6 @@ export function LandingPage({ content }: LandingPageProps) {
             columns="five"
           />
 
-          <ExperienceSection content={content} id={ids.experience} />
           <CaseStudiesSection content={content} id={ids.projects} />
           <AISection content={content} id={ids.ai} />
           <TechStackSection content={content} id={ids.technologies} />
@@ -441,54 +434,6 @@ function SectionShell({
       </Reveal>
       {children}
     </section>
-  );
-}
-
-function ExperienceSection({ content, id }: { content: LandingContent; id: string }) {
-  return (
-    <SectionShell
-      id={id}
-      eyebrow={content.experience.eyebrow}
-      title={content.experience.title}
-      description={content.experience.description}
-    >
-      <div className="timeline">
-        {content.experience.items.map((item, index) => (
-          <Reveal className="timeline-item" key={`${item.company}-${item.period}`} delay={index * 0.04}>
-            <div className="timeline-marker" aria-hidden="true" />
-            <div className="timeline-content">
-              <div className="timeline-topline">
-                <span>{item.period}</span>
-                <strong>{item.company}</strong>
-              </div>
-              <h3>{item.role}</h3>
-              {item.highlights ? (
-                <ul>
-                  {item.highlights.map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
-                  ))}
-                </ul>
-              ) : null}
-              {item.projects ? (
-                <div className="experience-projects">
-                  {item.projects.map((project) => (
-                    <div key={project.title}>
-                      <h4>{project.title}</h4>
-                      <p>{project.description}</p>
-                      <ul>
-                        {project.highlights.map((highlight) => (
-                          <li key={highlight}>{highlight}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </SectionShell>
   );
 }
 
