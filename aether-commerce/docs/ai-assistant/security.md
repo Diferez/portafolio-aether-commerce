@@ -9,6 +9,7 @@
 - The model cannot execute generic store actions. Each tool has a strict schema.
 - Prices, stock and cart totals are always read from Aether Worker API.
 - Mutations require explicit user intent and a deterministic idempotency key.
+- Mutable cart requests are blocked when classifier confidence is below `AI_MUTATION_CONFIDENCE_THRESHOLD`; unclear non-mutable requests are clarified below `AI_INTENT_CONFIDENCE_THRESHOLD`.
 - PII redaction is enabled by `AI_REDACT_PII=true`.
 - Logs avoid full message content unless `AI_LOG_MESSAGE_CONTENT=true`.
 - `AI_STORE_CONVERSATIONS=false` disables persisted conversations and message payloads. Mutable cart attempts are still audited without storing user message content.

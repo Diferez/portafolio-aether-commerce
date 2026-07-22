@@ -1,6 +1,6 @@
 # AI Assistant Requirements Audit
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 This audit maps the original assistant requirements to current workspace evidence. Status values are conservative:
 
@@ -45,17 +45,14 @@ This audit maps the original assistant requirements to current workspace evidenc
 | Docker image | Verified | `Dockerfile` is multi-stage, non-root and healthchecked; local `docker build` passed. |
 | Docker smoke runtime | Verified | Temporary `aether-ai-assistant:test` container started on port 8090 and `python scripts/smoke.py` passed. |
 | CI/CD gates | Verified | Root and nested CI run lint, typecheck, tests, security scan, evaluation, acceptance audit, Docker build/smoke, OpenAPI, build and E2E gates. `.github/workflows/ai-assistant-image.yml` builds, smokes and publishes the assistant image to GHCR. |
-| Production deployment workflow | Blocked | Workflow exists, validates Cloudflare secrets from the GitHub production environment, publishes a deployable assistant image to GHCR, and the preflight warns when AI assistant settings are incomplete. `NEXT_PUBLIC_AETHER_AI_URL` is still missing and production AI deployment has not been proven. |
+| Production deployment workflow | Verified | GitHub Actions `Deploy production` completed successfully for the Cloudflare Worker path, applying D1 migrations, deploying Aether API, storefront, admin and `aether-ai`, configuring AI secrets, and verifying API/portfolio/admin/assistant health. |
 | Documentation set | Verified | Required docs exist under `docs/ai-assistant/`, with architecture and graph Mermaid diagrams. |
 | Feature flags | Verified | `AI_ASSISTANT_ENABLED`, `AI_MUTATIONS_ENABLED`, daily budget and production readiness flags exist and are tested/documented. |
 | Store resilience without assistant | Verified | Storefront only enables the widget when `NEXT_PUBLIC_AETHER_AI_URL` is configured; normal cart/store flows remain separate. |
-| Production demonstration | Blocked | Local service, Docker smoke and storefront integration are verified; deployed AI assistant URL and production smoke evidence are still missing. |
+| Production demonstration | Verified | `https://aether-ai.pickofwow.workers.dev/healthz`, `/metrics`, message handling, input-limit rejection and D1-backed rate-limit buckets have been smoke-tested from the deployed Worker. |
 
 ## Open Production Items
 
-1. Provision production PostgreSQL and Redis for the assistant.
-2. Run the `AI assistant image` workflow and confirm the GHCR image is published.
-3. Deploy the assistant service from the GHCR image and set `NEXT_PUBLIC_AETHER_AI_URL`.
-4. Re-run the limited Gemini classifier evaluation from the deployed runtime.
-5. Run production smoke checks and update `acceptance-status.md`.
-6. Re-run this audit after environment-backed evidence exists.
+1. Decide whether the Docker/FastAPI/LangGraph service should also be hosted separately with PostgreSQL and Redis, or whether the free-tier Cloudflare Worker path is the production target.
+2. Re-run the limited Gemini classifier evaluation from the deployed runtime.
+3. Keep expanding Worker parity for requirements that are already implemented in the Docker/FastAPI path.

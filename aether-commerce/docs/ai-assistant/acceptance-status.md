@@ -1,6 +1,6 @@
 # AI Assistant Acceptance Status
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 This document tracks current evidence for the Aether AI sales assistant implementation. It is intentionally conservative: an item is not considered complete unless there is direct evidence in code, tests, documentation, or runtime behavior.
 
@@ -72,6 +72,15 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 - Malformed streaming cart summaries are ignored by the widget instead of being rendered as trusted cart state.
 - Cloudflare Worker deployment files now exist for the free-tier assistant target: `worker.ts`, `wrangler.jsonc`, and `.github/workflows/deploy-ai-assistant-cloudflare.yml`.
 
+## Validation Run On 2026-07-22
+
+- GitHub Actions `Deploy production` completed successfully for commit `241f513`, including AI assistant tests, Docker image build/smoke, D1 migrations, Aether API deploy, storefront deploy, admin deploy, AI Worker deploy, secret configuration and health checks.
+- GitHub Actions `AI assistant image` completed successfully for commit `241f513`.
+- `https://aether-ai.pickofwow.workers.dev/healthz` returned `status: ok`.
+- `https://aether-ai.pickofwow.workers.dev/metrics` returned Prometheus metrics including D1-backed rate-limit bucket metrics.
+- A deployed Worker request longer than `AI_MAX_INPUT_CHARACTERS` returned HTTP `413`, proving oversized inputs are rejected before Gemini calls.
+- The Cloudflare Worker now uses structured intent classification with confidence thresholds and blocks mutable cart actions below `AI_MUTATION_CONFIDENCE_THRESHOLD`.
+
 ## Fixes Applied On 2026-07-21
 
 - The assistant widget now detects category context on both standalone storefront routes and merged deployment routes:
@@ -111,13 +120,10 @@ This document tracks current evidence for the Aether AI sales assistant implemen
 
 ## Pending Evidence Before Marking Complete
 
-- `NEXT_PUBLIC_AETHER_AI_URL` is configured, but `https://aether-ai.pickofwow.workers.dev` has not yet been proven reachable by a completed Cloudflare deploy.
-- GHCR image publication has not been proven by a completed GitHub Actions run yet.
+- The Cloudflare Worker production path is deployed and smoke-tested, but the full Docker/FastAPI/LangGraph service has not been separately hosted with production PostgreSQL and Redis.
 - Limited Gemini classifier evaluation should be rerun from the deployed runtime.
-- Staging deployment of the AI assistant service has not been proven from this workspace.
-- Production deployment of the AI assistant service has not been proven from this workspace.
-- Re-run the requirement-by-requirement audit after environment-backed evidence exists.
+- Continue expanding Worker parity for requirements that are fully implemented in the Docker/FastAPI path.
 
 ## Current Deployment Note
 
-The existing public Aether storefront and Worker API are deployed and responding, but the AI assistant changes in this workspace are local unless committed, pushed, and deployed through the configured pipeline.
+The public Aether storefront, Worker API and Cloudflare Worker AI assistant are deployed and responding. The free-tier production assistant URL is `https://aether-ai.pickofwow.workers.dev`.
