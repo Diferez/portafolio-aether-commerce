@@ -655,11 +655,17 @@ export function AssistantWidget() {
                       <ul className="mt-2 divide-y divide-chat-border border-t border-chat-border">
                         {message.cart.items.map((item, index) => {
                           const name = typeof item.name === "string" ? item.name : "";
+                          const imageUrl = typeof item.imageUrl === "string" ? item.imageUrl : null;
                           const quantity = Number(item.quantity ?? 1);
                           const lineTotal = Number(item.lineTotal ?? 0);
                           return (
-                            <li key={index} className="flex items-center justify-between gap-2 py-1.5 text-xs text-chat-text-muted">
-                              <span className="truncate">
+                            <li key={index} className="flex items-center gap-2 py-1.5 text-xs text-chat-text-muted">
+                              {imageUrl ? (
+                                <img src={imageUrl} alt={name} className="h-9 w-9 shrink-0 rounded-lg bg-chat-surface-alt object-cover" />
+                              ) : (
+                                <div className="h-9 w-9 shrink-0 rounded-lg bg-chat-surface-alt" />
+                              )}
+                              <span className="min-w-0 flex-1 truncate">
                                 {quantity > 1 ? `${quantity}x ` : ""}
                                 {name}
                               </span>
