@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bot, Loader2, RotateCcw, Send, ShoppingBag, X } from "lucide-react";
+import { Bot, Check, Loader2, RotateCcw, Send, ShoppingBag, X } from "lucide-react";
 import { formatUsd } from "@aether/core";
-import { addProductReferenceToCart, getCartId, getCartToken, replaceLocalCartItems } from "./cart-client";
-import type { CartItem } from "@aether/schemas";
+import { addProductReferenceToCart, getCartId, getCartToken, readLocalCart, replaceLocalCartItems } from "./cart-client";
+import type { Cart, CartItem } from "@aether/schemas";
 import { aiAssistantUrl, storefrontPath } from "./config";
 import { getCurrentCustomer, type CustomerSession } from "./customer-client";
 import { useLanguage } from "./LanguageProvider";
@@ -129,6 +129,7 @@ export function AssistantWidget() {
   );
 
   const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const [footerCart, setFooterCart] = useState<Cart | null>(null);
 
   useEffect(() => {
     const syncCustomer = () => setCustomer(getCurrentCustomer());
@@ -136,6 +137,22 @@ export function AssistantWidget() {
     window.addEventListener("aether-customer-changed", syncCustomer);
     return () => window.removeEventListener("aether-customer-changed", syncCustomer);
   }, []);
+
+  // Keeps a persistent cart total pinned in the footer (see PASO 3 bug #4) instead
+  // of only recapping the cart inline whenever the assistant happens to mention it.
+  useEffect(() => {
+    const syncFooterCart = () => setFooterCart(readLocalCart());
+    syncFooterCart();
+    window.addEventListener("aether-cart-changed", syncFooterCart);
+    window.addEventListener("storage", syncFooterCart);
+    return () => {
+      window.removeEventListener("aether-cart-changed", syncFooterCart);
+      window.removeEventListener("storage", syncFooterCart);
+    };
+  }, []);
+
+  const footerItemCount = footerCart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
+  const footerTotal = footerCart?.totals.total ?? 0;
 
   function greetingMessage(): ChatMessage {
     const content = customer
@@ -508,7 +525,7 @@ export function AssistantWidget() {
       {isOpen ? (
         <div
           ref={panelRef}
-          className="flex h-[100dvh] w-full flex-col overflow-hidden border border-zinc-200 bg-white shadow-2xl sm:mb-3 sm:h-[min(640px,calc(100vh-6rem))] sm:w-[calc(100vw-2rem)] sm:max-w-md sm:rounded-lg"
+          className="flex h-[100dvh] w-full flex-col overflow-hidden border border-chat-border bg-chat-bg shadow-2xl sm:mb-3 sm:h-[min(640px,calc(100vh-6rem))] sm:w-[calc(100vw-2rem)] sm:max-w-md sm:rounded-chat"
           role="dialog"
           aria-label={copy.title}
           onKeyDown={(event) => {
@@ -517,62 +534,87 @@ export function AssistantWidget() {
             }
           }}
         >
-          <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-950 px-4 py-3 text-white">
-            <div>
-              <p className="text-sm font-semibold">{copy.title}</p>
-              <p className="text-xs text-zinc-300">{copy.intro}</p>
+          <div className="flex items-center justify-between gap-2 border-b border-chat-border bg-chat-surface px-4 py-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-chat-accent-soft text-sm font-bold text-chat-accent">
+                <Bot size={16} aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-chat-text">{copy.title}</p>
+                <p className="truncate text-xs text-chat-text-muted">{copy.intro}</p>
+              </div>
             </div>
-            <div className="flex gap-1">
-              <button type="button" onClick={reset} className="focus-ring grid h-9 w-9 place-items-center rounded-md hover:bg-white/10" aria-label={copy.reset}>
+            <div className="flex shrink-0 gap-1">
+              <button type="button" onClick={reset} className="focus-ring grid h-9 w-9 place-items-center rounded-chat text-chat-text-muted hover:bg-chat-surface-alt hover:text-chat-text" aria-label={copy.reset}>
                 <RotateCcw size={16} aria-hidden />
               </button>
-              <button type="button" onClick={() => setIsOpen(false)} className="focus-ring grid h-9 w-9 place-items-center rounded-md hover:bg-white/10" aria-label="Close">
+              <button type="button" onClick={() => setIsOpen(false)} className="focus-ring grid h-9 w-9 place-items-center rounded-chat text-chat-text-muted hover:bg-chat-surface-alt hover:text-chat-text" aria-label="Close">
                 <X size={18} aria-hidden />
               </button>
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 p-3">
+          <div className="flex-1 space-y-3 overflow-y-auto bg-chat-bg p-3">
             {cartFeedback ? (
-              <div className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800" role="status" aria-live="polite">
+              <div className="rounded-chat border border-chat-success bg-chat-success-soft px-3 py-2 text-sm font-semibold text-chat-success" role="status" aria-live="polite">
                 {cartFeedback}
               </div>
             ) : null}
             {messages.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">{copy.intro}</div>
+              <div className="rounded-chat border border-dashed border-chat-border bg-chat-surface p-4 text-sm text-chat-text-muted">{copy.intro}</div>
             ) : null}
             {messages.map((message, index) => (
               <div key={index} className={message.role === "user" ? "ml-8 text-right" : "mr-8"}>
-                <div className={`inline-block rounded-lg px-3 py-2 text-sm leading-6 ${message.role === "user" ? "bg-zinc-950 text-white" : "bg-white text-zinc-800 shadow-sm"}`}>
+                <div
+                  className={`inline-block max-w-[85%] rounded-2xl px-3.5 py-2.5 text-left text-sm leading-6 ${
+                    message.role === "user"
+                      ? "rounded-tr-md bg-chat-accent text-white"
+                      : "rounded-tl-md bg-chat-surface text-chat-text"
+                  }`}
+                >
                   {message.content}
                 </div>
                 {message.products?.length ? (
-                  <div className="mt-2 grid gap-2">
+                  <div className="mt-2 grid gap-2 text-left">
                     {message.products.map((product) => (
-                      <div key={product.product_id} className="flex gap-3 rounded-lg border border-zinc-200 bg-white p-2 text-left shadow-sm">
-                        {product.image_url ? <img src={product.image_url} alt={product.name} className="h-16 w-16 rounded-md object-cover" /> : null}
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-zinc-950">{product.name}</p>
-                          <p className="text-sm font-semibold text-teal-700">{formatUsd(Math.round(Number(product.price) * 100), locale === "es" ? "es-CO" : "en-US")}</p>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${product.available ? "bg-teal-50 text-teal-700" : "bg-rose-50 text-rose-700"}`}>
+                      <div key={product.product_id} className="flex gap-3 rounded-2xl border border-chat-border bg-chat-surface p-3">
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="h-16 w-16 shrink-0 rounded-xl bg-chat-surface-alt object-cover" />
+                        ) : (
+                          <div className="h-16 w-16 shrink-0 rounded-xl bg-chat-surface-alt" />
+                        )}
+                        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                          <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-chat-text">{product.name}</p>
+                          <p className="text-[15px] font-bold text-chat-success">
+                            {formatUsd(Math.round(Number(product.price) * 100), locale === "es" ? "es-CO" : "en-US")}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            <span
+                              className={`inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                                product.available ? "bg-chat-success-soft text-chat-success" : "bg-chat-surface-alt text-chat-text-muted"
+                              }`}
+                            >
+                              {product.available ? <Check size={11} strokeWidth={3} aria-hidden /> : null}
                               {product.available ? copy.inStock : copy.outOfStock}
                             </span>
                             {product.color || product.size ? (
-                              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-600">
+                              <span className="rounded-full bg-chat-surface-alt px-2 py-0.5 text-[11px] font-medium text-chat-text-muted">
                                 {copy.variant}: {[product.color, product.size].filter(Boolean).join(" / ")}
                               </span>
                             ) : null}
                           </div>
-                          <div className="mt-2 flex gap-2">
-                            <a href={storefrontPath(product.product_url.replace(/^\/store/, ""))} className="focus-ring rounded-md border border-zinc-300 px-2 py-1 text-xs font-semibold text-zinc-700">
+                          <div className="mt-1 flex gap-2">
+                            <a
+                              href={storefrontPath(product.product_url.replace(/^\/store/, ""))}
+                              className="focus-ring rounded-chat border border-chat-border px-3 py-1.5 text-[13px] font-medium text-chat-text transition-colors active:scale-[0.97]"
+                            >
                               {copy.view}
                             </a>
                             <button
                               type="button"
                               onClick={() => void addAssistantProduct(product)}
                               disabled={!product.available || addingProductId === product.product_id}
-                              className="focus-ring rounded-md bg-zinc-950 px-2 py-1 text-xs font-semibold text-white disabled:cursor-wait disabled:bg-zinc-400"
+                              className="focus-ring rounded-chat bg-chat-accent px-3 py-1.5 text-[13px] font-semibold text-white transition-colors active:scale-[0.97] disabled:cursor-wait disabled:bg-chat-border disabled:text-chat-text-muted"
                             >
                               {addingProductId === product.product_id ? copy.adding : copy.add}
                             </button>
@@ -583,31 +625,31 @@ export function AssistantWidget() {
                   </div>
                 ) : null}
                 {message.cart ? (
-                  <div className="mt-2 rounded-lg border border-teal-200 bg-white p-3 text-left shadow-sm">
+                  <div className="mt-2 rounded-2xl border border-chat-border bg-chat-surface p-3 text-left">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">{copy.cart}</p>
-                        <p className="text-sm font-semibold text-zinc-950">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-chat-success">{copy.cart}</p>
+                        <p className="text-sm font-semibold text-chat-text">
                           {message.cart.item_count} {copy.items}
                         </p>
                       </div>
-                      <p className="text-sm font-semibold text-zinc-950">
+                      <p className="text-sm font-semibold text-chat-text">
                         {formatUsd(Math.round(Number(message.cart.subtotal) * 100), locale === "es" ? "es-CO" : "en-US")}
                       </p>
                     </div>
                     {message.cart.items.length > 0 ? (
-                      <ul className="mt-2 divide-y divide-zinc-100 border-t border-zinc-100">
+                      <ul className="mt-2 divide-y divide-chat-border border-t border-chat-border">
                         {message.cart.items.map((item, index) => {
                           const name = typeof item.name === "string" ? item.name : "";
                           const quantity = Number(item.quantity ?? 1);
                           const lineTotal = Number(item.lineTotal ?? 0);
                           return (
-                            <li key={index} className="flex items-center justify-between gap-2 py-1.5 text-xs text-zinc-700">
+                            <li key={index} className="flex items-center justify-between gap-2 py-1.5 text-xs text-chat-text-muted">
                               <span className="truncate">
                                 {quantity > 1 ? `${quantity}x ` : ""}
                                 {name}
                               </span>
-                              <span className="shrink-0 font-medium text-zinc-900">
+                              <span className="shrink-0 font-medium text-chat-text">
                                 {formatUsd(Math.round(lineTotal), locale === "es" ? "es-CO" : "en-US")}
                               </span>
                             </li>
@@ -616,7 +658,7 @@ export function AssistantWidget() {
                       </ul>
                     ) : null}
                     {message.action?.type === "OPEN_CART" || message.action?.type?.startsWith("CART_") ? (
-                      <a href={storefrontPath("/cart")} className="focus-ring mt-3 inline-flex rounded-md bg-teal-700 px-3 py-2 text-xs font-semibold text-white">
+                      <a href={storefrontPath("/cart")} className="focus-ring mt-3 inline-flex rounded-chat bg-chat-accent px-3 py-2 text-xs font-semibold text-white">
                         {copy.openCart}
                       </a>
                     ) : null}
@@ -629,7 +671,7 @@ export function AssistantWidget() {
                         key={reply}
                         type="button"
                         onClick={() => void sendMessage(reply)}
-                        className="focus-ring rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold text-zinc-700 hover:border-teal-400 hover:text-teal-700"
+                        className="focus-ring rounded-full border border-chat-border px-3.5 py-2 text-[13px] font-medium text-chat-text-muted hover:border-chat-accent hover:text-chat-text"
                       >
                         {reply}
                       </button>
@@ -639,7 +681,7 @@ export function AssistantWidget() {
               </div>
             ))}
             {isSending ? (
-              <div className="mr-8 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-zinc-600 shadow-sm">
+              <div className="mr-8 inline-flex items-center gap-2 rounded-2xl bg-chat-surface px-3.5 py-2.5 text-sm text-chat-text-muted">
                 <Loader2 size={15} className="animate-spin" aria-hidden />
                 {statusMessage || copy.busy}
               </div>
@@ -647,23 +689,39 @@ export function AssistantWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form
-            className="flex gap-2 border-t border-zinc-200 bg-white p-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void sendMessage();
-            }}
-          >
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              className="focus-ring min-h-11 min-w-0 flex-1 rounded-md border border-zinc-300 px-3 text-sm text-zinc-950"
-              placeholder={copy.placeholder}
-            />
-            <button type="submit" disabled={isSending || !input.trim()} className="focus-ring grid h-11 w-11 place-items-center rounded-md bg-zinc-950 text-white disabled:bg-zinc-400" aria-label={copy.send}>
-              <Send size={17} aria-hidden />
-            </button>
-          </form>
+          <div className="border-t border-chat-border bg-chat-surface">
+            <div className="flex items-center justify-between gap-3 border-b border-chat-border px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={16} className="text-chat-success" aria-hidden />
+                <span className="text-xs font-medium text-chat-text-muted">
+                  {footerItemCount} {copy.items}
+                </span>
+              </div>
+              <span className="text-sm font-bold text-chat-text">{formatUsd(footerTotal, locale === "es" ? "es-CO" : "en-US")}</span>
+            </div>
+            <form
+              className="flex items-center gap-2 px-3 py-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void sendMessage();
+              }}
+            >
+              <input
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                className="focus-ring min-h-11 min-w-0 flex-1 rounded-2xl border border-chat-border bg-chat-surface-alt px-4 text-sm text-chat-text outline-none placeholder:text-chat-text-muted"
+                placeholder={copy.placeholder}
+              />
+              <button
+                type="submit"
+                disabled={isSending || !input.trim()}
+                className="focus-ring grid h-11 w-11 shrink-0 place-items-center rounded-full bg-chat-accent text-white disabled:bg-chat-border disabled:text-chat-text-muted"
+                aria-label={copy.send}
+              >
+                <Send size={17} aria-hidden />
+              </button>
+            </form>
+          </div>
         </div>
       ) : null}
 
@@ -671,15 +729,15 @@ export function AssistantWidget() {
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="focus-ring mb-5 ml-5 flex min-h-14 items-center gap-3 rounded-full bg-teal-700 px-4 text-white shadow-2xl transition hover:-translate-y-0.5 hover:bg-teal-800 sm:mb-0 sm:ml-0"
+        className="focus-ring mb-5 ml-5 flex min-h-14 items-center gap-3 rounded-full bg-chat-accent px-4 text-white shadow-2xl transition hover:-translate-y-0.5 sm:mb-0 sm:ml-0"
         aria-expanded={isOpen}
         aria-label={copy.title}
       >
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-teal-800">
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white">
           <Bot size={19} aria-hidden />
         </span>
         <span className="hidden text-left sm:block">
-          <span className="block text-xs text-teal-100">Aether</span>
+          <span className="block text-xs text-white/70">Aether</span>
           <span className="block text-sm font-semibold">{copy.title}</span>
         </span>
         <ShoppingBag size={17} aria-hidden className="sm:hidden" />

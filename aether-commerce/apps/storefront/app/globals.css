@@ -30,6 +30,20 @@
   --color-warning-soft: rgba(251, 191, 36, 0.14);
   --color-danger: #fb7185;
   --color-danger-soft: rgba(251, 113, 133, 0.14);
+
+  /* Assistant chat widget tokens (ChatbotRediseño spec) - deliberately
+     distinct from the global palette above, not a duplicate of it. */
+  --color-chat-bg: #0b0c10;
+  --color-chat-surface: #14161c;
+  --color-chat-surface-alt: #1b1e27;
+  --color-chat-border: #242832;
+  --color-chat-text: #f5f6f8;
+  --color-chat-text-muted: #9ba1ae;
+  --color-chat-accent: #7b68f5;
+  --color-chat-accent-soft: rgba(123, 104, 245, 0.12);
+  --color-chat-success: #2fd3a8;
+  --color-chat-success-soft: rgba(47, 211, 168, 0.12);
+  --radius-chat: 14px;
 }
 
 :root {
