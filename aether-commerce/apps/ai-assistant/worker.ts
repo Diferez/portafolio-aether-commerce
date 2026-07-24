@@ -445,6 +445,10 @@ async function getAuditEvents(request: Request, env: Env, url: URL): Promise<Ass
 async function enforceMessageUsage(request: Request, env: Env): Promise<AssistantHttpResult | null> {
   if (env.AI_ASSISTANT_ENABLED === "false") return null;
   const body = (await request.clone().json().catch(() => ({}))) as AssistantRequest;
+  // These checks run before intent classification (which is what actually
+  // detects the message's language), so locale is the only signal available
+  // here - good enough for a handful of rate-limit/budget messages.
+  const spanish = (body.locale || "es-CO").toLowerCase().startsWith("es");
   const maxInputCharacters = inputCharacterLimit(env);
   if (String(body.message || "").length > maxInputCharacters) {
     return {
@@ -453,7 +457,9 @@ async function enforceMessageUsage(request: Request, env: Env): Promise<Assistan
         success: false,
         error: {
           code: "input_too_large",
-          message: `El mensaje supera el limite de ${maxInputCharacters} caracteres.`,
+          message: spanish
+            ? `El mensaje supera el limite de ${maxInputCharacters} caracteres.`
+            : `The message exceeds the ${maxInputCharacters} character limit.`,
         },
       },
     };
@@ -463,7 +469,7 @@ async function enforceMessageUsage(request: Request, env: Env): Promise<Assistan
   const scopeHashes = await rateLimitScopes(request, sessionHash, body.thread_id || null);
   const minuteLimit = numberEnv(env.AI_RATE_LIMIT_MESSAGES_PER_MINUTE);
   const hourLimit = numberEnv(env.AI_RATE_LIMIT_MESSAGES_PER_HOUR);
-  const shortLimit = await enforceShortWindowLimits(env, scopeHashes, minuteLimit, hourLimit);
+  const shortLimit = await enforceShortWindowLimits(env, scopeHashes, minuteLimit, hourLimit, spanish);
   if (shortLimit) {
     await incrementDailyUsage(env, usageDay(), "rate_limit_errors", { request_count: 1 });
     return shortLimit;
@@ -479,7 +485,12 @@ async function enforceMessageUsage(request: Request, env: Env): Promise<Assistan
       status: 429,
       payload: {
         success: false,
-        error: { code: "daily_session_limit_exceeded", message: "El asistente alcanzo el limite diario de esta sesion." },
+        error: {
+          code: "daily_session_limit_exceeded",
+          message: spanish
+            ? "El asistente alcanzo el limite diario de esta sesion."
+            : "The assistant reached this session's daily limit.",
+        },
       },
     };
   }
@@ -490,7 +501,12 @@ async function enforceMessageUsage(request: Request, env: Env): Promise<Assistan
       status: 429,
       payload: {
         success: false,
-        error: { code: "daily_budget_exceeded", message: "El asistente alcanzo el presupuesto diario configurado." },
+        error: {
+          code: "daily_budget_exceeded",
+          message: spanish
+            ? "El asistente alcanzo el presupuesto diario configurado."
+            : "The assistant reached its configured daily budget.",
+        },
       },
     };
   }
@@ -513,7 +529,8 @@ async function enforceShortWindowLimits(
   env: Env,
   scopeHashes: string[],
   minuteLimit: number | null,
-  hourLimit: number | null
+  hourLimit: number | null,
+  spanish: boolean
 ): Promise<AssistantHttpResult | null> {
   const now = new Date();
   const windows = [
@@ -522,14 +539,18 @@ async function enforceShortWindowLimits(
       key: `minute:${now.toISOString().slice(0, 16)}`,
       expiresAt: new Date(now.getTime() + 2 * 60 * 1000).toISOString(),
       code: "minute_rate_limit_exceeded",
-      message: "El asistente alcanzo el limite de mensajes por minuto. Intenta de nuevo en un momento.",
+      message: spanish
+        ? "El asistente alcanzo el limite de mensajes por minuto. Intenta de nuevo en un momento."
+        : "The assistant reached its per-minute message limit. Try again in a moment.",
     },
     {
       limit: hourLimit,
       key: `hour:${now.toISOString().slice(0, 13)}`,
       expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(),
       code: "hour_rate_limit_exceeded",
-      message: "El asistente alcanzo el limite de mensajes por hora. Intenta de nuevo mas tarde.",
+      message: spanish
+        ? "El asistente alcanzo el limite de mensajes por hora. Intenta de nuevo mas tarde."
+        : "The assistant reached its per-hour message limit. Try again later.",
     },
   ];
   for (const window of windows) {

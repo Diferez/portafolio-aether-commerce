@@ -276,12 +276,26 @@ export function AssistantWidget() {
     } catch {
       try {
         await sendMessageFallback(message);
-      } catch {
-        setMessages((current) => [...current, { role: "assistant", content: copy.error }]);
+      } catch (err) {
+        const text = err instanceof Error && err.message ? err.message : copy.error;
+        setMessages((current) => [...current, { role: "assistant", content: text }]);
       }
     } finally {
       setIsSending(false);
       setStatusMessage(null);
+    }
+  }
+
+  // Rate limits and budget caps return a normal JSON body with a specific,
+  // already-translated message (e.g. "too many messages this minute") - that
+  // is a very different situation from the assistant being unreachable, so
+  // it should never be replaced with the generic connection-error copy.
+  async function readErrorMessage(response: Response): Promise<string> {
+    try {
+      const payload = (await response.clone().json()) as { error?: { message?: string } };
+      return typeof payload.error?.message === "string" && payload.error.message ? payload.error.message : copy.error;
+    } catch {
+      return copy.error;
     }
   }
 
@@ -291,8 +305,8 @@ export function AssistantWidget() {
       headers: await assistantRequestHeaders(),
       body: assistantRequestBody(message)
     });
+    if (!response.ok) throw new Error(await readErrorMessage(response));
     const payload = (await response.json()) as AssistantResponse;
-    if (!response.ok) throw new Error("Assistant request failed");
     appendAssistantResponse(payload);
   }
 
@@ -302,7 +316,7 @@ export function AssistantWidget() {
       headers: await assistantRequestHeaders(),
       body: assistantRequestBody(message)
     });
-    if (!response.ok || !response.body) throw new Error("Assistant stream unavailable");
+    if (!response.ok || !response.body) throw new Error(await readErrorMessage(response));
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
