@@ -154,6 +154,20 @@ export function AssistantWidget() {
   const footerItemCount = footerCart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
   const footerTotal = footerCart?.totals.total ?? 0;
 
+  // On mobile the panel takes over the full screen (see the sm:-prefixed overrides on the
+  // dialog below), so the store page behind it must stop scrolling - otherwise the user can
+  // drag the background content while the "modal" is open. Desktop keeps its own scroll: the
+  // panel there is a small floating card, not a takeover, so locking body scroll would be
+  // surprising for no visual benefit.
+  useEffect(() => {
+    if (!isOpen || !window.matchMedia("(max-width: 639px)").matches) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   function greetingMessage(): ChatMessage {
     const content = customer
       ? copy.greetingCustomer.replace("{name}", customer.name.split(" ")[0] || customer.name)
@@ -521,11 +535,11 @@ export function AssistantWidget() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 p-0 sm:inset-auto sm:bottom-5 sm:left-5">
+    <>
       {isOpen ? (
         <div
           ref={panelRef}
-          className="flex h-[100dvh] w-full flex-col overflow-hidden border border-chat-border bg-chat-bg shadow-2xl sm:mb-3 sm:h-[min(640px,calc(100vh-6rem))] sm:w-[calc(100vw-2rem)] sm:max-w-md sm:rounded-chat"
+          className="fixed inset-0 z-[9999] flex h-[100dvh] w-full flex-col overflow-hidden bg-chat-bg pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:inset-auto sm:bottom-5 sm:left-5 sm:z-50 sm:h-[min(640px,calc(100vh-6rem))] sm:w-[calc(100vw-2rem)] sm:max-w-md sm:rounded-chat sm:border sm:border-chat-border sm:pb-0 sm:pt-0 sm:shadow-2xl"
           role="dialog"
           aria-label={copy.title}
           onKeyDown={(event) => {
@@ -723,25 +737,25 @@ export function AssistantWidget() {
             </form>
           </div>
         </div>
-      ) : null}
-
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setIsOpen((current) => !current)}
-        className="focus-ring mb-5 ml-5 flex min-h-14 items-center gap-3 rounded-full bg-chat-accent px-4 text-white shadow-2xl transition hover:-translate-y-0.5 sm:mb-0 sm:ml-0"
-        aria-expanded={isOpen}
-        aria-label={copy.title}
-      >
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white">
-          <Bot size={19} aria-hidden />
-        </span>
-        <span className="hidden text-left sm:block">
-          <span className="block text-xs text-white/70">Aether</span>
-          <span className="block text-sm font-semibold">{copy.title}</span>
-        </span>
-        <ShoppingBag size={17} aria-hidden className="sm:hidden" />
-      </button>
-    </div>
+      ) : (
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="focus-ring fixed bottom-5 left-5 z-50 flex min-h-14 items-center gap-3 rounded-full bg-chat-accent px-4 text-white shadow-2xl transition hover:-translate-y-0.5"
+          aria-expanded={isOpen}
+          aria-label={copy.title}
+        >
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white">
+            <Bot size={19} aria-hidden />
+          </span>
+          <span className="hidden text-left sm:block">
+            <span className="block text-xs text-white/70">Aether</span>
+            <span className="block text-sm font-semibold">{copy.title}</span>
+          </span>
+          <ShoppingBag size={17} aria-hidden className="sm:hidden" />
+        </button>
+      )}
+    </>
   );
 }
