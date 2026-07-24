@@ -1055,21 +1055,13 @@ function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutM
 // configured, falling back to a direct fetch (e.g. local `wrangler dev`
 // without the binding wired up). See the Env.AETHER_API comment for why the
 // binding is required in production.
-async function apiFetch(env: Env, input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
-  const usingBinding = Boolean(env.AETHER_API);
+function apiFetch(env: Env, input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
   const requestInit = { ...init, signal: AbortSignal.timeout(timeoutMs) };
-  try {
-    // Calling fetch as a method off a plain wrapper object (e.g. `{ fetch }.fetch(...)`)
-    // throws "Illegal invocation" because the global fetch loses its required `this`
-    // binding, so the binding and no-binding cases must be called directly, not through
-    // a shared `fetcher` variable.
-    const response = usingBinding ? await env.AETHER_API!.fetch(input, requestInit) : await fetch(input, requestInit);
-    console.error("TEMP_DEBUG apiFetch_result", { usingBinding, url: String(input), status: response.status, ok: response.ok });
-    return response;
-  } catch (err) {
-    console.error("TEMP_DEBUG apiFetch_threw", { usingBinding, url: String(input), err: String(err) });
-    throw err;
-  }
+  // Calling fetch as a method off a plain wrapper object (e.g. `{ fetch }.fetch(...)`)
+  // throws "Illegal invocation" because the global fetch loses its required `this`
+  // binding, so the binding and no-binding cases are called directly rather than
+  // through a shared `fetcher` variable.
+  return env.AETHER_API ? env.AETHER_API.fetch(input, requestInit) : fetch(input, requestInit);
 }
 
 function responsePayload(
