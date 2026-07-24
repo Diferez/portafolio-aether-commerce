@@ -1,5 +1,14 @@
+type Fetcher = {
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+};
+
 type Env = {
   AETHER_API_BASE_URL: string;
+  // Service binding to the aether-api Worker. Cloudflare blocks a Worker on a
+  // *.workers.dev subdomain from fetching another Worker's *.workers.dev URL
+  // over plain HTTPS (error 1042), so calls must go through this binding
+  // instead of a raw fetch() to AETHER_API_BASE_URL.
+  AETHER_API?: Fetcher;
   DB?: D1Database;
   AI_ASSISTANT_ENABLED?: string;
   AI_CORS_ALLOWED_ORIGINS?: string;
@@ -886,7 +895,7 @@ function heuristicIntent(message: string): IntentResult {
 async function currentContextProduct(env: Env, body: AssistantRequest): Promise<AssistantProduct | null> {
   const slug = body.client_context?.current_product_slug;
   if (!slug) return null;
-  const response = await fetchWithTimeout(new URL(`/api/v1/catalog/products/${encodeURIComponent(slug)}`, env.AETHER_API_BASE_URL), undefined, 5000);
+  const response = await apiFetch(env, new URL(`/api/v1/catalog/products/${encodeURIComponent(slug)}`, env.AETHER_API_BASE_URL), undefined, 5000);
   if (!response.ok) return null;
   const payload = (await response.json()) as { data?: unknown };
   return toAssistantProduct(payload.data);
@@ -910,14 +919,14 @@ async function searchProducts(env: Env, message: string): Promise<AssistantProdu
     const query = extractQuery(message);
     if (query) apiUrl.searchParams.set("q", query);
   }
-  const response = await fetchWithTimeout(apiUrl, undefined, 5000);
+  const response = await apiFetch(env, apiUrl, undefined, 5000);
   if (!response.ok) return [];
   const payload = (await response.json()) as { data?: unknown[] };
   return (payload.data || []).map(toAssistantProduct).filter(Boolean).slice(0, 5) as AssistantProduct[];
 }
 
 async function fetchCart(env: Env, cartId: string, cartToken: string): Promise<Record<string, unknown> | null> {
-  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}`, env.AETHER_API_BASE_URL), {
+  const response = await apiFetch(env, new URL(`/api/v1/cart/${encodeURIComponent(cartId)}`, env.AETHER_API_BASE_URL), {
     headers: { "x-aether-cart-token": cartToken },
   }, 5000);
   if (!response.ok) return null;
@@ -934,7 +943,7 @@ async function fetchCart(env: Env, cartId: string, cartToken: string): Promise<R
 
 async function addToCart(env: Env, cartId: string, cartToken: string, product: AssistantProduct, quantity: number, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
   const slug = product.product_url.split("slug=")[1]?.split("&")[0] || product.product_id;
-  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, env.AETHER_API_BASE_URL), {
+  const response = await apiFetch(env, new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items`, env.AETHER_API_BASE_URL), {
     method: "POST",
     headers: { "content-type": "application/json", "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
     body: JSON.stringify({ productId: decodeURIComponent(slug), variantId: product.variant_id || undefined, quantity }),
@@ -944,7 +953,7 @@ async function addToCart(env: Env, cartId: string, cartToken: string, product: A
 }
 
 async function removeCartItem(env: Env, cartId: string, cartToken: string, itemId: string, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
-  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
+  const response = await apiFetch(env, new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
     method: "DELETE",
     headers: { "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
   }, 5000);
@@ -953,7 +962,7 @@ async function removeCartItem(env: Env, cartId: string, cartToken: string, itemI
 }
 
 async function updateCartItem(env: Env, cartId: string, cartToken: string, itemId: string, quantity: number, idempotencyKeyValue: string): Promise<Record<string, unknown> | null> {
-  const response = await fetchWithTimeout(new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
+  const response = await apiFetch(env, new URL(`/api/v1/cart/${encodeURIComponent(cartId)}/items/${encodeURIComponent(itemId)}`, env.AETHER_API_BASE_URL), {
     method: "PATCH",
     headers: { "content-type": "application/json", "x-aether-cart-token": cartToken, "x-idempotency-key": idempotencyKeyValue },
     body: JSON.stringify({ quantity }),
@@ -1040,6 +1049,15 @@ function extractQuery(message: string): string {
 
 function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
   return fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+}
+
+// Routes aether-api calls through the AETHER_API service binding when it is
+// configured, falling back to a direct fetch (e.g. local `wrangler dev`
+// without the binding wired up). See the Env.AETHER_API comment for why the
+// binding is required in production.
+function apiFetch(env: Env, input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
+  const fetcher = env.AETHER_API ?? { fetch };
+  return fetcher.fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
 }
 
 function responsePayload(

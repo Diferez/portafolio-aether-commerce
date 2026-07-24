@@ -8,6 +8,12 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
+  "services": [
+    {
+      "binding": "AETHER_API",
+      "service": "aether-api"
+    }
+  ],
   "vars": {
     "AETHER_API_BASE_URL": "https://aether-api.pickofwow.workers.dev",
     "AI_ASSISTANT_ENABLED": "true",
