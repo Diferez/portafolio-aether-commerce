@@ -270,14 +270,19 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
         "PENDING"
       ));
     }
+    const itemSummary = describeCartItems(cart, spanish);
     const reply =
       intent === "CHECKOUT_REQUEST"
         ? spanish
-          ? "Puedo preparar tu carrito, pero el pago se completa en el checkout seguro de Aether."
-          : "I can prepare your cart, but payment must be completed through Aether secure checkout."
+          ? `Puedo preparar tu carrito${itemSummary ? ` (${itemSummary})` : ""}, pero el pago se completa en el checkout seguro de Aether.`
+          : `I can prepare your cart${itemSummary ? ` (${itemSummary})` : ""}, but payment must be completed through Aether secure checkout.`
         : spanish
-          ? `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s).`
-          : `Your cart has ${Number(cart.item_count || 0)} item(s).`;
+          ? itemSummary
+            ? `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s): ${itemSummary}.`
+            : `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s).`
+          : itemSummary
+            ? `Your cart has ${Number(cart.item_count || 0)} item(s): ${itemSummary}.`
+            : `Your cart has ${Number(cart.item_count || 0)} item(s).`;
     return finish(responsePayload(requestId, threadId, reply, intent, [], cart, intent === "CHECKOUT_REQUEST" ? "OPEN_CHECKOUT" : "OPEN_CART", "SUCCEEDED"));
   }
 
@@ -331,7 +336,7 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   }
 
   const contextProduct = await currentContextProduct(env, body);
-  const products = contextProduct ? [contextProduct] : await searchProducts(env, message);
+  const products = contextProduct ? [contextProduct] : await searchProducts(env, message, sessionHash);
   if (intent === "ADD_TO_CART") {
     if (env.AI_MUTATIONS_ENABLED === "false") {
       await audit("add_to_cart", "mutations_disabled", null, "denied", "blocked", "mutations_disabled");
@@ -843,6 +848,51 @@ async function classifyIntent(message: string, env: Env, sessionHash?: string): 
   }
 }
 
+// The heuristic query extractor only strips a fixed list of verbs (busca,
+// add, search, ...) so phrases it doesn't recognize - "tienen chanel?",
+// "busco un laptop" - pass through with filler words and punctuation still
+// attached, and the catalog's substring match then finds nothing even when
+// the product exists. Gemini pulls out just the product/brand keyword
+// instead, falling back to the heuristic if it's unavailable or fails.
+async function extractSearchQuery(message: string, env: Env, sessionHash?: string): Promise<string> {
+  const fallback = extractQueryHeuristic(message);
+  if (!env.GEMINI_API_KEY) return fallback;
+  try {
+    if (sessionHash) {
+      await incrementDailyUsage(env, usageDay(), sessionHash, { llm_call_count: 1 });
+      await incrementDailyUsage(env, usageDay(), "project", { llm_call_count: 1 });
+    }
+    const model = env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    const response = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [
+            {
+              text: "Extract the core product name, brand, or category keywords a shopper is searching for in an online store. Return JSON only with key query (a short string, 1-4 words, no punctuation, no question words like do/does/tienen/tiene/hay/quiero). If the message is not a product search, return an empty string for query.",
+            },
+          ],
+        },
+        contents: [{ role: "user", parts: [{ text: message }] }],
+        generationConfig: {
+          temperature: 0,
+          maxOutputTokens: 40,
+          responseMimeType: "application/json",
+        },
+      }),
+    }, 2000);
+    if (!response.ok) return fallback;
+    const data = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
+    const parsed = text ? (JSON.parse(text) as { query?: unknown }) : {};
+    const query = typeof parsed.query === "string" ? parsed.query.trim().slice(0, 80) : "";
+    return query || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 // When a search/lookup genuinely finds nothing (e.g. the store just doesn't
 // carry the requested category), Gemini composes a short, grounded reply
 // naming what the store actually has instead of a generic "I can help you
@@ -962,7 +1012,7 @@ function isDealsQuery(message: string): boolean {
   return /(deal|oferta|descuento|discount)/i.test(message);
 }
 
-async function searchProducts(env: Env, message: string): Promise<AssistantProduct[]> {
+async function searchProducts(env: Env, message: string, sessionHash?: string): Promise<AssistantProduct[]> {
   const apiUrl = new URL("/api/v1/catalog/products", env.AETHER_API_BASE_URL);
   apiUrl.searchParams.set("page", "1");
   apiUrl.searchParams.set("pageSize", "5");
@@ -973,7 +1023,7 @@ async function searchProducts(env: Env, message: string): Promise<AssistantProdu
     apiUrl.searchParams.set("hasDiscount", "true");
     apiUrl.searchParams.set("sort", "discount");
   } else {
-    const query = extractQuery(message);
+    const query = await extractSearchQuery(message, env, sessionHash);
     if (query) apiUrl.searchParams.set("q", query);
   }
   const response = await apiFetch(env, apiUrl, undefined, 5000);
@@ -1050,6 +1100,18 @@ function toCartSummary(payload: unknown): Record<string, unknown> | null {
   };
 }
 
+function describeCartItems(cart: Record<string, unknown>, spanish: boolean): string {
+  const items = Array.isArray(cart.items) ? (cart.items as Record<string, unknown>[]) : [];
+  if (items.length === 0) return "";
+  return items
+    .map((item) => {
+      const name = String(item.name || (spanish ? "producto" : "item"));
+      const quantity = Number(item.quantity || 1);
+      return quantity > 1 ? `${quantity}x ${name}` : name;
+    })
+    .join(", ");
+}
+
 function resolveCartItem(cart: Record<string, unknown>, message: string): Record<string, unknown> | null {
   const items = Array.isArray(cart.items) ? (cart.items as Record<string, unknown>[]) : [];
   if (items.length === 0) return null;
@@ -1097,7 +1159,7 @@ function toAssistantProduct(input: unknown): AssistantProduct | null {
   };
 }
 
-function extractQuery(message: string): string {
+function extractQueryHeuristic(message: string): string {
   return message
     .replace(/agrega|anade|añade|add|busca|buscar|search|show|find|recomienda|recommend|producto|product|oferta|deal/gi, "")
     .trim()

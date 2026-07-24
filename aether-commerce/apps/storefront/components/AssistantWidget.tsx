@@ -57,12 +57,15 @@ type ChatMessage = {
   streaming?: boolean;
 };
 
+const threadStorageKey = "aether.assistant.threadId.v1";
+
 export function AssistantWidget() {
   const { locale } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyReady, setHistoryReady] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
@@ -141,9 +144,73 @@ export function AssistantWidget() {
   }
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!enabled) return;
+    const storedThreadId = window.sessionStorage.getItem(threadStorageKey);
+    if (!storedThreadId) {
+      setHistoryReady(true);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(
+          `${aiAssistantUrl.replace(/\/$/, "")}/v1/assistant/conversations/${encodeURIComponent(storedThreadId)}`,
+          { headers: { "x-aether-session-id": getCartId() } }
+        );
+        if (!response.ok) return;
+        const payload = (await response.json()) as {
+          success?: boolean;
+          data?: { messages?: Array<{ role: string; content: string | null; payload?: Record<string, unknown> }> };
+        };
+        if (cancelled || !payload.success || !payload.data?.messages?.length) return;
+        const restored = payload.data.messages
+          .map((entry): ChatMessage | null => {
+            if (entry.role === "user") {
+              return { role: "user", content: entry.content || "" };
+            }
+            if (entry.role === "assistant") {
+              const stored = (entry.payload || {}) as Partial<AssistantResponse>;
+              const restoredMessage: ChatMessage = {
+                role: "assistant",
+                content: entry.content || stored.message || ""
+              };
+              if (Array.isArray(stored.products)) restoredMessage.products = stored.products;
+              if (stored.cart) restoredMessage.cart = stored.cart;
+              if (stored.action) restoredMessage.action = stored.action;
+              if (stored.suggested_replies) restoredMessage.suggestedReplies = stored.suggested_replies;
+              return restoredMessage;
+            }
+            return null;
+          })
+          .filter((entry): entry is ChatMessage => entry !== null);
+        if (!cancelled && restored.length > 0) {
+          setThreadId(storedThreadId);
+          setMessages(restored);
+        }
+      } catch {
+        // Conversation history is a convenience restore, not required to use the assistant.
+      } finally {
+        if (!cancelled) setHistoryReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Runs once per mount to restore the prior conversation before the greeting can render.
+  }, [enabled]);
+
+  useEffect(() => {
+    if (threadId) {
+      window.sessionStorage.setItem(threadStorageKey, threadId);
+    }
+  }, [threadId]);
+
+  useEffect(() => {
+    if (!isOpen || !historyReady) return;
     setMessages((current) => (current.length === 0 ? [greetingMessage()] : current));
-  }, [isOpen]);
+  }, [isOpen, historyReady]);
 
   useEffect(() => {
     if (isOpen) {
@@ -385,6 +452,7 @@ export function AssistantWidget() {
 
   function reset() {
     setThreadId(null);
+    window.sessionStorage.removeItem(threadStorageKey);
     setMessages([greetingMessage()]);
     setInput("");
     setCartFeedback(null);
