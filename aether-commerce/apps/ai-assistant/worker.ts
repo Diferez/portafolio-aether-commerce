@@ -361,7 +361,8 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
   if (products.length > 0) {
     return finish(responsePayload(requestId, threadId, spanish ? "Encontre estas opciones reales en Aether." : "I found these real options in Aether.", intent, products));
   }
-  return finish(responsePayload(requestId, threadId, spanish ? "Puedo ayudarte a buscar productos reales y revisar tu carrito." : "I can help you search real products and review your cart.", intent));
+  const emptyResultMessage = await composeEmptyResultReply(env, message, spanish, sessionHash);
+  return finish(responsePayload(requestId, threadId, emptyResultMessage, intent));
 }
 
 type AssistantHttpResult = {
@@ -839,6 +840,62 @@ async function classifyIntent(message: string, env: Env, sessionHash?: string): 
     return validateIntentResult(parsed, fallback);
   } catch {
     return fallback;
+  }
+}
+
+// When a search/lookup genuinely finds nothing (e.g. the store just doesn't
+// carry the requested category), Gemini composes a short, grounded reply
+// naming what the store actually has instead of a generic "I can help you
+// search" filler. Falls back to that filler if Gemini or the category list
+// is unavailable, so behavior is unchanged without GEMINI_API_KEY.
+async function composeEmptyResultReply(env: Env, message: string, spanish: boolean, sessionHash?: string): Promise<string> {
+  const fallback = spanish
+    ? "Puedo ayudarte a buscar productos reales y revisar tu carrito."
+    : "I can help you search real products and review your cart.";
+  if (!env.GEMINI_API_KEY) return fallback;
+  try {
+    const categories = await listCategoryNames(env);
+    if (categories.length === 0) return fallback;
+    if (sessionHash) {
+      await incrementDailyUsage(env, usageDay(), sessionHash, { llm_call_count: 1 });
+      await incrementDailyUsage(env, usageDay(), "project", { llm_call_count: 1 });
+    }
+    const model = env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    const response = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [
+            {
+              text: `You are the Aether store assistant. A shopper's search returned zero matching products. Reply in ${spanish ? "Spanish" : "English"}, in one or two short sentences: say the store does not carry that, and suggest two or three categories from this exact list, without inventing products, prices, or categories that are not in the list: ${categories.join(", ")}. Do not just repeat the shopper's words back.`,
+            },
+          ],
+        },
+        contents: [{ role: "user", parts: [{ text: message }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 150,
+        },
+      }),
+    }, 2500);
+    if (!response.ok) return fallback;
+    const data = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
+    return text || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function listCategoryNames(env: Env): Promise<string[]> {
+  try {
+    const response = await apiFetch(env, new URL("/api/v1/catalog/categories", env.AETHER_API_BASE_URL), undefined, 3000);
+    if (!response.ok) return [];
+    const payload = (await response.json()) as { data?: Array<{ name?: string }> };
+    return (payload.data || []).map((category) => category.name).filter((name): name is string => Boolean(name));
+  } catch {
+    return [];
   }
 }
 
