@@ -21,7 +21,17 @@ function detectLocale(): Locale {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => detectLocale());
+  // Starts at "en" unconditionally so the client's first render matches the
+  // server-rendered HTML exactly (the server always resolves detectLocale()
+  // to "en" since window is undefined there). Detecting the real locale
+  // inside the useState initializer instead causes a text hydration
+  // mismatch (React error #418) for any client whose stored/browser locale
+  // is "es". The real locale is applied right after mount instead.
+  const [locale, setLocaleState] = useState<Locale>("en");
+
+  useEffect(() => {
+    setLocaleState(detectLocale());
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = locale;
