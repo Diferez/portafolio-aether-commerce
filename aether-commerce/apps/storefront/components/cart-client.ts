@@ -94,6 +94,15 @@ export function readLocalCartItems() {
   return readLocalItems();
 }
 
+// Overwrites the local cache with the server's authoritative cart items.
+// Needed after a mutation the assistant made directly against the API (add,
+// remove, update, clear) - those never touch this local cache, so anything
+// reading it (FloatingCart, SiteHeader) would keep showing stale items
+// otherwise.
+export function replaceLocalCartItems(items: CartItem[]) {
+  writeLocalItems(items);
+}
+
 export function readLocalCart(cartId = getCartId()): Cart {
   const items = readLocalItems();
   return {

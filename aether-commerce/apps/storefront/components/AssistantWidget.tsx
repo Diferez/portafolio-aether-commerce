@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, Loader2, RotateCcw, Send, ShoppingBag, X } from "lucide-react";
 import { formatUsd } from "@aether/core";
-import { addProductReferenceToCart, getCartId, getCartToken } from "./cart-client";
+import { addProductReferenceToCart, getCartId, getCartToken, replaceLocalCartItems } from "./cart-client";
+import type { CartItem } from "@aether/schemas";
 import { aiAssistantUrl, storefrontPath } from "./config";
 import { getCurrentCustomer, type CustomerSession } from "./customer-client";
 import { useLanguage } from "./LanguageProvider";
@@ -406,6 +407,9 @@ export function AssistantWidget() {
 
   function appendAssistantResponse(payload: AssistantResponse) {
     setThreadId(payload.thread_id);
+    if (payload.cart && Array.isArray(payload.cart.items)) {
+      replaceLocalCartItems(payload.cart.items as unknown as CartItem[]);
+    }
     setMessages((current) => {
       const nextMessage: ChatMessage = {
         role: "assistant",
