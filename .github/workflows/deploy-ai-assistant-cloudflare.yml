@@ -26,8 +26,8 @@ jobs:
       AETHER_D1_DATABASE_NAME: ${{ vars.AETHER_D1_DATABASE_NAME || 'aether-production' }}
       AETHER_API_BASE_URL: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
       AI_CORS_ALLOWED_ORIGINS: ${{ vars.APP_ORIGIN_STORE }}
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
-      GEMINI_FALLBACK_MODEL: ${{ vars.GEMINI_FALLBACK_MODEL }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+      GEMINI_FALLBACK_MODEL: ${{ vars.GEMINI_FALLBACK_MODEL || 'gemini-3.1-flash-lite' }}
 
     steps:
       - name: Checkout repository

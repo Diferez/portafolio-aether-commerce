@@ -803,7 +803,7 @@ async function classifyIntent(message: string, env: Env, sessionHash?: string): 
       await incrementDailyUsage(env, usageDay(), sessionHash, { llm_call_count: 1 });
       await incrementDailyUsage(env, usageDay(), "project", { llm_call_count: 1 });
     }
-    const model = env.GEMINI_MODEL || "gemini-3.5-flash";
+    const model = env.GEMINI_MODEL || "gemini-3.5-flash-lite";
     const response = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "content-type": "application/json" },

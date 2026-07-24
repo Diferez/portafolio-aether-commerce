@@ -54,3 +54,9 @@ next-env.d.ts
 /work/
 aether-commerce/apps/api/wrangler.production.json
 aether-commerce/apps/ai-assistant/wrangler.production.json
+
+# graphify
+graphify-out/
+**/graphify-out/
+.graphify_*
+**/.graphify_*
