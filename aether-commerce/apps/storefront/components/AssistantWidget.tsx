@@ -5,6 +5,7 @@ import { Bot, Loader2, RotateCcw, Send, ShoppingBag, X } from "lucide-react";
 import { formatUsd } from "@aether/core";
 import { addProductReferenceToCart, getCartId, getCartToken } from "./cart-client";
 import { aiAssistantUrl, storefrontPath } from "./config";
+import { getCurrentCustomer, type CustomerSession } from "./customer-client";
 import { useLanguage } from "./LanguageProvider";
 
 type AssistantProduct = {
@@ -77,6 +78,9 @@ export function AssistantWidget() {
         ? {
             title: "Asistente Aether",
             intro: "Preguntame por productos reales o pide ayuda con tu carrito.",
+            greetingGuest: "Hola! Soy el Asistente Aether. Preguntame por productos reales o pide ayuda con tu carrito.",
+            greetingCustomer: "Hola {name}! Preguntame por productos reales o pide ayuda con tu carrito.",
+            suggestedStart: ["Ver carrito", "Buscar ofertas"],
             placeholder: "Buscar tenis, regalos, ofertas...",
             send: "Enviar",
             reset: "Reiniciar",
@@ -97,6 +101,9 @@ export function AssistantWidget() {
         : {
             title: "Aether Assistant",
             intro: "Ask me for real products or cart help.",
+            greetingGuest: "Hi! I'm the Aether Assistant. Ask me for real products or cart help.",
+            greetingCustomer: "Hi {name}! Ask me for real products or cart help.",
+            suggestedStart: ["View cart", "Search deals"],
             placeholder: "Search sneakers, gifts, deals...",
             send: "Send",
             reset: "Reset",
@@ -116,6 +123,27 @@ export function AssistantWidget() {
           },
     [locale]
   );
+
+  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+
+  useEffect(() => {
+    const syncCustomer = () => setCustomer(getCurrentCustomer());
+    syncCustomer();
+    window.addEventListener("aether-customer-changed", syncCustomer);
+    return () => window.removeEventListener("aether-customer-changed", syncCustomer);
+  }, []);
+
+  function greetingMessage(): ChatMessage {
+    const content = customer
+      ? copy.greetingCustomer.replace("{name}", customer.name.split(" ")[0] || customer.name)
+      : copy.greetingGuest;
+    return { role: "assistant", content, suggestedReplies: copy.suggestedStart };
+  }
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setMessages((current) => (current.length === 0 ? [greetingMessage()] : current));
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -357,7 +385,7 @@ export function AssistantWidget() {
 
   function reset() {
     setThreadId(null);
-    setMessages([]);
+    setMessages([greetingMessage()]);
     setInput("");
     setCartFeedback(null);
   }

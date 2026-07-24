@@ -892,13 +892,24 @@ async function currentContextProduct(env: Env, body: AssistantRequest): Promise<
   return toAssistantProduct(payload.data);
 }
 
+function isDealsQuery(message: string): boolean {
+  return /(deal|oferta|descuento|discount)/i.test(message);
+}
+
 async function searchProducts(env: Env, message: string): Promise<AssistantProduct[]> {
-  const query = extractQuery(message);
   const apiUrl = new URL("/api/v1/catalog/products", env.AETHER_API_BASE_URL);
   apiUrl.searchParams.set("page", "1");
   apiUrl.searchParams.set("pageSize", "5");
   apiUrl.searchParams.set("inStock", "true");
-  if (query) apiUrl.searchParams.set("q", query);
+  if (isDealsQuery(message)) {
+    // "Search deals"/"Buscar ofertas" describe a filter, not literal product
+    // text - a q= search for those words would never match a real product.
+    apiUrl.searchParams.set("hasDiscount", "true");
+    apiUrl.searchParams.set("sort", "discount");
+  } else {
+    const query = extractQuery(message);
+    if (query) apiUrl.searchParams.set("q", query);
+  }
   const response = await fetchWithTimeout(apiUrl, undefined, 5000);
   if (!response.ok) return [];
   const payload = (await response.json()) as { data?: unknown[] };
@@ -1022,7 +1033,7 @@ function toAssistantProduct(input: unknown): AssistantProduct | null {
 
 function extractQuery(message: string): string {
   return message
-    .replace(/agrega|anade|añade|add|busca|buscar|show|find|recomienda|recommend|producto|product|oferta|deal/gi, "")
+    .replace(/agrega|anade|añade|add|busca|buscar|search|show|find|recomienda|recommend|producto|product|oferta|deal/gi, "")
     .trim()
     .slice(0, 80);
 }
