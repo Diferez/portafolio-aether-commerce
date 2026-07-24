@@ -296,13 +296,9 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
       return finish(responsePayload(requestId, threadId, spanish ? "No pude consultar tu carrito. No realice ningun cambio." : "I could not read your cart. No changes were made.", intent, [], null, "ASK_CLARIFICATION", "FAILED"));
     }
     if (intent === "CLEAR_CART") {
-      if (!hasClearCartConfirmation(message)) {
-        await audit("clear_cart", `cart:${cartId}:confirmation_missing`, cartId, "denied", "blocked", "confirmation_required");
-        return finish(responsePayload(requestId, threadId, spanish ? "Para vaciar todo el carrito necesito una confirmacion explicita." : "To clear the entire cart I need explicit confirmation.", intent, [], cart, "ASK_CLARIFICATION", "PENDING"));
-      }
-      const idem = await idempotencyKey(requestId, "clear_cart", `cart:${cartId}:confirmed`);
+      const idem = await idempotencyKey(requestId, "clear_cart", `cart:${cartId}`);
       const updated = await clearCart(env, cartId, cartToken, cart, idem);
-      await audit("clear_cart", `cart:${cartId}:confirmed`, cartId, "allowed", updated ? "succeeded" : "failed", updated ? null : "cart_update_failed");
+      await audit("clear_cart", `cart:${cartId}`, cartId, "allowed", updated ? "succeeded" : "failed", updated ? null : "cart_update_failed");
       return finish(responsePayload(requestId, threadId, spanish ? "Listo. Vacie el carrito." : "Done. I cleared the cart.", intent, [], updated || cart, updated ? "CART_CLEARED" : "ASK_CLARIFICATION", updated ? "SUCCEEDED" : "FAILED"));
     }
     const item = resolveCartItem(cart, message);
@@ -1117,10 +1113,6 @@ function extractQuantity(message: string): number | null {
     if (value.includes(word)) return quantity;
   }
   return null;
-}
-
-function hasClearCartConfirmation(message: string): boolean {
-  return /(confirmo|si,? vacia|si vaciar|yes,? clear|confirm clear|vacia todo)/i.test(message);
 }
 
 function toAssistantProduct(input: unknown): AssistantProduct | null {
