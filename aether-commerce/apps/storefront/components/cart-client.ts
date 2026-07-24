@@ -11,7 +11,7 @@ import { apiBaseUrl } from "./config";
 const cartIdKey = "aether.cartId.dummyjson.v1";
 const cartTokenKey = "aether.cartToken.dummyjson.v1";
 const localCartKey = "aether.localCartItems.dummyjson.v1";
-const cartApiTimeoutMs = 1200;
+const cartApiTimeoutMs = 5000;
 
 async function fetchCartApi(input: RequestInfo | URL, init?: RequestInit) {
   const controller = new AbortController();

@@ -48,13 +48,30 @@ export default function CartPage() {
 
     try {
       const token = await getCartToken();
-      const response = await fetch(`${apiBaseUrl}/api/v1/cart/${id}`, {
-        headers: token ? { "x-aether-cart-token": token } : {}
-      });
-      const payload = (await response.json()) as { success: boolean; data?: Cart };
+      const fetchServerCart = () =>
+        fetch(`${apiBaseUrl}/api/v1/cart/${id}`, {
+          headers: token ? { "x-aether-cart-token": token } : {}
+        });
+
+      let response = await fetchServerCart();
+      let payload = (await response.json()) as { success: boolean; data?: Cart };
       if (!response.ok || !payload.success) {
         throw new Error("Cart API rejected read.");
       }
+
+      if (!payload.data?.items.length && hasLocalItems) {
+        // The add-to-cart call that created these items likely timed out
+        // before reaching the server. Push them now instead of waiting for
+        // checkout, so the server cart (and anything reading it, like the
+        // AI assistant) reflects what the shopper actually has.
+        await syncLocalCartToApi();
+        response = await fetchServerCart();
+        payload = (await response.json()) as { success: boolean; data?: Cart };
+        if (!response.ok || !payload.success) {
+          throw new Error("Cart API rejected read.");
+        }
+      }
+
       const nextCart = payload.data?.items.length ? payload.data : localCart.items.length ? localCart : payload.data;
       setCart(nextCart ?? null);
       setStatus(payload.data?.items.length ? t.cartSynced : localCart.items.length ? t.cartSavedLocal : t.cartUnavailable);
