@@ -29,7 +29,7 @@ jobs:
       AETHER_D1_DATABASE_NAME: ${{ vars.AETHER_D1_DATABASE_NAME || 'aether-production' }}
       AETHER_D1_DATABASE_ID: ${{ vars.AETHER_D1_DATABASE_ID }}
       AETHER_ENV: production
-      PLATZI_API_BASE_URL: ${{ vars.PLATZI_API_BASE_URL || 'https://api.escuelajs.co/api/v1' }}
+      DUMMYJSON_API_BASE_URL: ${{ vars.DUMMYJSON_API_BASE_URL || 'https://dummyjson.com' }}
       NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
       AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
       NEXT_PUBLIC_PORTFOLIO_URL: ${{ vars.NEXT_PUBLIC_PORTFOLIO_URL }}

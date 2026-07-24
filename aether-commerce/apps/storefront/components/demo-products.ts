@@ -60,6 +60,10 @@ export const demoProducts: Product[] = [
     ],
     rating: { average: 4.8, count: 216 },
     reviewCount: 216,
+    reviews: [
+      { rating: 5, comment: "Display is gorgeous and the battery easily lasts a full day.", date: "2026-06-02T00:00:00.000Z", reviewerName: "Priya S." },
+      { rating: 4, comment: "Great build quality, wish it had one more USB-C port.", date: "2026-05-18T00:00:00.000Z", reviewerName: "Marco L." }
+    ],
     inventory: {
       sku: "AET-ARC-STD",
       available: 12,
@@ -74,6 +78,15 @@ export const demoProducts: Product[] = [
     visible: true,
     seoTitle: "Aether Arc Laptop | Aether",
     seoDescription: "Premium ultrabook for modern teams.",
+    catalogSource: "dummyjson",
+    externalStock: null,
+    lastSyncedAt: "2026-07-01T00:00:00.000Z",
+    shippingInformation: "Ships in 2-4 business days",
+    warrantyInformation: "1 year Aether demo warranty",
+    returnPolicy: "30-day return policy",
+    minimumOrderQuantity: 1,
+    weight: 1.3,
+    dimensions: { width: 31.4, height: 1.5, depth: 22 },
     createdAt: "2026-07-01T00:00:00.000Z",
     updatedAt: "2026-07-01T00:00:00.000Z"
   },
@@ -136,6 +149,9 @@ export const demoProducts: Product[] = [
     ],
     rating: { average: 4.6, count: 88 },
     reviewCount: 88,
+    reviews: [
+      { rating: 5, comment: "Turned my desk into a single-cable setup. Excellent.", date: "2026-06-10T00:00:00.000Z", reviewerName: "Jonas K." }
+    ],
     inventory: {
       sku: "AET-DOCK-STD",
       available: 8,
@@ -150,6 +166,15 @@ export const demoProducts: Product[] = [
     visible: true,
     seoTitle: "Aether Dock Studio | Aether",
     seoDescription: "Desk hub for focused work.",
+    catalogSource: "dummyjson",
+    externalStock: null,
+    lastSyncedAt: "2026-07-01T00:00:00.000Z",
+    shippingInformation: "Ships in 1-3 business days",
+    warrantyInformation: "1 year Aether demo warranty",
+    returnPolicy: "30-day return policy",
+    minimumOrderQuantity: 1,
+    weight: 0.4,
+    dimensions: { width: 12, height: 3, depth: 8 },
     createdAt: "2026-07-01T00:00:00.000Z",
     updatedAt: "2026-07-01T00:00:00.000Z"
   },
@@ -212,6 +237,10 @@ export const demoProducts: Product[] = [
     ],
     rating: { average: 4.7, count: 143 },
     reviewCount: 143,
+    reviews: [
+      { rating: 5, comment: "No noticeable lag on calls, very comfortable for long sessions.", date: "2026-06-21T00:00:00.000Z", reviewerName: "Ana R." },
+      { rating: 4, comment: "Great sound, case could be smaller.", date: "2026-05-30T00:00:00.000Z", reviewerName: "Diego F." }
+    ],
     inventory: {
       sku: "AET-PULSE-STD",
       available: 3,
@@ -226,6 +255,15 @@ export const demoProducts: Product[] = [
     visible: true,
     seoTitle: "Aether Pulse Headset | Aether",
     seoDescription: "Premium headset for hybrid work.",
+    catalogSource: "dummyjson",
+    externalStock: null,
+    lastSyncedAt: "2026-07-01T00:00:00.000Z",
+    shippingInformation: "Ships in 2-4 business days",
+    warrantyInformation: "1 year Aether demo warranty",
+    returnPolicy: "30-day return policy",
+    minimumOrderQuantity: 1,
+    weight: 0.28,
+    dimensions: { width: 18, height: 20, depth: 8 },
     createdAt: "2026-07-01T00:00:00.000Z",
     updatedAt: "2026-07-01T00:00:00.000Z"
   }

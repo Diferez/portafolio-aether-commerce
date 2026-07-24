@@ -4,7 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import type { AppBindings } from "../types";
 import { ok } from "../http";
 import { requirePermission } from "../middleware/admin";
-import { getCatalogProducts, getProductById } from "../services/catalog";
+import { clearCatalogCache, getCatalogProducts, getProductById } from "../services/catalog";
 
 const productOverrideSchema = z.object({
   name: z.string().min(1).optional(),
@@ -57,7 +57,7 @@ adminRoutes.get("/dashboard", requirePermission("orders.read"), async (c) => {
     ],
     serviceStatus: {
       d1: "ok",
-      platzi: "cached",
+      dummyjson: "cached",
       stripe: c.env.STRIPE_SECRET_KEY ? "configured" : "sandbox_placeholder",
       resend: c.env.RESEND_API_KEY ? "configured" : "not_configured"
     }
@@ -111,7 +111,7 @@ adminRoutes.delete("/products/:id/override", requirePermission("products.write")
 });
 
 adminRoutes.post("/products/:id/cache-refresh", requirePermission("products.write"), async (c) => {
-  await c.env.DB.prepare("delete from products_cache where id = 'platzi-products'").run();
+  await clearCatalogCache(c.env);
   return ok(c, { productId: c.req.param("id"), refreshed: true });
 });
 

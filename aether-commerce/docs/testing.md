@@ -12,7 +12,7 @@
 ## Integration
 
 - D1 migrations and seeds.
-- Catalog fallback when Platzi API times out.
+- Catalog fallback when DummyJSON API times out.
 - Clerk JWT mock and role extraction.
 - Stripe checkout and webhook signature mock.
 - Resend email mock and `email_events` logging.
@@ -40,7 +40,7 @@
 
 ## Acceptance Checks
 
-- Catalog falls back to cache or snapshot when Platzi is unavailable.
+- Catalog falls back to cache or snapshot when DummyJSON is unavailable.
 - Product overrides are stored independently from the external source.
 - Worker recalculates cart totals and checkout values.
 - Public demo admin cannot persist mutations.

@@ -8,7 +8,7 @@ Aether vive dentro del monorepo `aether-commerce/`.
 - Admin: Next.js estatico en `apps/admin`.
 - API: Cloudflare Worker con Hono en `apps/api`, expuesto bajo `/api/v1`.
 - Base de datos: Cloudflare D1 con migraciones SQL en `apps/api/migrations`.
-- Catalogo: adaptador Platzi en `apps/api/src/services/catalog.ts`, normalizado con Zod y tipos compartidos.
+- Catalogo: adaptador DummyJSON en `apps/api/src/services/catalog.ts`, normalizado con Zod y tipos compartidos.
 - Carrito: servicio `apps/api/src/services/cart.ts`, persistido en D1 como JSON en `carts`.
 - Checkout: Worker API con Stripe sandbox.
 - Auth customer: flujo client-side existente en storefront, con endpoints account/user en Worker.
@@ -87,7 +87,7 @@ Servicio IA:
 
 - La lectura y las mutaciones de carrito hechas por el asistente requieren token firmado emitido por el Worker. Si falta o no corresponde al carrito, el asistente pide revalidar la tienda y no consulta el carrito.
 - No hay Redis/PostgreSQL existentes; el servicio agrega soporte configurable, con fallback local solo para desarrollo.
-- El catalogo Platzi no tiene atributos ricos de talla/color en todos los productos; el asistente debe preguntar cuando falten datos.
+- El catalogo DummyJSON no tiene atributos ricos de talla/color en todos los productos; el asistente debe preguntar cuando falten datos.
 - Desplegar FastAPI requiere hosting adicional al Worker actual.
 
 ## Decisiones

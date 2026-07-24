@@ -2,7 +2,7 @@
 
 ## Product images do not load
 
-Platzi source data can contain invalid image URLs. The catalog adapter removes
+DummyJSON source data can contain invalid image URLs. The catalog adapter removes
 bad URLs and falls back to deterministic Cloudinary placeholders.
 
 ## Checkout does not redirect

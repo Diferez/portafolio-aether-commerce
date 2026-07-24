@@ -44,7 +44,7 @@ api.get("/health", async (c) => {
     environment: c.env.AETHER_ENV ?? "development",
     checks: {
       d1,
-      platziBaseUrl: Boolean(c.env.PLATZI_API_BASE_URL),
+      dummyJsonBaseUrl: Boolean(c.env.DUMMYJSON_API_BASE_URL),
       stripeSandboxConfigured: Boolean(c.env.STRIPE_SECRET_KEY),
       stripeSecretKeyStatus: getStripeSecretKeyStatus(c.env.STRIPE_SECRET_KEY),
       resendConfigured: Boolean(c.env.RESEND_API_KEY)

@@ -9,7 +9,7 @@ def test_product_contract_maps_cents_to_decimal_price() -> None:
     client = AetherApiClient("https://example.com")
     card = client._to_product_card(
         {
-            "id": "platzi_1",
+            "id": "dummyjson_1",
             "slug": "demo-product",
             "name": "Demo Product",
             "shortDescription": "A real product",

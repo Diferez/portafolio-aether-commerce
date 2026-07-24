@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 AETHER_ENV = "development"
-PLATZI_API_BASE_URL = "https://api.escuelajs.co/api/v1"
+DUMMYJSON_API_BASE_URL = "https://dummyjson.com"
 
 [[d1_databases]]
 binding = "DB"

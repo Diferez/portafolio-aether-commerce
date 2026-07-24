@@ -18,7 +18,7 @@ const config = {
   preview_urls: true,
   vars: {
     AETHER_ENV: process.env.AETHER_ENV || "production",
-    PLATZI_API_BASE_URL: process.env.PLATZI_API_BASE_URL || "https://api.escuelajs.co/api/v1",
+    DUMMYJSON_API_BASE_URL: process.env.DUMMYJSON_API_BASE_URL || "https://dummyjson.com",
     APP_ORIGIN_STORE: process.env.APP_ORIGIN_STORE || "",
     APP_ORIGIN_ADMIN: process.env.APP_ORIGIN_ADMIN || ""
   },

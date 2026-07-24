@@ -9,7 +9,7 @@ flowchart LR
   Storefront --> API["Cloudflare Worker API"]
   Admin --> API
   API --> D1["D1 database"]
-  API --> Platzi["Platzi Catalog API"]
+  API --> DummyJSON["DummyJSON Catalog API"]
   API --> Stripe["Stripe test mode"]
   API --> Clerk["Clerk JWT verification"]
   API --> Resend["Resend email"]
@@ -22,7 +22,7 @@ flowchart LR
 - Worker-owned trust boundary: prices, discounts, stock, order totals, refunds,
   webhooks, role checks, and emails are calculated or verified in the Worker.
 - Integer cents: every monetary value is stored and exchanged as integer cents.
-- External catalog data is untrusted: Platzi products are validated, normalized,
+- External catalog data is untrusted: DummyJSON products are validated, normalized,
   cleaned, cached, and merged with local overrides before reaching the UI.
 - Public demo admin cannot mutate persistent data.
 
@@ -40,7 +40,7 @@ flowchart LR
 ## Data flow
 
 1. Storefront requests products from `/api/v1/catalog/products`.
-2. Worker loads cache, fetches Platzi when needed, normalizes products, applies
+2. Worker loads cache, fetches DummyJSON when needed, normalizes products, applies
    overrides and inventory, and returns Aether contracts.
 3. Cart and checkout requests are recalculated in the Worker.
 4. Stripe Checkout sessions are created in test mode only.

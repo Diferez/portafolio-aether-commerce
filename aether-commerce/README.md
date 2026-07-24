@@ -2,7 +2,7 @@
 
 Aether is a bilingual premium tech commerce demo designed for free-tier-friendly
 deployment on Cloudflare Pages, Cloudflare Workers, D1, Clerk, Stripe test mode,
-Resend, Cloudinary, and the Platzi Fake Store API.
+Resend, Cloudinary, and the DummyJSON product API.
 
 This folder is intentionally self-contained and does not replace the portfolio
 site in the repository root.

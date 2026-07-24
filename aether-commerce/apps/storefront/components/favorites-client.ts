@@ -3,10 +3,11 @@
 import type { Product } from "@aether/schemas";
 import { getCurrentCustomer, type CustomerSession } from "./customer-client";
 
-const guestFavoritesKey = "aether.favoritesItems.guest";
+// Versioned for the same reason as cart-client.ts's keys - see legacy-storage.ts.
+const guestFavoritesKey = "aether.favoritesItems.guest.dummyjson.v1";
 
 function favoritesKey(customer: CustomerSession | null = getCurrentCustomer()) {
-  return customer ? `aether.favoritesItems.${customer.id}` : guestFavoritesKey;
+  return customer ? `aether.favoritesItems.${customer.id}.dummyjson.v1` : guestFavoritesKey;
 }
 
 function readProductsFromKey(key: string): Product[] {

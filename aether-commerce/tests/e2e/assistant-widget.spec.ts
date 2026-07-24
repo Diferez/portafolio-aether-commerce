@@ -28,7 +28,7 @@ test("assistant widget opens and renders structured product results", async ({ p
           id: "cart-1",
           items: [
             {
-              productId: "platzi_9006",
+              productId: "dummyjson_9006",
               variantId: "everyday-runner-sneakers-standard",
               quantity: 1,
               name: "Everyday Runner Sneakers",
@@ -72,7 +72,7 @@ test("assistant widget opens and renders structured product results", async ({ p
           intent: "SEARCH_PRODUCTS",
           products: [
             {
-              product_id: "platzi_9006",
+              product_id: "dummyjson_9006",
               variant_id: "everyday-runner-sneakers-standard",
               name: "Everyday Runner Sneakers",
               description: "Lightweight sneakers built for daily movement.",

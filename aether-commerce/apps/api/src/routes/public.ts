@@ -5,7 +5,7 @@ import { productQuerySchema } from "@aether/schemas";
 import { defaultShippingSettings } from "@aether/core";
 import type { AppBindings } from "../types";
 import { collection, fail, ok } from "../http";
-import { getCatalogProducts, getCategories, getProductById, getProductBySlug } from "../services/catalog";
+import { getBrands, getCatalogProducts, getCategories, getProductById, getProductBySlug } from "../services/catalog";
 
 export const publicRoutes = new Hono<AppBindings>();
 
@@ -38,6 +38,11 @@ publicRoutes.get("/products/slug/:slug", async (c) => {
 publicRoutes.get("/categories", async (c) => {
   cachePublicCatalog(c);
   return ok(c, await getCategories(c.env));
+});
+
+publicRoutes.get("/brands", async (c) => {
+  cachePublicCatalog(c);
+  return ok(c, await getBrands(c.env));
 });
 
 publicRoutes.get("/categories/:slug/products", async (c) => {

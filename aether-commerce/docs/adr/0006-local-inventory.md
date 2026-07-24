@@ -6,5 +6,5 @@ Accepted.
 
 ## Decision
 
-Use Platzi stock only as an initial signal and track reservations, sales,
+Use DummyJSON stock only as an initial signal and track reservations, sales,
 returns, adjustments, and damaged products locally in D1.

@@ -108,7 +108,7 @@ Variables no sensibles del environment `production`:
 - `AETHER_API_ORIGIN`
 - `NEXT_PUBLIC_PORTFOLIO_URL`
 - `APP_ORIGIN_ADMIN`
-- `PLATZI_API_BASE_URL`
+- `DUMMYJSON_API_BASE_URL`
 
 Secrets requeridos del environment `production`:
 

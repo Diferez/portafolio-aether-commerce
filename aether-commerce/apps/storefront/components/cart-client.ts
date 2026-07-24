@@ -4,9 +4,13 @@ import { calculateCartTotals } from "@aether/core";
 import type { Cart, CartItem, Product } from "@aether/schemas";
 import { apiBaseUrl } from "./config";
 
-const cartIdKey = "aether.cartId";
-const cartTokenKey = "aether.cartToken";
-const localCartKey = "aether.localCartItems";
+// Versioned so a catalog-source migration (e.g. Platzi -> DummyJSON, where
+// product IDs are not comparable across sources) never resurrects stale
+// cart data under a new schema. See legacy-storage.ts for the one-time
+// cleanup of the pre-v1 (Platzi-era) keys.
+const cartIdKey = "aether.cartId.dummyjson.v1";
+const cartTokenKey = "aether.cartToken.dummyjson.v1";
+const localCartKey = "aether.localCartItems.dummyjson.v1";
 const cartApiTimeoutMs = 1200;
 
 async function fetchCartApi(input: RequestInfo | URL, init?: RequestInit) {
@@ -123,6 +127,37 @@ export function removeLocalCartItem(itemId: string) {
   writeLocalItems(
     readLocalItems().filter((item) => item.productId !== itemId && item.variantId !== itemId && item.slug !== itemId)
   );
+}
+
+function updateLocalItemQuantity(itemId: string, quantity: number) {
+  const clamped = Math.min(25, Math.max(1, Math.round(quantity)));
+  writeLocalItems(
+    readLocalItems().map((item) =>
+      item.productId === itemId || item.variantId === itemId || item.slug === itemId
+        ? { ...item, quantity: clamped, lineTotal: item.finalUnitPrice * clamped }
+        : item
+    )
+  );
+}
+
+export async function updateCartItemQuantity(itemId: string, quantity: number) {
+  updateLocalItemQuantity(itemId, quantity);
+  const id = getCartId();
+
+  try {
+    const response = await fetchCartApi(`${apiBaseUrl}/api/v1/cart/${id}/items/${encodeURIComponent(itemId)}`, {
+      method: "PATCH",
+      headers: await cartMutationHeaders(),
+      body: JSON.stringify({ quantity: Math.min(25, Math.max(1, Math.round(quantity))) })
+    });
+    const payload = (await response.json()) as { success?: boolean };
+    if (!response.ok || !payload.success) {
+      throw new Error("Cart API rejected quantity update.");
+    }
+    return "synced" as const;
+  } catch {
+    return "local" as const;
+  }
 }
 
 export async function removeProductFromCart(itemId: string) {

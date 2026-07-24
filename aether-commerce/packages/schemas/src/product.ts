@@ -20,12 +20,25 @@ export const productImageSchema = z.object({
   alt: z.string().min(1),
   width: z.number().int().positive().optional(),
   height: z.number().int().positive().optional(),
-  source: z.enum(["platzi", "cloudinary", "fallback"])
+  source: z.enum(["dummyjson", "cloudinary", "fallback"])
 });
 
 export const productRatingSchema = z.object({
   average: z.number().min(0).max(5),
   count: z.number().int().min(0)
+});
+
+export const productReviewSchema = z.object({
+  rating: z.number().min(0).max(5),
+  comment: z.string().min(1),
+  date: z.string().datetime(),
+  reviewerName: z.string().min(1)
+});
+
+export const productDimensionsSchema = z.object({
+  width: z.number().min(0),
+  height: z.number().min(0),
+  depth: z.number().min(0)
 });
 
 export const productSchema = z.object({
@@ -71,6 +84,7 @@ export const productSchema = z.object({
   variants: z.array(productVariantSchema),
   rating: productRatingSchema,
   reviewCount: z.number().int().min(0),
+  reviews: z.array(productReviewSchema),
   inventory: z.object({
     sku: z.string().min(1),
     available: z.number().int().min(0),
@@ -85,6 +99,15 @@ export const productSchema = z.object({
   visible: z.boolean(),
   seoTitle: z.string().nullable(),
   seoDescription: z.string().nullable(),
+  catalogSource: z.literal("dummyjson"),
+  externalStock: z.number().int().min(0).nullable(),
+  lastSyncedAt: z.string().datetime(),
+  shippingInformation: z.string().nullable(),
+  warrantyInformation: z.string().nullable(),
+  returnPolicy: z.string().nullable(),
+  minimumOrderQuantity: z.number().int().min(1).nullable(),
+  weight: z.number().min(0).nullable(),
+  dimensions: productDimensionsSchema.nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime()
 });
@@ -93,13 +116,16 @@ export const productQuerySchema = z.object({
   q: z.string().trim().optional(),
   search: z.string().trim().optional(),
   category: z.string().trim().optional(),
+  brand: z.string().trim().optional(),
   flag: z.enum(["featured", "new", "deal", "limited"]).optional(),
   featured: z.coerce.boolean().optional(),
   deal: z.coerce.boolean().optional(),
   newArrival: z.coerce.boolean().optional(),
   inStock: z.coerce.boolean().optional(),
+  hasDiscount: z.coerce.boolean().optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
+  minRating: z.coerce.number().min(0).max(5).optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(60).default(12),
   limit: z.coerce.number().int().min(1).max(60).optional(),

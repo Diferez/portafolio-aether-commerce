@@ -30,3 +30,36 @@ export function cleanImageUrls(input: unknown, fallbackUrl: string): string[] {
 export function finalPriceFromDiscount(price: number, discountPercentage: number): number {
   return applyPercentageDiscount(price, discountPercentage);
 }
+
+const CATEGORY_NAME_OVERRIDES: Record<string, string> = {
+  "mens-shirts": "Men's Shirts",
+  "mens-shoes": "Men's Shoes",
+  "mens-watches": "Men's Watches",
+  "womens-bags": "Women's Bags",
+  "womens-dresses": "Women's Dresses",
+  "womens-jewellery": "Women's Jewellery",
+  "womens-shoes": "Women's Shoes",
+  "womens-watches": "Women's Watches",
+  "mobile-accessories": "Mobile Accessories",
+  "sports-accessories": "Sports Accessories",
+  "home-decoration": "Home Decoration",
+  "skin-care": "Skin Care"
+};
+
+/**
+ * Category slugs are the identifier of record everywhere (filters, routes,
+ * cache keys). This only produces a *display* label - never branch logic on
+ * its output.
+ */
+export function humanizeCategorySlug(slug: string): string {
+  const override = CATEGORY_NAME_OVERRIDES[slug];
+  if (override) {
+    return override;
+  }
+
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}

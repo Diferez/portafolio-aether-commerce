@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Check, Heart, Search, ShoppingBag, SlidersHorizontal } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Check, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@aether/schemas";
-import { formatUsd } from "@aether/core";
+import { Badge, Button, Input, Select, Sheet } from "@aether/ui";
 import { apiBaseUrl, storefrontPath } from "./config";
 import { addProductToCart } from "./cart-client";
 import { demoProducts } from "./demo-products";
 import { readFavoriteProducts, toggleFavoriteProduct } from "./favorites-client";
 import { useLanguage } from "./LanguageProvider";
-import { getLocalizedProduct } from "./product-localization";
+import { ProductCard, ProductCardSkeleton } from "./ProductCard";
 
 type ApiPagination = {
   page: number;
   pageSize: number;
   total: number;
   pageCount: number;
-  hasNextPage?: boolean;
-  hasPreviousPage?: boolean;
 };
 
 type ApiProducts = {
@@ -26,90 +24,180 @@ type ApiProducts = {
   pagination?: ApiPagination;
 };
 
-type CatalogStatus = "demo" | "live" | "offline";
+type ApiList = { success: true; data: Array<{ slug: string; name: string } | string> };
 
-const filterOptions: Array<{ value: "featured" | "deal" | "new" | ""; labelKey: "all" | "featured" | "deals" | "new" }> = [
-  { value: "", labelKey: "all" },
-  { value: "featured", labelKey: "featured" },
-  { value: "deal", labelKey: "deals" },
-  { value: "new", labelKey: "new" }
-];
+type CatalogStatus = "demo" | "live" | "offline";
+type SortValue = "featured" | "newest" | "price_asc" | "price_desc" | "rating" | "name" | "discount";
 
 const catalogApiTimeoutMs = 12000;
+const debounceMs = 350;
+
+function useQueryState(enabled: boolean) {
+  const [params, setParamsState] = useState<URLSearchParams>(
+    () => new URLSearchParams(enabled && typeof window !== "undefined" ? window.location.search : "")
+  );
+
+  useEffect(() => {
+    if (!enabled) return;
+    const sync = () => setParamsState(new URLSearchParams(window.location.search));
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, [enabled]);
+
+  const setParams = useCallback(
+    (next: Record<string, string | undefined>, options?: { replace?: boolean }) => {
+      if (!enabled || typeof window === "undefined") return;
+      const url = new URL(window.location.href);
+      for (const [key, value] of Object.entries(next)) {
+        if (value === undefined || value === "") {
+          url.searchParams.delete(key);
+        } else {
+          url.searchParams.set(key, value);
+        }
+      }
+      window.history[options?.replace ? "replaceState" : "pushState"]({}, "", url.toString());
+      setParamsState(new URLSearchParams(url.search));
+    },
+    [enabled]
+  );
+
+  return [params, setParams] as const;
+}
 
 export function ProductGrid({
   compact = false,
+  fixedCategory,
+  excludeSlug,
   initialFlag = "",
+  initialSort,
   heading,
   eyebrow,
-  description
+  description,
+  pageSize = 12
 }: {
   compact?: boolean;
+  fixedCategory?: string;
+  excludeSlug?: string;
   initialFlag?: "featured" | "deal" | "new" | "";
+  initialSort?: SortValue;
   heading?: string;
   eyebrow?: string;
   description?: string;
+  pageSize?: number;
 }) {
-  const [products, setProducts] = useState<Product[]>(demoProducts);
-  const [query, setQuery] = useState("");
-  const [flag, setFlag] = useState<"featured" | "deal" | "new" | "">(initialFlag);
+  const syncUrl = !compact;
+  const { locale, t } = useLanguage();
+  const [urlParams, setUrlParams] = useQueryState(syncUrl);
+
+  const [queryInput, setQueryInput] = useState(() => urlParams.get("q") ?? "");
+  const [debouncedQuery, setDebouncedQuery] = useState(queryInput);
+  const [sort, setSort] = useState<SortValue>(() => (urlParams.get("sort") as SortValue) || initialSort || "featured");
+  const [category, setCategory] = useState(() => fixedCategory ?? urlParams.get("category") ?? "");
+  const [brand, setBrand] = useState(() => urlParams.get("brand") ?? "");
+  const [minPrice, setMinPrice] = useState(() => urlParams.get("minPrice") ?? "");
+  const [maxPrice, setMaxPrice] = useState(() => urlParams.get("maxPrice") ?? "");
+  const [minRating, setMinRating] = useState(() => urlParams.get("minRating") ?? "");
+  const [hasDiscount, setHasDiscount] = useState(() => urlParams.get("hasDiscount") === "1");
+  const [inStock, setInStock] = useState(() => urlParams.get("inStock") === "1");
+  const [page, setPage] = useState(() => Number(urlParams.get("page") ?? 1) || 1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [flag] = useState<"featured" | "deal" | "new" | "">(initialFlag);
+
+  const [products, setProducts] = useState<Product[]>(compact ? [] : demoProducts);
+  const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<CatalogStatus>("demo");
   const [statusMessage, setStatusMessage] = useState("");
+  const [brands, setBrands] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [addingIds, setAddingIds] = useState<string[]>([]);
   const [addedProduct, setAddedProduct] = useState<Product | null>(null);
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<ApiPagination>({
-    page: 1,
-    pageSize: 6,
-    total: demoProducts.length,
-    pageCount: 1
-  });
-  const { locale, t } = useLanguage();
+  const [pagination, setPagination] = useState<ApiPagination>({ page: 1, pageSize, total: 0, pageCount: 1 });
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedQuery(queryInput.trim()), debounceMs);
+    return () => window.clearTimeout(timeout);
+  }, [queryInput]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedQuery, sort, category, brand, minPrice, maxPrice, minRating, hasDiscount, inStock]);
+
+  useEffect(() => {
+    if (!syncUrl) return;
+    setUrlParams(
+      {
+        q: debouncedQuery || undefined,
+        sort: sort !== "featured" ? sort : undefined,
+        category: category || undefined,
+        brand: brand || undefined,
+        minPrice: minPrice || undefined,
+        maxPrice: maxPrice || undefined,
+        minRating: minRating || undefined,
+        hasDiscount: hasDiscount ? "1" : undefined,
+        inStock: inStock ? "1" : undefined,
+        page: page > 1 ? String(page) : undefined
+      },
+      { replace: true }
+    );
+  }, [debouncedQuery, sort, category, brand, minPrice, maxPrice, minRating, hasDiscount, inStock, page, syncUrl, setUrlParams]);
+
+  useEffect(() => {
+    if (compact || fixedCategory) return;
+    Promise.all([
+      fetch(`${apiBaseUrl}/api/v1/catalog/brands`).then((response) => response.json() as Promise<ApiList>),
+      fetch(`${apiBaseUrl}/api/v1/catalog/categories`).then((response) => response.json() as Promise<{ success: boolean; data?: Array<{ slug: string; name: string }> }>)
+    ])
+      .then(([brandsPayload, categoriesPayload]) => {
+        if (brandsPayload.success) setBrands(brandsPayload.data.map((entry) => (typeof entry === "string" ? entry : entry.name)));
+        if (categoriesPayload.success && categoriesPayload.data) setCategories(categoriesPayload.data);
+      })
+      .catch(() => undefined);
+  }, [compact, fixedCategory]);
 
   useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), catalogApiTimeoutMs);
+    setLoading(true);
+
     const params = new URLSearchParams({
       page: String(page),
-      pageSize: "6",
-      sort: flag === "new" ? "newest" : flag === "deal" ? "discount" : "featured"
+      pageSize: String(pageSize),
+      sort: flag === "new" ? "newest" : flag === "deal" ? "discount" : sort
     });
-    if (query.trim()) params.set("search", query.trim());
+    if (debouncedQuery) params.set("search", debouncedQuery);
     if (flag) params.set("flag", flag);
+    const effectiveCategory = fixedCategory ?? category;
+    if (effectiveCategory) params.set("category", effectiveCategory);
+    if (brand) params.set("brand", brand);
+    if (minPrice) params.set("minPrice", String(Math.max(0, Math.round(Number(minPrice) * 100))));
+    if (maxPrice) params.set("maxPrice", String(Math.max(0, Math.round(Number(maxPrice) * 100))));
+    if (minRating) params.set("minRating", minRating);
+    if (hasDiscount) params.set("hasDiscount", "true");
+    if (inStock) params.set("inStock", "true");
 
-    fetch(`${apiBaseUrl}/api/v1/catalog/products?${params.toString()}`, {
-      signal: controller.signal
-    })
+    fetch(`${apiBaseUrl}/api/v1/catalog/products?${params.toString()}`, { signal: controller.signal })
       .then((response) => response.json())
       .then((payload: ApiProducts) => {
-        if (payload.success) {
-          setProducts(payload.data);
-          setPagination(
-            payload.pagination ?? {
-              page,
-              pageSize: 6,
-              total: payload.data.length,
-              pageCount: 1
-            }
-          );
-          setStatus("live");
-          setStatusMessage("");
-        }
+        if (!payload.success) return;
+        const data = excludeSlug ? payload.data.filter((product) => product.slug !== excludeSlug) : payload.data;
+        setProducts(data);
+        setPagination(payload.pagination ?? { page, pageSize, total: data.length, pageCount: 1 });
+        setStatus("live");
+        setStatusMessage("");
       })
       .catch(() => {
         setStatus("offline");
         setStatusMessage("");
-      });
+        if (!compact) setProducts(demoProducts);
+      })
+      .finally(() => setLoading(false));
+
     return () => {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [compact, flag, page, query]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [compact, flag, query]);
+  }, [compact, page, pageSize, sort, debouncedQuery, flag, fixedCategory, category, brand, minPrice, maxPrice, minRating, hasDiscount, inStock, excludeSlug]);
 
   useEffect(() => {
     const syncFavorites = () => setFavoriteIds(readFavoriteProducts().map((product) => product.id));
@@ -122,13 +210,21 @@ export function ProductGrid({
     };
   }, []);
 
-  const filtered = useMemo(() => products, [products]);
+  const sortOptions: Array<{ value: SortValue; label: string }> = useMemo(
+    () => [
+      { value: "featured", label: t.sortFeatured },
+      { value: "price_asc", label: t.sortPriceAsc },
+      { value: "price_desc", label: t.sortPriceDesc },
+      { value: "rating", label: t.sortRating },
+      { value: "discount", label: t.sortDiscount },
+      { value: "name", label: t.sortName },
+      { value: "newest", label: t.sortNewest }
+    ],
+    [t]
+  );
 
   async function addToCart(product: Product) {
-    if (addingIds.includes(product.id)) {
-      return;
-    }
-
+    if (addingIds.includes(product.id)) return;
     setAddingIds((current) => [...current, product.id]);
     try {
       const result = await addProductToCart(product);
@@ -148,213 +244,261 @@ export function ProductGrid({
     }
   }
 
+  function toggleFavorite(product: Product) {
+    toggleFavoriteProduct(product);
+    setFavoriteIds(readFavoriteProducts().map((candidate) => candidate.id));
+  }
+
   function goToPage(nextPage: number) {
     setPage(nextPage);
-    window.requestAnimationFrame(() => {
-      document.getElementById("catalog-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    if (!compact) {
+      window.requestAnimationFrame(() => {
+        document.getElementById("catalog-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
-  function toggleFavorite(product: Product) {
-    const result = toggleFavoriteProduct(product);
-    setFavoriteIds(readFavoriteProducts().map((candidate) => candidate.id));
-    setStatusMessage(
-      locale === "es"
-        ? result === "added"
-          ? `${product.name} guardado en favoritos`
-          : `${product.name} eliminado de favoritos`
-        : result === "added"
-          ? `${product.name} saved to favorites`
-          : `${product.name} removed from favorites`
-    );
+  function clearFilters() {
+    setQueryInput("");
+    setSort(initialSort ?? "featured");
+    if (!fixedCategory) setCategory("");
+    setBrand("");
+    setMinPrice("");
+    setMaxPrice("");
+    setMinRating("");
+    setHasDiscount(false);
+    setInStock(false);
   }
+
+  const hasActiveFilters = Boolean(
+    debouncedQuery || (!fixedCategory && category) || brand || minPrice || maxPrice || minRating || hasDiscount || inStock
+  );
+
+  const filterPanel = (
+    <div className="grid gap-4">
+      {!fixedCategory ? (
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium text-zinc-950">{t.category}</span>
+          <Select value={category} onChange={(event) => setCategory(event.target.value)}>
+            <option value="">{t.all}</option>
+            {categories.map((entry) => (
+              <option key={entry.slug} value={entry.slug}>
+                {entry.name}
+              </option>
+            ))}
+          </Select>
+        </label>
+      ) : null}
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium text-zinc-950">{t.brandLabel}</span>
+        <Select value={brand} onChange={(event) => setBrand(event.target.value)}>
+          <option value="">{t.allBrands}</option>
+          {brands.map((entry) => (
+            <option key={entry} value={entry}>
+              {entry}
+            </option>
+          ))}
+        </Select>
+      </label>
+      <div className="grid gap-1.5 text-sm">
+        <span className="font-medium text-zinc-950">{t.priceRange}</span>
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            min={0}
+            inputMode="decimal"
+            placeholder={t.minPrice}
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value)}
+            aria-label={t.minPrice}
+          />
+          <span className="text-zinc-500">-</span>
+          <Input
+            type="number"
+            min={0}
+            inputMode="decimal"
+            placeholder={t.maxPrice}
+            value={maxPrice}
+            onChange={(event) => setMaxPrice(event.target.value)}
+            aria-label={t.maxPrice}
+          />
+        </div>
+      </div>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium text-zinc-950">{t.minRating}</span>
+        <Select value={minRating} onChange={(event) => setMinRating(event.target.value)}>
+          <option value="">{t.anyRating}</option>
+          {[4.5, 4, 3.5, 3].map((value) => (
+            <option key={value} value={value}>
+              {value}+
+            </option>
+          ))}
+        </Select>
+      </label>
+      <label className="flex min-h-11 items-center gap-2 text-sm text-zinc-950">
+        <input type="checkbox" checked={hasDiscount} onChange={(event) => setHasDiscount(event.target.checked)} className="h-4 w-4" />
+        {t.onlyDiscounted}
+      </label>
+      <label className="flex min-h-11 items-center gap-2 text-sm text-zinc-950">
+        <input type="checkbox" checked={inStock} onChange={(event) => setInStock(event.target.checked)} className="h-4 w-4" />
+        {t.onlyInStock}
+      </label>
+      {hasActiveFilters ? (
+        <Button type="button" variant="outline" onClick={clearFilters}>
+          {t.clearFilters}
+        </Button>
+      ) : null}
+    </div>
+  );
 
   return (
-    <section className="aether-shell py-8" aria-labelledby="catalog-heading">
+    <section className={compact ? "aether-shell py-8" : "aether-shell py-8"} aria-labelledby="catalog-heading">
       <div className="mb-5">
-        <div>
-          <p className="text-sm font-semibold uppercase text-teal-700">
-            {eyebrow ??
-              (statusMessage ||
-                (status === "live" ? t.liveCatalog : status === "offline" ? t.offlineCatalog : t.demoReady))}
-          </p>
-          <h1 id="catalog-heading" className="mt-1 text-3xl font-semibold tracking-normal text-zinc-950 md:text-5xl">
-            {heading ?? t.premiumCatalog}
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600">
-            {description ?? t.catalogDescription}
-          </p>
-        </div>
-        <div className="mt-5 grid gap-3 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm lg:grid-cols-[minmax(280px,1fr)_auto] lg:items-center">
+        <p className="text-sm font-semibold uppercase text-accent">
+          {eyebrow ?? (statusMessage || (status === "live" ? t.liveCatalog : status === "offline" ? t.offlineCatalog : t.demoReady))}
+        </p>
+        <h2 id="catalog-heading" className="mt-1 text-2xl font-semibold tracking-normal text-zinc-950 md:text-4xl">
+          {heading ?? t.premiumCatalog}
+        </h2>
+        {description ? <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600">{description}</p> : null}
+      </div>
+
+      {!compact ? (
+        <div className="mb-5 grid gap-3 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
           <label className="focus-within:ring-3 flex min-h-11 items-center gap-2 rounded-md border border-zinc-300 bg-zinc-50 px-3 text-sm">
             <Search size={17} aria-hidden />
             <span className="sr-only">{t.searchProducts}</span>
             <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              value={queryInput}
+              onChange={(event) => setQueryInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") setDebouncedQuery(queryInput.trim());
+              }}
               className="w-full min-w-0 border-0 bg-transparent text-zinc-950 outline-none placeholder:text-zinc-500"
               placeholder={t.searchPlaceholder}
             />
+            {queryInput ? (
+              <button type="button" onClick={() => setQueryInput("")} aria-label="Clear search" className="focus-ring rounded p-1 text-zinc-500 hover:text-zinc-950">
+                <X size={15} aria-hidden />
+              </button>
+            ) : null}
           </label>
-          <div className="flex min-w-0 items-center gap-2 overflow-x-auto rounded-md border border-slate-800 bg-slate-950 p-1 text-sm text-slate-100 lg:justify-end">
-            <span className="grid h-9 w-9 shrink-0 place-items-center text-slate-300">
-              <SlidersHorizontal size={17} aria-hidden />
-            </span>
-            <span className="sr-only">{t.filterCatalog}</span>
-            {filterOptions.map((option) => {
-              const label =
-                option.labelKey === "all" ? t.all : option.labelKey === "new" ? t.new : t[option.labelKey];
-              const active = flag === option.value;
-              return (
-                <button
-                  key={option.value || "all"}
-                  type="button"
-                  onClick={() => setFlag(option.value)}
-                  className={`focus-ring min-h-9 shrink-0 rounded px-3 text-xs font-semibold ${
-                    active ? "bg-cyan-400 text-zinc-950" : "text-slate-200 hover:bg-white/10"
-                  }`}
-                  aria-pressed={active}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <Select value={sort} onChange={(event) => setSort(event.target.value as SortValue)} aria-label={t.sortBy} className="sm:w-56">
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t.sortBy}: {option.label}
+              </option>
+            ))}
+          </Select>
+          <Button type="button" variant="outline" className="lg:hidden" onClick={() => setFiltersOpen(true)}>
+            <SlidersHorizontal size={16} aria-hidden />
+            {t.filters}
+            {hasActiveFilters ? <Badge tone="accent">•</Badge> : null}
+          </Button>
+        </div>
+      ) : null}
+
+      <div className={compact ? "" : "grid gap-6 lg:grid-cols-[240px_1fr]"}>
+        {!compact ? (
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-950">
+                <SlidersHorizontal size={16} aria-hidden />
+                {t.filters}
+              </h3>
+              {filterPanel}
+            </div>
+          </aside>
+        ) : null}
+
+        <div>
+          {!compact ? (
+            <p className="mb-3 text-sm text-zinc-600">{t.resultsCount.replace("{count}", String(pagination.total))}</p>
+          ) : null}
+
+          {loading && products.length === 0 ? (
+            <div className={`grid gap-4 sm:grid-cols-2 ${compact ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-4"}`}>
+              {Array.from({ length: compact ? 4 : pageSize }).map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))}
+            </div>
+          ) : !loading && products.length === 0 ? (
+            <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center">
+              <p className="text-lg font-semibold text-zinc-950">{t.noResultsTitle}</p>
+              <p className="mt-2 text-sm text-zinc-600">{t.noResultsDescription}</p>
+              {hasActiveFilters ? (
+                <Button type="button" variant="outline" className="mt-4" onClick={clearFilters}>
+                  {t.clearFilters}
+                </Button>
+              ) : null}
+            </div>
+          ) : (
+            <div className={`grid gap-4 sm:grid-cols-2 ${compact ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-4"}`}>
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isFavorite={favoriteIds.includes(product.id)}
+                  isAdding={addingIds.includes(product.id)}
+                  isAdded={addedProduct?.id === product.id}
+                  onToggleFavorite={toggleFavorite}
+                  onAddToCart={(item) => void addToCart(item)}
+                />
+              ))}
+            </div>
+          )}
+
+          {!compact && pagination.pageCount > 1 ? (
+            <div className="mt-6 flex flex-col gap-3 border-t border-zinc-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-zinc-600">
+                {t.pageOf.replace("{page}", String(pagination.page)).replace("{pageCount}", String(Math.max(1, pagination.pageCount)))}
+              </p>
+              <div className="flex gap-3">
+                {pagination.page > 1 ? (
+                  <Button type="button" variant="outline" onClick={() => goToPage(Math.max(1, page - 1))}>
+                    {t.previousPage}
+                  </Button>
+                ) : null}
+                {pagination.page < pagination.pageCount ? (
+                  <Button type="button" onClick={() => goToPage(Math.min(Math.max(1, pagination.pageCount), page + 1))}>
+                    {t.nextPage}
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((product) => {
-          const localized = getLocalizedProduct(product, locale);
-          const isAdding = addingIds.includes(product.id);
-          const isAdded = addedProduct?.id === product.id;
+      {!compact ? (
+        <Sheet open={filtersOpen} onClose={() => setFiltersOpen(false)} side="bottom" title={t.filters}>
+          {filterPanel}
+          <Button type="button" className="mt-4 w-full" onClick={() => setFiltersOpen(false)}>
+            {t.applyFilters}
+          </Button>
+        </Sheet>
+      ) : null}
 
-          return (
-            <article
-              key={product.id}
-              className={`overflow-hidden rounded-lg border bg-white shadow-sm transition ${
-                isAdded ? "border-teal-400 ring-2 ring-teal-100" : "border-zinc-200"
-              }`}
-            >
-              <a href={storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`)} className="block">
-                <img
-                  src={product.images[0]?.url}
-                  alt={product.images[0]?.alt || product.name}
-                  className="aspect-[4/3] w-full bg-zinc-100 object-cover"
-                />
-              </a>
-              <div className="space-y-4 p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-amber-700">{localized.category}</p>
-                    <a href={storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`)} className="mt-1 block text-lg font-semibold text-zinc-950 hover:text-cyan-300">
-                      {product.name}
-                    </a>
-                  </div>
-                  <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
-                    {formatUsd(product.finalPrice, locale === "es" ? "es-CO" : "en-US")}
-                  </span>
-                </div>
-                <p className="line-clamp-2 min-h-12 text-sm leading-6 text-zinc-600">{localized.description}</p>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-zinc-500">
-                    {product.rating.average} {t.stars} | {t.availability[product.inventory.status]}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleFavorite(product)}
-                      className={`focus-ring grid h-10 w-10 place-items-center rounded-md border hover:bg-zinc-100 ${
-                        favoriteIds.includes(product.id) ? "border-rose-300 bg-rose-50 text-rose-700" : "border-zinc-300"
-                      }`}
-                      aria-label={locale === "es" ? `Guardar ${product.name}` : `Save ${product.name}`}
-                      aria-pressed={favoriteIds.includes(product.id)}
-                    >
-                      <Heart size={17} fill={favoriteIds.includes(product.id) ? "currentColor" : "none"} aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void addToCart(product)}
-                      disabled={isAdding}
-                      className={`focus-ring grid h-10 w-10 place-items-center rounded-md text-white transition ${
-                        isAdded
-                          ? "scale-105 bg-teal-700"
-                          : isAdding
-                            ? "bg-zinc-700"
-                            : "bg-zinc-950 hover:bg-zinc-800"
-                      }`}
-                      aria-label={locale === "es" ? `Agregar ${product.name} al carrito` : `Add ${product.name} to cart`}
-                      aria-busy={isAdding}
-                    >
-                      {isAdded ? (
-                        <Check size={18} className="animate-[bounce_0.7s_ease-in-out_1]" aria-hidden />
-                      ) : (
-                        <ShoppingBag size={17} className={isAdding ? "animate-pulse" : ""} aria-hidden />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </article>
-          );
-        })}
-      </div>
       {addedProduct ? (
         <div
-          className="fixed bottom-5 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-teal-200 bg-white p-4 shadow-xl"
+          className="fixed bottom-5 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-emerald-500/40 bg-white p-4 shadow-xl"
           role="status"
           aria-live="polite"
         >
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-teal-700 text-white">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-emerald-600 text-white">
               <Check size={18} aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-zinc-950">
-                {locale === "es" ? "Agregado al carrito" : "Added to cart"}
-              </p>
+              <p className="truncate text-sm font-semibold text-zinc-950">{locale === "es" ? "Agregado al carrito" : "Added to cart"}</p>
               <p className="truncate text-sm text-zinc-600">{addedProduct.name}</p>
             </div>
-            <a
-              href={storefrontPath("/cart")}
-              className="focus-ring shrink-0 rounded-md bg-zinc-950 px-3 py-2 text-sm font-semibold text-white"
-            >
+            <a href={storefrontPath("/cart")} className="focus-ring shrink-0 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white">
               {t.cart}
             </a>
           </div>
         </div>
       ) : null}
-      <div className="mt-6 flex flex-col gap-3 border-t border-zinc-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-zinc-600">
-          {locale === "es"
-            ? t.pageOf
-                .replace("{page}", String(pagination.page))
-                .replace("{pageCount}", String(Math.max(1, pagination.pageCount)))
-            : t.pageOf
-                .replace("{page}", String(pagination.page))
-                .replace("{pageCount}", String(Math.max(1, pagination.pageCount)))}
-        </p>
-        <div className="flex gap-3">
-          {pagination.page > 1 ? (
-            <button
-              type="button"
-              onClick={() => goToPage(Math.max(1, page - 1))}
-              className="focus-ring inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-950 bg-white px-4 text-sm font-semibold text-zinc-950 hover:bg-zinc-100"
-            >
-              {t.previousPage}
-            </button>
-          ) : null}
-          {pagination.page < pagination.pageCount ? (
-            <button
-              type="button"
-              onClick={() => goToPage(Math.min(Math.max(1, pagination.pageCount), page + 1))}
-              className="focus-ring inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white hover:bg-zinc-800"
-            >
-              {t.nextPage}
-            </button>
-          ) : null}
-        </div>
-      </div>
     </section>
   );
 }

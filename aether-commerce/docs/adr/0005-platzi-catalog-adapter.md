@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted.
+Superseded by [ADR 0011](./0011-dummyjson-catalog-migration.md). The Catalog
+Adapter pattern this ADR established is unchanged; only the upstream source
+behind it moved from Platzi to DummyJSON.
 
 ## Decision
 
