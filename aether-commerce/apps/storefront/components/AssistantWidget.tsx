@@ -138,6 +138,14 @@ export function AssistantWidget() {
     return () => window.removeEventListener("aether-customer-changed", syncCustomer);
   }, []);
 
+  // Lets other components (e.g. the Hero's "Talk to Aether AI" CTA) open the
+  // widget without prop-drilling, matching the aether-cart-changed pattern.
+  useEffect(() => {
+    const openAssistant = () => setIsOpen(true);
+    window.addEventListener("aether-open-assistant", openAssistant);
+    return () => window.removeEventListener("aether-open-assistant", openAssistant);
+  }, []);
+
   // Keeps a persistent cart total pinned in the footer (see PASO 3 bug #4) instead
   // of only recapping the cart inline whenever the assistant happens to mention it.
   useEffect(() => {

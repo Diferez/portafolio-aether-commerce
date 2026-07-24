@@ -36,13 +36,14 @@ export function Hero() {
               {t.heroCtaPrimary}
               <ArrowRight size={16} aria-hidden />
             </a>
-            <a
-              href={storefrontPath("/products")}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("aether-open-assistant"))}
               className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-md border border-zinc-300 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-100"
             >
               <MessageCircle size={16} aria-hidden />
               {t.heroCtaSecondary}
-            </a>
+            </button>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
