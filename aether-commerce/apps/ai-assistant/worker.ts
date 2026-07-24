@@ -270,19 +270,14 @@ async function handleAssistant(request: Request, env: Env): Promise<AssistantRes
         "PENDING"
       ));
     }
-    const itemSummary = describeCartItems(cart, spanish);
     const reply =
       intent === "CHECKOUT_REQUEST"
         ? spanish
-          ? `Puedo preparar tu carrito${itemSummary ? ` (${itemSummary})` : ""}, pero el pago se completa en el checkout seguro de Aether.`
-          : `I can prepare your cart${itemSummary ? ` (${itemSummary})` : ""}, but payment must be completed through Aether secure checkout.`
+          ? "Puedo preparar tu carrito, pero el pago se completa en el checkout seguro de Aether."
+          : "I can prepare your cart, but payment must be completed through Aether secure checkout."
         : spanish
-          ? itemSummary
-            ? `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s): ${itemSummary}.`
-            : `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s).`
-          : itemSummary
-            ? `Your cart has ${Number(cart.item_count || 0)} item(s): ${itemSummary}.`
-            : `Your cart has ${Number(cart.item_count || 0)} item(s).`;
+          ? `Tu carrito tiene ${Number(cart.item_count || 0)} producto(s).`
+          : `Your cart has ${Number(cart.item_count || 0)} item(s).`;
     return finish(responsePayload(requestId, threadId, reply, intent, [], cart, intent === "CHECKOUT_REQUEST" ? "OPEN_CHECKOUT" : "OPEN_CART", "SUCCEEDED"));
   }
 
@@ -1098,18 +1093,6 @@ function toCartSummary(payload: unknown): Record<string, unknown> | null {
     currency: "USD",
     items: data.items || [],
   };
-}
-
-function describeCartItems(cart: Record<string, unknown>, spanish: boolean): string {
-  const items = Array.isArray(cart.items) ? (cart.items as Record<string, unknown>[]) : [];
-  if (items.length === 0) return "";
-  return items
-    .map((item) => {
-      const name = String(item.name || (spanish ? "producto" : "item"));
-      const quantity = Number(item.quantity || 1);
-      return quantity > 1 ? `${quantity}x ${name}` : name;
-    })
-    .join(", ");
 }
 
 function resolveCartItem(cart: Record<string, unknown>, message: string): Record<string, unknown> | null {

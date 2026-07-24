@@ -577,6 +577,26 @@ export function AssistantWidget() {
                         {formatUsd(Math.round(Number(message.cart.subtotal) * 100), locale === "es" ? "es-CO" : "en-US")}
                       </p>
                     </div>
+                    {message.cart.items.length > 0 ? (
+                      <ul className="mt-2 divide-y divide-zinc-100 border-t border-zinc-100">
+                        {message.cart.items.map((item, index) => {
+                          const name = typeof item.name === "string" ? item.name : "";
+                          const quantity = Number(item.quantity ?? 1);
+                          const lineTotal = Number(item.lineTotal ?? 0);
+                          return (
+                            <li key={index} className="flex items-center justify-between gap-2 py-1.5 text-xs text-zinc-700">
+                              <span className="truncate">
+                                {quantity > 1 ? `${quantity}x ` : ""}
+                                {name}
+                              </span>
+                              <span className="shrink-0 font-medium text-zinc-900">
+                                {formatUsd(Math.round(lineTotal), locale === "es" ? "es-CO" : "en-US")}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : null}
                     {message.action?.type === "OPEN_CART" || message.action?.type?.startsWith("CART_") ? (
                       <a href={storefrontPath("/cart")} className="focus-ring mt-3 inline-flex rounded-md bg-teal-700 px-3 py-2 text-xs font-semibold text-white">
                         {copy.openCart}
