@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check, Heart, ShoppingBag, Star } from "lucide-react";
+import { Bell, Check, Flame, Heart, ShoppingBag, Star } from "lucide-react";
 import type { Product } from "@aether/schemas";
 import { formatUsd } from "@aether/core";
 import { Skeleton } from "@aether/ui";
@@ -8,6 +8,7 @@ import { storefrontPath } from "./config";
 import { useLanguage } from "./LanguageProvider";
 import { getLocalizedProduct } from "./product-localization";
 import { ProductBadge } from "./ProductBadge";
+import { getImageBadge, getLowStockLabel, isLowStock } from "./product-badge-logic";
 
 export function ProductCard({
   product,
@@ -31,6 +32,8 @@ export function ProductCard({
   const detailHref = storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`);
   const outOfStock = product.availableStock <= 0;
   const priceLocale = locale === "es" ? "es-CO" : "en-US";
+  const imageBadge = getImageBadge(product);
+  const lowStock = !outOfStock && isLowStock(product.availableStock);
 
   return (
     <article
@@ -43,7 +46,7 @@ export function ProductCard({
           src={product.thumbnail}
           alt={product.images[0]?.alt || product.name}
           loading="lazy"
-          className={`h-full w-full object-contain p-4 transition group-hover:scale-[1.03] ${outOfStock ? "grayscale" : ""}`}
+          className={`h-full w-full object-contain p-2 transition group-hover:scale-[1.03] ${outOfStock ? "grayscale" : ""}`}
           onError={(event) => {
             event.currentTarget.src =
               "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=60";
@@ -52,23 +55,17 @@ export function ProductCard({
 
         {outOfStock ? <div className="absolute inset-0 bg-surface/55" aria-hidden /> : null}
 
-        {!outOfStock && product.discountPercentage > 0 ? (
+        {imageBadge.kind === "discount" ? (
           <ProductBadge variant="discount" className="absolute left-3 top-3">
-            -{product.discountPercentage}%
+            -{imageBadge.percentage}%
           </ProductBadge>
-        ) : null}
-
-        {outOfStock ? (
+        ) : imageBadge.kind === "out_of_stock" ? (
           <ProductBadge
             variant="status"
             tone="danger"
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           >
             {t.availability.out_of_stock}
-          </ProductBadge>
-        ) : product.availabilityStatus === "low_stock" ? (
-          <ProductBadge variant="status" tone="warning" className="absolute right-3 top-3">
-            {t.availability.low_stock}
           </ProductBadge>
         ) : null}
       </a>
@@ -172,6 +169,15 @@ export function ProductCard({
             )}
           </div>
         </div>
+        {lowStock ? (
+          <div
+            role="status"
+            className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-md bg-warning-tint px-[9px] py-1 text-xs text-warning [font-variant-numeric:tabular-nums]"
+          >
+            <Flame size={13} aria-hidden />
+            <span>{getLowStockLabel(product.availableStock, t)}</span>
+          </div>
+        ) : null}
       </div>
     </article>
   );

@@ -33,6 +33,10 @@
   --color-success-soft: rgba(4, 120, 87, 0.1);
   --color-warning: #b45309;
   --color-warning-soft: rgba(180, 83, 9, 0.1);
+  /* Opaque amber tint for inline chips that must stay legible over any photo
+     background (translucent bg-warning-soft disappears over white product
+     shots) - mixed from existing tokens, not a new hex swatch. */
+  --color-warning-tint: color-mix(in srgb, var(--color-warning) 7%, var(--color-surface));
   --color-danger: #e11d48;
   --color-danger-soft: rgba(225, 29, 72, 0.1);
 
@@ -69,6 +73,7 @@ html[data-theme="dark"] {
   --color-success-soft: rgba(52, 211, 153, 0.14);
   --color-warning: #fbbf24;
   --color-warning-soft: rgba(251, 191, 36, 0.14);
+  --color-warning-tint: color-mix(in srgb, var(--color-warning) 16%, var(--color-surface));
   --color-danger: #fb7185;
   --color-danger-soft: rgba(251, 113, 133, 0.14);
 }
