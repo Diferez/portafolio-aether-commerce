@@ -47,7 +47,7 @@ export function ContactForm() {
     <section className="aether-shell py-10" aria-labelledby="contact-heading">
       <div className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 md:grid-cols-[0.8fr_1.2fr]">
         <div>
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase text-teal-700">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase text-accent">
             <Mail size={17} aria-hidden />
             {labels.eyebrow}
           </p>
@@ -74,7 +74,7 @@ export function ContactForm() {
             <input name="consent" type="checkbox" required className="mt-1" />
             {labels.consent}
           </label>
-          <button className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">
+          <button className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover">
             <Send size={17} aria-hidden />
             {labels.submit}
           </button>

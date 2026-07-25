@@ -16,9 +16,22 @@ export const metadata: Metadata = {
   }
 };
 
+const themeInitScript = `
+(function () {
+  try {
+    if (window.localStorage.getItem("aether.theme.v1") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <LanguageProvider>
           <SiteHeader />
