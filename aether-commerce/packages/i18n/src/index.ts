@@ -200,6 +200,9 @@ export const dictionaries = {
       hidden: "hidden",
       discontinued: "discontinued"
     },
+    savings: "Save {amount}",
+    notifyMe: "Notify me",
+    notifyWhenBackInStock: "Notify me when {name} is back in stock",
     homeHighlights: [
       ["Worker-owned checkout", "Prices and inventory are recalculated server-side before Stripe test checkout."],
       ["Bilingual demo", "English and Spanish copy is centralized so pages do not mix languages."],
@@ -421,6 +424,9 @@ export const dictionaries = {
       hidden: "oculto",
       discontinued: "descontinuado"
     },
+    savings: "Ahorras {amount}",
+    notifyMe: "Avisarme",
+    notifyWhenBackInStock: "Avisarme cuando {name} vuelva a tener stock",
     homeHighlights: [
       ["Checkout controlado por backend", "Precios e inventario se recalculan en el servidor antes del checkout de prueba con Stripe."],
       ["Demo bilingue", "Los textos en ingles y espanol estan centralizados para evitar mezcla de idiomas."],

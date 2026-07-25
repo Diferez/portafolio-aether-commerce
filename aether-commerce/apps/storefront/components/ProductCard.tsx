@@ -1,12 +1,13 @@
 "use client";
 
-import { Check, Heart, ShoppingBag, Star } from "lucide-react";
+import { Bell, Check, Heart, ShoppingBag, Star } from "lucide-react";
 import type { Product } from "@aether/schemas";
 import { formatUsd } from "@aether/core";
-import { Badge, Skeleton } from "@aether/ui";
+import { Skeleton } from "@aether/ui";
 import { storefrontPath } from "./config";
 import { useLanguage } from "./LanguageProvider";
 import { getLocalizedProduct } from "./product-localization";
+import { ProductBadge } from "./ProductBadge";
 
 export function ProductCard({
   product,
@@ -14,7 +15,8 @@ export function ProductCard({
   isAdding,
   isAdded,
   onToggleFavorite,
-  onAddToCart
+  onAddToCart,
+  onNotifyRestock
 }: {
   product: Product;
   isFavorite: boolean;
@@ -22,11 +24,13 @@ export function ProductCard({
   isAdded: boolean;
   onToggleFavorite: (product: Product) => void;
   onAddToCart: (product: Product) => void;
+  onNotifyRestock?: (product: Product) => void;
 }) {
   const { locale, t } = useLanguage();
   const localized = getLocalizedProduct(product, locale);
   const detailHref = storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`);
   const outOfStock = product.availableStock <= 0;
+  const priceLocale = locale === "es" ? "es-CO" : "en-US";
 
   return (
     <article
@@ -34,52 +38,80 @@ export function ProductCard({
         isAdded ? "border-accent ring-2 ring-accent-soft" : "border-zinc-200 hover:border-border-strong"
       }`}
     >
-      <a href={detailHref} className="relative block aspect-square shrink-0 bg-zinc-50">
+      <a href={detailHref} className="relative block aspect-square shrink-0 overflow-hidden bg-zinc-50">
         <img
           src={product.thumbnail}
           alt={product.images[0]?.alt || product.name}
           loading="lazy"
-          className="h-full w-full object-contain p-4 transition group-hover:scale-[1.03]"
+          className={`h-full w-full object-contain p-4 transition group-hover:scale-[1.03] ${outOfStock ? "grayscale" : ""}`}
           onError={(event) => {
             event.currentTarget.src =
               "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=60";
           }}
         />
-        {product.discountPercentage > 0 ? (
-          <Badge tone="accent" className="absolute left-2 top-2">
+
+        {outOfStock ? <div className="absolute inset-0 bg-surface/55" aria-hidden /> : null}
+
+        {!outOfStock && product.discountPercentage > 0 ? (
+          <ProductBadge variant="discount" className="absolute left-3 top-3">
             -{product.discountPercentage}%
-          </Badge>
+          </ProductBadge>
         ) : null}
+
         {outOfStock ? (
-          <Badge tone="danger" className="absolute right-2 top-2">
+          <ProductBadge
+            variant="status"
+            tone="danger"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
             {t.availability.out_of_stock}
-          </Badge>
+          </ProductBadge>
         ) : product.availabilityStatus === "low_stock" ? (
-          <Badge tone="warning" className="absolute right-2 top-2">
+          <ProductBadge variant="status" tone="warning" className="absolute right-3 top-3">
             {t.availability.low_stock}
-          </Badge>
+          </ProductBadge>
         ) : null}
       </a>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="truncate text-xs font-semibold uppercase tracking-wide text-accent">
+        {/* Redundant with the "out of stock" chip over the image so screen
+            reader users get the status even if they don't reach the image's
+            absolutely-positioned content in source order. */}
+        {outOfStock ? <span className="sr-only">{t.availability.out_of_stock}</span> : null}
+        <p
+          className={`truncate text-xs font-semibold uppercase tracking-wide ${
+            outOfStock ? "text-ink-subtle" : "text-accent"
+          }`}
+        >
           {product.brand && product.brand !== "Aether" ? product.brand : localized.category}
         </p>
-        <a href={detailHref} className="line-clamp-2 min-h-[2.6em] text-sm font-semibold leading-tight text-zinc-950 hover:text-accent">
+        <a
+          href={detailHref}
+          className={`line-clamp-2 min-h-[2.6em] text-sm font-semibold leading-tight ${
+            outOfStock ? "text-ink-muted" : "text-zinc-950 hover:text-accent"
+          }`}
+        >
           {product.name}
         </a>
-        <div className="flex items-center gap-1 text-xs text-zinc-600">
-          <Star size={13} className="fill-amber-400 text-amber-400" aria-hidden />
+        <div className={`flex items-center gap-1 text-xs ${outOfStock ? "text-ink-subtle" : "text-zinc-600"}`}>
+          <Star
+            size={13}
+            className={outOfStock ? "fill-ink-subtle text-ink-subtle" : "fill-amber-400 text-amber-400"}
+            aria-hidden
+          />
           <span>{product.rating.average.toFixed(1)}</span>
-          <span className="text-zinc-500">({product.reviewCount})</span>
+          <span className={outOfStock ? "text-ink-subtle" : "text-zinc-500"}>({product.reviewCount})</span>
         </div>
         <div className="mt-auto flex items-end justify-between gap-2 pt-1">
           <div className="min-w-0">
-            <p className="truncate text-lg font-semibold text-zinc-950">
-              {formatUsd(product.finalPrice, locale === "es" ? "es-CO" : "en-US")}
+            <p className={`truncate text-lg font-semibold ${outOfStock ? "text-ink-muted" : "text-zinc-950"}`}>
+              {formatUsd(product.finalPrice, priceLocale)}
             </p>
             {product.originalPrice ? (
-              <p className="truncate text-xs text-zinc-500 line-through">
-                {formatUsd(product.originalPrice, locale === "es" ? "es-CO" : "en-US")}
+              <p className="truncate text-xs text-zinc-500 line-through">{formatUsd(product.originalPrice, priceLocale)}</p>
+            ) : null}
+            {!outOfStock && product.originalPrice ? (
+              <p className="truncate text-xs font-medium text-success [font-variant-numeric:tabular-nums]">
+                {t.savings.replace("{amount}", formatUsd(product.originalPrice - product.finalPrice, priceLocale))}
               </p>
             ) : null}
           </div>
@@ -98,25 +130,46 @@ export function ProductCard({
             >
               <Heart size={17} fill={isFavorite ? "currentColor" : "none"} aria-hidden />
             </button>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault();
-                if (!outOfStock) onAddToCart(product);
-              }}
-              disabled={isAdding || outOfStock}
-              className={`focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md text-white transition ${
-                isAdded ? "scale-105 bg-emerald-600" : outOfStock ? "cursor-not-allowed bg-zinc-400" : isAdding ? "bg-accent-hover" : "bg-accent hover:bg-accent-hover"
-              }`}
-              aria-label={locale === "es" ? `Agregar ${product.name} al carrito` : `Add ${product.name} to cart`}
-              aria-busy={isAdding}
-            >
-              {isAdded ? (
-                <Check size={18} className="animate-[bounce_0.7s_ease-in-out_1]" aria-hidden />
-              ) : (
-                <ShoppingBag size={17} className={isAdding ? "animate-pulse" : ""} aria-hidden />
-              )}
-            </button>
+            {outOfStock ? (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (onNotifyRestock) {
+                    onNotifyRestock(product);
+                  } else {
+                    // TODO: wire up to a real "notify me when back in stock"
+                    // endpoint once the API exposes one - no backend support
+                    // exists yet, so this is a stub rather than a dead button.
+                    console.info(`[notify-restock] ${product.id} - no endpoint wired yet`);
+                  }
+                }}
+                className="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md border border-border-strong bg-surface text-ink transition hover:bg-surface-hover"
+                aria-label={t.notifyWhenBackInStock.replace("{name}", product.name)}
+              >
+                <Bell size={17} aria-hidden />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  onAddToCart(product);
+                }}
+                disabled={isAdding}
+                className={`focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md text-white transition ${
+                  isAdded ? "scale-105 bg-emerald-600" : isAdding ? "bg-accent-hover" : "bg-accent hover:bg-accent-hover"
+                }`}
+                aria-label={locale === "es" ? `Agregar ${product.name} al carrito` : `Add ${product.name} to cart`}
+                aria-busy={isAdding}
+              >
+                {isAdded ? (
+                  <Check size={18} className="animate-[bounce_0.7s_ease-in-out_1]" aria-hidden />
+                ) : (
+                  <ShoppingBag size={17} className={isAdding ? "animate-pulse" : ""} aria-hidden />
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
