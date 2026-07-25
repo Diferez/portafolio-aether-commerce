@@ -2,11 +2,14 @@
 
 import {
   Blocks,
+  Bot,
   Cloud,
   CreditCard,
   Database,
   GitBranch,
+  Image as ImageIcon,
   KeyRound,
+  Layers,
   Mail,
   ServerCog,
   ShieldCheck,
@@ -31,6 +34,16 @@ type ArchitectureCopy = {
     hub: string;
     deployNote: string;
     services: Array<{ label: string; Icon: LucideIcon; deployTime?: boolean }>;
+  };
+  infra: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    repo: string;
+    ci: string;
+    bindingsLabel: string;
+    deployTargets: Array<{ label: string; sub: string; Icon: LucideIcon }>;
+    services: Array<{ label: string; sub: string; Icon: LucideIcon }>;
   };
   charts: {
     apiTitle: string;
@@ -87,6 +100,27 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
         { label: "Stripe sandbox", Icon: CreditCard },
         { label: "Resend email events", Icon: Mail },
         { label: "GitHub Actions + Wrangler", Icon: GitBranch, deployTime: true }
+      ]
+    },
+    infra: {
+      eyebrow: "Infrastructure",
+      title: "What actually gets deployed, and where.",
+      body: "Every push to main runs the same GitHub Actions workflow: build, test, then deploy each piece to its own Cloudflare resource. Nothing is deployed by hand.",
+      repo: "GitHub repository (main)",
+      ci: "GitHub Actions CI/CD",
+      bindingsLabel: "Secrets & bindings (D1, Stripe, Resend, Clerk, Cloudinary)",
+      deployTargets: [
+        { label: "aether-api", sub: "Cloudflare Worker", Icon: ServerCog },
+        { label: "portafolio-aether-commerce", sub: "Cloudflare Worker", Icon: Blocks },
+        { label: "aether-admin", sub: "Cloudflare Pages", Icon: Layers },
+        { label: "ai-assistant", sub: "Cloudflare Worker", Icon: Bot }
+      ],
+      services: [
+        { label: "D1", sub: "aether-production", Icon: Database },
+        { label: "Stripe", sub: "sandbox mode", Icon: CreditCard },
+        { label: "Resend", sub: "transactional email", Icon: Mail },
+        { label: "Clerk", sub: "auth (ready)", Icon: KeyRound },
+        { label: "Cloudinary", sub: "media (optional)", Icon: ImageIcon }
       ]
     },
     charts: {
@@ -192,6 +226,27 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
         { label: "GitHub Actions + Wrangler", Icon: GitBranch, deployTime: true }
       ]
     },
+    infra: {
+      eyebrow: "Infraestructura",
+      title: "Que se despliega en realidad, y donde.",
+      body: "Cada push a main corre el mismo workflow de GitHub Actions: build, tests y despliegue de cada pieza a su propio recurso de Cloudflare. Nada se despliega a mano.",
+      repo: "Repositorio en GitHub (main)",
+      ci: "GitHub Actions CI/CD",
+      bindingsLabel: "Secretos y bindings (D1, Stripe, Resend, Clerk, Cloudinary)",
+      deployTargets: [
+        { label: "aether-api", sub: "Cloudflare Worker", Icon: ServerCog },
+        { label: "portafolio-aether-commerce", sub: "Cloudflare Worker", Icon: Blocks },
+        { label: "aether-admin", sub: "Cloudflare Pages", Icon: Layers },
+        { label: "ai-assistant", sub: "Cloudflare Worker", Icon: Bot }
+      ],
+      services: [
+        { label: "D1", sub: "aether-production", Icon: Database },
+        { label: "Stripe", sub: "modo sandbox", Icon: CreditCard },
+        { label: "Resend", sub: "correo transaccional", Icon: Mail },
+        { label: "Clerk", sub: "auth (listo)", Icon: KeyRound },
+        { label: "Cloudinary", sub: "media (opcional)", Icon: ImageIcon }
+      ]
+    },
     charts: {
       apiTitle: "Superficie de API por dominio",
       apiDescription: "Handlers de ruta definidos realmente en la API Worker, contados directo del codigo fuente - no trafico de muestra.",
@@ -255,6 +310,24 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
     ]
   }
 };
+
+function FanOut({ count }: { count: number }) {
+  const offsets = Array.from({ length: count }, (_, i) => ((i + 0.5) / count) * 100);
+  const first = offsets[0] ?? 0;
+  const last = offsets[offsets.length - 1] ?? 0;
+  return (
+    <div className="relative mx-auto h-8 w-full max-w-4xl" aria-hidden>
+      <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border-strong sm:hidden" />
+      <div
+        className="absolute top-0 hidden h-px bg-border-strong sm:block"
+        style={{ left: `${first}%`, right: `${100 - last}%` }}
+      />
+      {offsets.map((offset) => (
+        <div key={offset} className="absolute top-0 hidden h-4 w-px bg-border-strong sm:block" style={{ left: `${offset}%` }} />
+      ))}
+    </div>
+  );
+}
 
 function BarChart({
   data,
@@ -354,6 +427,59 @@ export default function ArchitecturePage() {
                 <div className="min-w-0">
                   <span className="block truncate text-sm font-semibold text-ink">{label}</span>
                   {deployTime ? <span className="block text-[11px] text-ink-subtle">{page.runtime.deployNote}</span> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-lg border border-border bg-surface p-5">
+        <p className="text-sm font-semibold uppercase text-accent-2">{page.infra.eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">{page.infra.title}</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-muted">{page.infra.body}</p>
+
+        <div className="mt-6 flex flex-col items-stretch gap-3">
+          <div className="mx-auto flex w-full max-w-sm items-center gap-3 rounded-lg border border-border-strong bg-surface-hover px-4 py-3">
+            <GitBranch className="shrink-0 text-ink" size={20} aria-hidden />
+            <span className="text-sm font-semibold text-ink">{page.infra.repo}</span>
+          </div>
+
+          <div className="mx-auto h-8 w-px bg-border-strong" aria-hidden />
+
+          <div className="mx-auto flex w-full max-w-sm items-center gap-3 rounded-lg border border-accent bg-accent-soft px-4 py-3">
+            <Workflow className="shrink-0 text-accent" size={20} aria-hidden />
+            <span className="text-sm font-semibold text-ink">{page.infra.ci}</span>
+          </div>
+
+          <FanOut count={page.infra.deployTargets.length} />
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {page.infra.deployTargets.map(({ label, sub, Icon }) => (
+              <div key={label} className="flex items-center gap-3 rounded-lg border border-border bg-surface-hover px-4 py-3">
+                <Icon className="shrink-0 text-accent-2" size={20} aria-hidden />
+                <div className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">{label}</span>
+                  <span className="block text-[11px] text-ink-subtle">{sub}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mx-auto mt-2 max-w-md text-center text-[11px] text-ink-subtle">{page.infra.bindingsLabel}</p>
+
+          <FanOut count={page.infra.services.length} />
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {page.infra.services.map(({ label, sub, Icon }) => (
+              <div
+                key={label}
+                className="flex items-center gap-3 rounded-lg border border-dashed border-border-strong bg-surface px-4 py-3"
+              >
+                <Icon className="shrink-0 text-ink-muted" size={20} aria-hidden />
+                <div className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">{label}</span>
+                  <span className="block text-[11px] text-ink-subtle">{sub}</span>
                 </div>
               </div>
             ))}
