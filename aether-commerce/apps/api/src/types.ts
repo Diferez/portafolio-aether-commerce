@@ -4,6 +4,7 @@ export type Env = {
   DB: D1Database;
   APP_ORIGIN_STORE?: string;
   APP_ORIGIN_ADMIN?: string;
+  APP_STORE_BASE_PATH?: string;
   CLERK_SECRET_KEY?: string;
   CLERK_JWT_ISSUER?: string;
   STRIPE_SECRET_KEY?: string;

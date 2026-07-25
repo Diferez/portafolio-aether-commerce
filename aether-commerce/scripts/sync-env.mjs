@@ -8,6 +8,7 @@ const envPath = join(root, ".env");
 const workerKeys = [
   "APP_ORIGIN_STORE",
   "APP_ORIGIN_ADMIN",
+  "APP_STORE_BASE_PATH",
   "CLERK_SECRET_KEY",
   "CLERK_WEBHOOK_SECRET",
   "CLERK_JWT_ISSUER",

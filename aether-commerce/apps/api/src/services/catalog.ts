@@ -41,7 +41,8 @@ function storefrontOrigin(env: Env) {
 }
 
 function absoluteImageUrl(env: Env, imagePath: string) {
-  return `${storefrontOrigin(env)}${imagePath}`;
+  const basePath = (env.APP_STORE_BASE_PATH ?? "").replace(/\/$/, "");
+  return `${storefrontOrigin(env)}${basePath}${imagePath}`;
 }
 
 function flagsFor(product: LocalProduct): Product["flags"] {
