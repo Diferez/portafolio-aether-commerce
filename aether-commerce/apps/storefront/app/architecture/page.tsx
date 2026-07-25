@@ -1,8 +1,22 @@
 "use client";
 
-import { Blocks, Cloud, Database, GitBranch, KeyRound, Mail, ServerCog, ShieldCheck, ShoppingCart, Workflow } from "lucide-react";
+import {
+  Blocks,
+  Cloud,
+  CreditCard,
+  Database,
+  GitBranch,
+  KeyRound,
+  Mail,
+  ServerCog,
+  ShieldCheck,
+  ShoppingCart,
+  Workflow
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useLanguage } from "../../components/LanguageProvider";
+
+type BarDatum = { label: string; count: number };
 
 type ArchitectureCopy = {
   eyebrow: string;
@@ -13,8 +27,23 @@ type ArchitectureCopy = {
     eyebrow: string;
     title: string;
     body: string;
-    labels: string[];
+    client: string;
+    hub: string;
+    deployNote: string;
+    services: Array<{ label: string; Icon: LucideIcon; deployTime?: boolean }>;
   };
+  charts: {
+    apiTitle: string;
+    apiDescription: string;
+    apiUnit: string;
+    apiTotal: string;
+    dataTitle: string;
+    dataDescription: string;
+    dataUnit: string;
+    dataTotal: string;
+  };
+  apiDomains: BarDatum[];
+  dataDomains: BarDatum[];
   flows: Array<{ title: string; body: string; Icon: LucideIcon }>;
 };
 
@@ -50,8 +79,45 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
       eyebrow: "Runtime map",
       title: "Clear boundaries between UI, API, data, and third-party services.",
       body: "The front never owns secrets or final commerce decisions. It renders the experience, sends intent to the Worker, and receives normalized responses that are safe for the browser.",
-      labels: ["Static portfolio + store", "Hono Worker API", "D1 database", "Stripe sandbox", "Resend email events", "GitHub Actions + Wrangler"]
+      client: "Static portfolio + store",
+      hub: "Hono Worker API",
+      deployNote: "Deploy-time only",
+      services: [
+        { label: "D1 database", Icon: Database },
+        { label: "Stripe sandbox", Icon: CreditCard },
+        { label: "Resend email events", Icon: Mail },
+        { label: "GitHub Actions + Wrangler", Icon: GitBranch, deployTime: true }
+      ]
     },
+    charts: {
+      apiTitle: "API surface by domain",
+      apiDescription: "Route handlers actually defined in the Worker API, counted straight from the source - not sample traffic.",
+      apiUnit: "endpoints",
+      apiTotal: "endpoints across 8 route groups",
+      dataTitle: "Data model by domain",
+      dataDescription: "Every table declared across the D1 migrations, grouped by the part of the system it serves.",
+      dataUnit: "tables",
+      dataTotal: "tables across 7 domains"
+    },
+    apiDomains: [
+      { label: "Admin", count: 28 },
+      { label: "Customer account", count: 25 },
+      { label: "Storefront browsing", count: 12 },
+      { label: "Cart", count: 6 },
+      { label: "Catalog", count: 4 },
+      { label: "Checkout", count: 2 },
+      { label: "Contact", count: 1 },
+      { label: "Webhooks", count: 1 }
+    ],
+    dataDomains: [
+      { label: "Commerce & catalog", count: 10 },
+      { label: "Orders & payments", count: 9 },
+      { label: "AI assistant", count: 6 },
+      { label: "Users & access", count: 6 },
+      { label: "Reviews & engagement", count: 5 },
+      { label: "Admin & ops", count: 4 },
+      { label: "Notifications", count: 3 }
+    ],
     flows: [
       {
         title: "Catalog flow",
@@ -116,8 +182,45 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
       eyebrow: "Mapa de ejecucion",
       title: "Limites claros entre UI, API, datos y servicios externos.",
       body: "El front no posee secretos ni toma decisiones finales de comercio. Renderiza la experiencia, envia intenciones al Worker y recibe respuestas normalizadas seguras para el navegador.",
-      labels: ["Portafolio + tienda estatica", "API Worker con Hono", "Base de datos D1", "Stripe sandbox", "Eventos de correo con Resend", "GitHub Actions + Wrangler"]
+      client: "Portafolio + tienda estatica",
+      hub: "API Worker con Hono",
+      deployNote: "Solo en despliegue",
+      services: [
+        { label: "Base de datos D1", Icon: Database },
+        { label: "Stripe sandbox", Icon: CreditCard },
+        { label: "Eventos de correo con Resend", Icon: Mail },
+        { label: "GitHub Actions + Wrangler", Icon: GitBranch, deployTime: true }
+      ]
     },
+    charts: {
+      apiTitle: "Superficie de API por dominio",
+      apiDescription: "Handlers de ruta definidos realmente en la API Worker, contados directo del codigo fuente - no trafico de muestra.",
+      apiUnit: "endpoints",
+      apiTotal: "endpoints en 8 grupos de rutas",
+      dataTitle: "Modelo de datos por dominio",
+      dataDescription: "Cada tabla declarada en las migraciones de D1, agrupada por la parte del sistema a la que sirve.",
+      dataUnit: "tablas",
+      dataTotal: "tablas en 7 dominios"
+    },
+    apiDomains: [
+      { label: "Administracion", count: 28 },
+      { label: "Cuenta del cliente", count: 25 },
+      { label: "Navegacion de tienda", count: 12 },
+      { label: "Carrito", count: 6 },
+      { label: "Catalogo", count: 4 },
+      { label: "Checkout", count: 2 },
+      { label: "Contacto", count: 1 },
+      { label: "Webhooks", count: 1 }
+    ],
+    dataDomains: [
+      { label: "Comercio y catalogo", count: 10 },
+      { label: "Ordenes y pagos", count: 9 },
+      { label: "Asistente de IA", count: 6 },
+      { label: "Usuarios y accesos", count: 6 },
+      { label: "Resenas y engagement", count: 5 },
+      { label: "Administracion", count: 4 },
+      { label: "Notificaciones", count: 3 }
+    ],
     flows: [
       {
         title: "Flujo de catalogo",
@@ -153,46 +256,147 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
   }
 };
 
+function BarChart({
+  data,
+  unit,
+  totalLabel,
+  barClassName,
+  trackClassName
+}: {
+  data: BarDatum[];
+  unit: string;
+  totalLabel: string;
+  barClassName: string;
+  trackClassName: string;
+}) {
+  const max = Math.max(...data.map((row) => row.count));
+  const total = data.reduce((sum, row) => sum + row.count, 0);
+
+  return (
+    <div className="rounded-lg border border-border bg-surface p-5">
+      <div className="flex flex-col gap-3">
+        {data.map((row) => (
+          <div key={row.label} className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem] items-center gap-3 sm:grid-cols-[minmax(0,11rem)_1fr_2.5rem]">
+            <span className="truncate text-sm text-ink-muted">{row.label}</span>
+            <div className={`h-3.5 w-full overflow-hidden ${trackClassName}`}>
+              <div
+                className={`h-full rounded-r-[4px] ${barClassName}`}
+                style={{ width: `${Math.max((row.count / max) * 100, 4)}%` }}
+              />
+            </div>
+            <span className="text-right text-sm font-semibold tabular-nums text-ink">{row.count}</span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 border-t border-border pt-3 text-xs text-ink-subtle">
+        {total.toLocaleString()} {unit} · {totalLabel}
+      </p>
+    </div>
+  );
+}
+
 export default function ArchitecturePage() {
   const { locale } = useLanguage();
   const page = copy[locale];
 
   return (
     <main className="aether-shell py-8">
-      <p className="text-sm font-semibold uppercase text-teal-700">{page.eyebrow}</p>
-      <h1 className="mt-2 text-4xl font-semibold text-zinc-950">{page.title}</h1>
-      <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-600">{page.description}</p>
+      <p className="text-sm font-semibold uppercase text-accent">{page.eyebrow}</p>
+      <h1 className="mt-2 text-4xl font-semibold text-ink">{page.title}</h1>
+      <p className="mt-3 max-w-3xl text-base leading-7 text-ink-muted">{page.description}</p>
+
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {page.items.map(({ title, body, Icon }) => (
-          <section key={title} className="rounded-lg border border-zinc-200 bg-white p-5">
-            <Icon className="text-teal-700" aria-hidden />
-            <h2 className="mt-3 text-xl font-semibold">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-600">{body}</p>
+          <section key={title} className="rounded-lg border border-border bg-surface p-5">
+            <Icon className="text-accent" aria-hidden />
+            <h2 className="mt-3 text-xl font-semibold text-ink">{title}</h2>
+            <p className="mt-2 text-sm leading-6 text-ink-muted">{body}</p>
           </section>
         ))}
       </div>
-      <section className="mt-8 rounded-lg border border-zinc-200 bg-zinc-950 p-5 text-white">
-        <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div>
-            <p className="text-sm font-semibold uppercase text-cyan-300">{page.runtime.eyebrow}</p>
-            <h2 className="mt-2 text-2xl font-semibold">{page.runtime.title}</h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-300">{page.runtime.body}</p>
+
+      <section className="mt-8 rounded-lg border border-border bg-surface p-5">
+        <p className="text-sm font-semibold uppercase text-accent-2">{page.runtime.eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">{page.runtime.title}</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-muted">{page.runtime.body}</p>
+
+        <div className="mt-6 flex flex-col items-stretch gap-3">
+          <div className="mx-auto flex w-full max-w-sm items-center gap-3 rounded-lg border border-border-strong bg-surface-hover px-4 py-3">
+            <Blocks className="shrink-0 text-ink" size={20} aria-hidden />
+            <span className="text-sm font-semibold text-ink">{page.runtime.client}</span>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {page.runtime.labels.map((label) => (
-              <div key={label} className="rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-zinc-100">
-                {label}
+
+          <div className="mx-auto h-8 w-px bg-border-strong" aria-hidden />
+
+          <div className="mx-auto flex w-full max-w-sm items-center gap-3 rounded-lg border border-accent bg-accent-soft px-4 py-3">
+            <ServerCog className="shrink-0 text-accent" size={20} aria-hidden />
+            <span className="text-sm font-semibold text-ink">{page.runtime.hub}</span>
+          </div>
+
+          <div className="relative mx-auto h-8 w-full max-w-3xl" aria-hidden>
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border-strong sm:hidden" />
+            <div className="absolute left-[12.5%] right-[12.5%] top-0 hidden h-px bg-border-strong sm:block" />
+            <div className="absolute left-[12.5%] top-0 hidden h-4 w-px bg-border-strong sm:block" />
+            <div className="absolute left-[37.5%] top-0 hidden h-4 w-px bg-border-strong sm:block" />
+            <div className="absolute left-[62.5%] top-0 hidden h-4 w-px bg-border-strong sm:block" />
+            <div className="absolute left-[87.5%] top-0 hidden h-4 w-px bg-border-strong sm:block" />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {page.runtime.services.map(({ label, Icon, deployTime }) => (
+              <div
+                key={label}
+                className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${
+                  deployTime ? "border-dashed border-border-strong bg-surface" : "border-border bg-surface-hover"
+                }`}
+              >
+                <Icon className={deployTime ? "shrink-0 text-ink-muted" : "shrink-0 text-accent-2"} size={20} aria-hidden />
+                <div className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-ink">{label}</span>
+                  {deployTime ? <span className="block text-[11px] text-ink-subtle">{page.runtime.deployNote}</span> : null}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <section>
+          <h2 className="text-xl font-semibold text-ink">{page.charts.apiTitle}</h2>
+          <p className="mt-1 text-sm leading-6 text-ink-muted">{page.charts.apiDescription}</p>
+          <div className="mt-4">
+            <BarChart
+              data={page.apiDomains}
+              unit={page.charts.apiUnit}
+              totalLabel={page.charts.apiTotal}
+              barClassName="bg-accent"
+              trackClassName="rounded-r-[4px] bg-accent-soft"
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-ink">{page.charts.dataTitle}</h2>
+          <p className="mt-1 text-sm leading-6 text-ink-muted">{page.charts.dataDescription}</p>
+          <div className="mt-4">
+            <BarChart
+              data={page.dataDomains}
+              unit={page.charts.dataUnit}
+              totalLabel={page.charts.dataTotal}
+              barClassName="bg-accent-2"
+              trackClassName="rounded-r-[4px] bg-accent-2-soft"
+            />
+          </div>
+        </section>
+      </div>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {page.flows.map(({ title, body, Icon }) => (
-          <section key={title} className="rounded-lg border border-zinc-200 bg-white p-5">
-            <Icon className="text-teal-700" aria-hidden />
-            <h2 className="mt-3 text-lg font-semibold">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-600">{body}</p>
+          <section key={title} className="rounded-lg border border-border bg-surface p-5">
+            <Icon className="text-accent" aria-hidden />
+            <h2 className="mt-3 text-lg font-semibold text-ink">{title}</h2>
+            <p className="mt-2 text-sm leading-6 text-ink-muted">{body}</p>
           </section>
         ))}
       </div>
