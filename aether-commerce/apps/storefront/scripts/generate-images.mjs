@@ -57,10 +57,20 @@ const args = process.argv.slice(2);
 const onlyCategory = args.find((a) => a.startsWith("--only="))?.split("=")[1];
 const limit = Number(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? Infinity);
 const force = args.includes("--force");
+const slugsFile = args.find((a) => a.startsWith("--slugs-file="))?.split("=")[1];
 
 // --- Load and select products ------------------------------------------
 const allProducts = JSON.parse(readFileSync(dataPath, "utf8"));
 let products = onlyCategory ? allProducts.filter((p) => p.category === onlyCategory) : allProducts;
+if (slugsFile) {
+  const wantedSlugs = new Set(
+    readFileSync(slugsFile, "utf8")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+  );
+  products = products.filter((p) => wantedSlugs.has(p.slug));
+}
 if (Number.isFinite(limit)) products = products.slice(0, limit);
 
 mkdirSync(publicDir, { recursive: true });
@@ -97,7 +107,12 @@ async function fetchWithRetry(url, options, attempt = 1) {
 }
 
 async function searchPexels(query, page = 1, perPage = 15) {
-  const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}&orientation=square`;
+  // No orientation filter: Pexels' square-cropped results skew toward
+  // "flatlay" lifestyle shots (several unrelated items arranged on a desk)
+  // rather than clean product photography, which is usually landscape. The
+  // download step already center-crops to a 1:1 square, so filtering by
+  // orientation here only made the pool worse, not more relevant.
+  const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}`;
   const response = await fetchWithRetry(url, { headers: { Authorization: PEXELS_API_KEY } });
   if (!response.ok) throw new Error(`Pexels search failed (${response.status}) for "${query}"`);
   const payload = await response.json();
@@ -142,13 +157,115 @@ async function downloadAndProcess(imageUrl, outMainPath, outThumbPath) {
   writeFileSync(outThumbPath, await encodeUnderLimit(thumb, 82));
 }
 
+// Ordered most-specific-first: each entry is [pattern to test against the
+// normalized (lowercase, accent-stripped) product name, Pexels search term].
+// A search built from real product-type words ("phone case", "office chair")
+// reliably returns the right kind of stock photo; a search built from the
+// product's own invented marketing name (its last word is usually a
+// model/line qualifier like "Fold", "RTX", "Chrono") does not - Pexels has no
+// idea what a "Meridian Willow" or a "Ridgeline Vanguard" is, so that query
+// falls back to irrelevant top results.
+//
+// A few product names contain a furniture/room word inside an unrelated
+// product (e.g. "Soporte Plegable de Escritorio" is a stand, not a desk), so
+// those ambiguous families are resolved explicitly in queryFor() before this
+// list is consulted at all.
+const NAME_QUERY_RULES = [
+  [/espejo/, "decorative wall mirror"],
+  [/cuadro/, "framed wall art print"],
+  [/reloj de pared/, "modern wall clock"],
+  [/lampara de mesa/, "table lamp"],
+  [/lampara de piso/, "floor lamp"],
+  [/lampara de escritorio/, "desk lamp"],
+  [/lampara colgante/, "pendant hanging lamp"],
+  [/set de luces/, "string lights home decor"],
+  [/cesta|canasta/, "woven storage basket"],
+  [/frasco/, "glass jar set kitchen"],
+  [/organizador.*closet/, "closet organizer shelving"],
+  [/organizador/, "drawer organizer"],
+  [/cojin/, "throw pillow cushion"],
+  [/manta|cobertor/, "knit throw blanket"],
+  [/tapete/, "area rug"],
+  [/cortina/, "blackout curtains"],
+  [/silla gamer/, "gaming chair"],
+  [/silla/, "office chair"],
+  [/escritorio/, "office desk"],
+  [/estanteria/, "bookshelf shelving unit"],
+  [/sofa/, "modern sofa couch"],
+
+  [/read|paperlight/, "e-reader device"],
+  [/tridex|corex/, "tablet computer"],
+
+  [/funda/, "phone case"],
+  [/cable/, "usb cable"],
+  [/power bank/, "portable power bank charger"],
+
+  [/frecuencia cardiaca/, "heart rate monitor chest strap"],
+  [/cuerda de salto/, "jump rope"],
+  [/guantes de entrenamiento/, "gym gloves"],
+  [/bandas de resistencia/, "resistance bands fitness"],
+  [/botella termica/, "insulated water bottle"],
+  [/botella plegable/, "collapsible water bottle"],
+  [/shaker/, "protein shaker bottle"],
+  [/mancuernas/, "adjustable dumbbells"],
+  [/rodillo de espuma/, "foam roller"],
+  [/colchoneta de yoga/, "yoga mat"],
+  [/barra de dominadas/, "pull up bar"],
+  [/luz trasera/, "bike tail light"],
+  [/casco de ciclismo/, "bike helmet"],
+
+  [/solmark|fendra/, "sunglasses"],
+
+  [/ryzel/, "foldable smartphone"],
+  [/ovalta|arion/, "smartphone"]
+];
+
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
 function queryFor(product) {
-  // A distinguishing word from the product's own name (its last token is
-  // usually a model/line qualifier - "Grip", "Fold", "Edge") keeps products
-  // within the same subcategory (same tags) from all issuing the identical
-  // search query.
-  const distinguishing = product.name.split(" ").slice(-1)[0];
-  return [product.tags?.[0], product.subcategory, product.category.replace(/-/g, " "), distinguishing].filter(Boolean).join(" ");
+  const name = normalize(product.name);
+
+  // Resolved first because their own name contains a word ("escritorio",
+  // "auto") that would otherwise match an unrelated rule in the list below.
+  if (/soporte/.test(name)) {
+    if (/bicicleta|manubrio/.test(name)) return "phone bike mount";
+    if (/auto/.test(name)) return "car phone mount";
+    if (/videollamada/.test(name)) return "phone stand desk";
+    return "phone stand";
+  }
+  if (/cargador/.test(name)) {
+    if (/auto/.test(name)) return "car phone charger";
+    if (/inalambrico/.test(name)) return "wireless phone charger";
+    return "usb wall charger";
+  }
+  if (/audifono/.test(name)) {
+    return /in-ear/.test(name) ? "earbuds" : "headphones";
+  }
+  if (/ridgeline|kaelo/.test(name)) {
+    if (/2-en-1|swivel/.test(name)) return "2 in 1 convertible laptop";
+    if (product.subcategory === "gaming") return "gaming laptop";
+    return "laptop computer";
+  }
+  // Driven by the actual category field, not the brand name - some watch
+  // lines (e.g. "Chronoly Meridian Classic") borrow a name that would
+  // otherwise misidentify which gender's watch line it belongs to.
+  if (product.category === "mens-watches" || product.category === "womens-watches") {
+    if (product.subcategory === "smartwatch") return "smartwatch on wrist";
+    return product.category === "mens-watches" ? "men's wristwatch" : "women's wristwatch";
+  }
+
+  for (const [pattern, query] of NAME_QUERY_RULES) {
+    if (pattern.test(name)) return query;
+  }
+
+  // Fallback for anything not covered above: the old tag/category heuristic,
+  // without the marketing-name word that caused irrelevant results.
+  return [product.tags?.[0], product.subcategory, product.category.replace(/-/g, " ")].filter(Boolean).join(" ");
 }
 
 async function processProduct(product, index, total) {
