@@ -20,7 +20,8 @@ const config = {
     AETHER_ENV: process.env.AETHER_ENV || "production",
     DUMMYJSON_API_BASE_URL: process.env.DUMMYJSON_API_BASE_URL || "https://dummyjson.com",
     APP_ORIGIN_STORE: process.env.APP_ORIGIN_STORE || "",
-    APP_ORIGIN_ADMIN: process.env.APP_ORIGIN_ADMIN || ""
+    APP_ORIGIN_ADMIN: process.env.APP_ORIGIN_ADMIN || "",
+    APP_STORE_BASE_PATH: process.env.APP_STORE_BASE_PATH || "/store"
   },
   d1_databases: [
     {
