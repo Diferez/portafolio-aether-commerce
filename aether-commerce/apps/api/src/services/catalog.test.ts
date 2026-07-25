@@ -1,192 +1,133 @@
 import { describe, expect, it } from "vitest";
+import type { Env } from "../types";
 import { __testables } from "./catalog";
 
-const { normalize, discountFor, flagsFor, isCatalogCandidate, isTrustedImageUrl, isMeaningfulText, normalizeReviews, fallbackProducts } =
-  __testables;
+const { normalizeLocal, flagsFor, foldText, typedLocalProducts } = __testables;
 
-function makeDummyJsonProduct(overrides: Partial<Parameters<typeof normalize>[0]> = {}) {
+const testEnv = { APP_ORIGIN_STORE: "https://store.example" } as Env;
+
+type LocalProduct = Parameters<typeof normalizeLocal>[1];
+
+function makeLocalProduct(overrides: Partial<LocalProduct> = {}): LocalProduct {
   return {
-    id: 42,
-    title: "Premium Wireless Mouse",
-    description: "A precise wireless mouse built for long work sessions.",
+    id: "prd_0042",
+    sku: "MOB-FUND-0042",
+    slug: "funda-slim-grip",
+    name: "Funda Slim Grip",
+    brand: "Halven",
     category: "mobile-accessories",
-    price: 59.99,
-    discountPercentage: 12.5,
+    subcategory: "fundas",
+    price: 19,
+    currency: "USD",
     stock: 34,
-    tags: ["wireless", "office"],
-    brand: "Logitech",
-    sku: "LOG-MW-42",
-    weight: 0.12,
-    dimensions: { width: 6.5, height: 3.8, depth: 11.2 },
-    warrantyInformation: "2 year warranty",
-    shippingInformation: "Ships in 1 business day",
-    returnPolicy: "90 days return policy",
-    minimumOrderQuantity: 1,
-    reviews: [
-      { rating: 5, comment: "Excellent tracking and battery life.", date: "2026-01-15T00:00:00.000Z", reviewerName: "Test User", reviewerEmail: "test@example.com" }
-    ],
-    thumbnail: "https://cdn.dummyjson.com/products/images/mobile-accessories/mouse/thumbnail.png",
-    images: ["https://cdn.dummyjson.com/products/images/mobile-accessories/mouse/1.png"],
+    rating: 4.6,
+    reviewCount: 128,
+    shortDescription: "Cubre los bordes sin anadir bulto.",
+    description: "Cubre los bordes y las camaras sin anadir bulto notable al bolsillo.",
+    highlights: ["Material: Policarbonato", "Peso: 32 g", "Disponible en 5 colores"],
+    specs: { Material: "Policarbonato con borde de TPU", Peso: "32 g" },
+    tags: ["funda", "proteccion", "accesorio-celular"],
+    variants: [{ type: "color", options: ["Negro", "Grafito", "Arena"] }],
+    images: { main: "/products/funda-slim-grip-1.webp", gallery: ["/products/funda-slim-grip-2.webp", "/products/funda-slim-grip-3.webp"] },
+    imagePrompt: "a black phone case, studio photography",
+    featured: false,
+    isNew: false,
+    createdAt: "2025-03-10",
     ...overrides
   };
 }
 
-describe("catalog.normalize", () => {
-  it("maps a DummyJSON product onto the Aether Product contract", () => {
-    const product = normalize(makeDummyJsonProduct());
+describe("catalog.normalizeLocal", () => {
+  it("maps a local catalog product onto the Aether Product contract", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct());
 
-    expect(product.id).toBe("dummyjson_42");
-    expect(product.externalId).toBe(42);
+    expect(product.id).toBe("prd_0042");
+    expect(product.externalId).toBeNull();
     expect(product.sourceId).toBe("42");
-    expect(product.slug).toBe("premium-wireless-mouse");
-    expect(product.catalogSource).toBe("dummyjson");
-    expect(product.brand).toBe("Logitech");
-    expect(product.sku).toBe("LOG-MW-42");
+    expect(product.slug).toBe("funda-slim-grip");
+    expect(product.catalogSource).toBe("local");
+    expect(product.brand).toBe("Halven");
+    expect(product.sku).toBe("MOB-FUND-0042");
     expect(product.category.slug).toBe("mobile-accessories");
     expect(product.category.name).toBe("Mobile Accessories");
   });
 
-  it("converts a decimal dollar price into integer cents", () => {
-    const product = normalize(makeDummyJsonProduct({ price: 59.99 }));
-    expect(product.price).toBe(5999);
-    expect(Number.isInteger(product.price)).toBe(true);
+  it("converts the dollar price to integer cents", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct({ price: 19 }));
+    expect(product.finalPrice).toBe(1900);
+    expect(Number.isInteger(product.finalPrice)).toBe(true);
   });
 
-  it("derives discountPercentage from the deterministic id formula, not the source field", () => {
-    // id=42 -> 42 % 3 === 0 -> 8% (see discountFor); the raw DummyJSON
-    // discountPercentage (12.5%) must never leak through.
-    const product = normalize(makeDummyJsonProduct({ id: 42, discountPercentage: 12.5 }));
-    expect(product.discountPercentage).toBe(discountFor(42));
-    expect(product.discountPercentage).not.toBe(12.5);
+  it("swaps price direction: local price -> finalPrice, compareAtPrice -> price/originalPrice", () => {
+    // The local catalog's `price` is what the customer actually pays;
+    // compareAtPrice (when present) is the higher, struck-through reference.
+    // The shared Product contract expects the opposite - price = pre-discount,
+    // finalPrice = what's charged - so this must land inverted.
+    const product = normalizeLocal(testEnv, makeLocalProduct({ price: 19, compareAtPrice: 25 }));
+    expect(product.finalPrice).toBe(1900);
+    expect(product.price).toBe(2500);
+    expect(product.originalPrice).toBe(2500);
+    expect(product.discountPercentage).toBe(24);
   });
 
-  it("stores the raw DummyJSON stock as externalStock without using it for availableStock", () => {
-    const product = normalize(makeDummyJsonProduct({ id: 42, stock: 999 }));
-    expect(product.externalStock).toBe(999);
-    expect(product.availableStock).not.toBe(999);
-    expect(product.availableStock).toBeGreaterThanOrEqual(0);
+  it("has no discount and no originalPrice when compareAtPrice is absent", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct({ price: 19 }));
+    expect(product.price).toBe(1900);
+    expect(product.originalPrice).toBeNull();
+    expect(product.discountPercentage).toBe(0);
   });
 
-  it("tags every image with source dummyjson when the URL is trusted", () => {
-    const product = normalize(makeDummyJsonProduct());
-    expect(product.images.length).toBeGreaterThan(0);
-    expect(product.images.every((image) => image.source === "dummyjson")).toBe(true);
+  it("uses the catalog's own stock directly as availableStock", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct({ stock: 0 }));
+    expect(product.availableStock).toBe(0);
+    expect(product.availabilityStatus).toBe("out_of_stock");
   });
 
-  it("falls back to a fallback-sourced image when no trusted image is present", () => {
-    const product = normalize(makeDummyJsonProduct({ images: ["https://evil.example.com/x.png"], thumbnail: "https://evil.example.com/y.png" }));
-    expect(product.images[0]?.source).toBe("fallback");
+  it("builds absolute image URLs from APP_ORIGIN_STORE and tags them as local", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct());
+    expect(product.images).toHaveLength(3);
+    expect(product.images[0]?.url).toBe("https://store.example/products/funda-slim-grip-1.webp");
+    expect(product.images.every((image) => image.source === "local")).toBe(true);
+    expect(product.thumbnail).toBe("https://store.example/products/funda-slim-grip-1.webp");
   });
 
-  it("carries shipping/warranty/return fields through untouched", () => {
-    const product = normalize(makeDummyJsonProduct());
-    expect(product.shippingInformation).toBe("Ships in 1 business day");
-    expect(product.warrantyInformation).toBe("2 year warranty");
-    expect(product.returnPolicy).toBe("90 days return policy");
-    expect(product.dimensions).toEqual({ width: 6.5, height: 3.8, depth: 11.2 });
-    expect(product.weight).toBe(0.12);
+  it("falls back to http://localhost:3000 when APP_ORIGIN_STORE is unset", () => {
+    const product = normalizeLocal({} as Env, makeLocalProduct());
+    expect(product.thumbnail.startsWith("http://localhost:3000/products/")).toBe(true);
   });
 
-  it("normalizes every hand-authored fallback product without throwing", () => {
-    for (const product of fallbackProducts) {
-      expect(() => normalize(product)).not.toThrow();
+  it("maps specs to the specifications array", () => {
+    const product = normalizeLocal(testEnv, makeLocalProduct());
+    expect(product.specifications).toEqual([
+      { key: "Material", value: "Policarbonato con borde de TPU" },
+      { key: "Peso", value: "32 g" }
+    ]);
+  });
+
+  it("normalizes every generated catalog product without throwing", () => {
+    for (const product of typedLocalProducts) {
+      expect(() => normalizeLocal(testEnv, product)).not.toThrow();
     }
   });
 });
 
-describe("catalog.normalizeReviews", () => {
-  it("maps rating/comment/date/reviewerName and drops reviewerEmail", () => {
-    const [review] = normalizeReviews(
-      [{ rating: 4.6, comment: "Great value.", date: "2026-02-01T00:00:00.000Z", reviewerName: "Jamie", reviewerEmail: "jamie@example.com" } as never],
-      "2026-01-01T00:00:00.000Z"
-    );
-    if (!review) throw new Error("expected a normalized review");
-    expect(review.reviewerName).toBe("Jamie");
-    expect(review.comment).toBe("Great value.");
-    expect(review).not.toHaveProperty("reviewerEmail");
-  });
-
-  it("clamps out-of-range ratings and skips reviews without a comment", () => {
-    const reviews = normalizeReviews(
-      [
-        { rating: 9, comment: "Too high a rating.", reviewerName: "A" } as never,
-        { rating: -3, comment: "Too low a rating.", reviewerName: "B" } as never,
-        { rating: 4, comment: "", reviewerName: "C" } as never
-      ],
-      "2026-01-01T00:00:00.000Z"
-    );
-    expect(reviews).toHaveLength(2);
-    expect(reviews[0]?.rating).toBe(5);
-    expect(reviews[1]?.rating).toBe(0);
-  });
-
-  it("returns an empty array for missing or non-array input", () => {
-    expect(normalizeReviews(undefined, "2026-01-01T00:00:00.000Z")).toEqual([]);
-    expect(normalizeReviews([] as never, "2026-01-01T00:00:00.000Z")).toEqual([]);
-  });
-});
-
-describe("catalog.discountFor / flagsFor", () => {
-  it("is deterministic for a given id", () => {
-    expect(discountFor(21)).toBe(discountFor(21));
-    expect(discountFor(7)).toBe(18);
-    expect(discountFor(10)).toBe(12);
-    expect(discountFor(9)).toBe(8);
-    expect(discountFor(1)).toBe(0);
+describe("catalog.flagsFor", () => {
+  it("derives flags from the product's own featured/isNew/compareAtPrice/stock fields", () => {
+    expect(flagsFor(makeLocalProduct({ featured: true }))).toContain("featured");
+    expect(flagsFor(makeLocalProduct({ isNew: true }))).toContain("new");
+    expect(flagsFor(makeLocalProduct({ compareAtPrice: 30 }))).toContain("deal");
+    expect(flagsFor(makeLocalProduct({ stock: 3 }))).toContain("limited");
   });
 
   it("always returns at least one flag", () => {
-    for (let id = 1; id <= 30; id += 1) {
-      expect(flagsFor(makeDummyJsonProduct({ id })).length).toBeGreaterThan(0);
-    }
+    const flags = flagsFor(makeLocalProduct({ featured: false, isNew: false, stock: 50 }));
+    expect(flags.length).toBeGreaterThan(0);
   });
 });
 
-describe("catalog.isCatalogCandidate", () => {
-  it("accepts a well-formed product", () => {
-    expect(isCatalogCandidate(makeDummyJsonProduct())).toBe(true);
-  });
-
-  it("rejects a product with zero price", () => {
-    expect(isCatalogCandidate(makeDummyJsonProduct({ price: 0 }))).toBe(false);
-  });
-
-  it("rejects a product with no trusted images", () => {
-    const product = makeDummyJsonProduct({ images: [] });
-    delete (product as { thumbnail?: string }).thumbnail;
-    expect(isCatalogCandidate(product)).toBe(false);
-  });
-
-  it("rejects a product with a low-quality title", () => {
-    expect(isCatalogCandidate(makeDummyJsonProduct({ title: "asdf" }))).toBe(false);
-  });
-});
-
-describe("catalog.isMeaningfulText", () => {
-  it("accepts a normal sentence", () => {
-    expect(isMeaningfulText("A precise wireless mouse", 2)).toBe(true);
-  });
-
-  it("rejects keyboard-mash and repeated-character strings", () => {
-    expect(isMeaningfulText("qwerty")).toBe(false);
-    expect(isMeaningfulText("aaaaaaaa")).toBe(false);
-  });
-});
-
-describe("catalog.isTrustedImageUrl", () => {
-  it("trusts DummyJSON's CDN", () => {
-    expect(isTrustedImageUrl("https://cdn.dummyjson.com/products/images/laptops/1.png")).toBe(true);
-  });
-
-  it("trusts the Unsplash fallback host", () => {
-    expect(isTrustedImageUrl("https://images.unsplash.com/photo-1")).toBe(true);
-  });
-
-  it("rejects an untrusted host", () => {
-    expect(isTrustedImageUrl("https://evil.example.com/1.png")).toBe(false);
-  });
-
-  it("rejects a malformed URL", () => {
-    expect(isTrustedImageUrl("not-a-url")).toBe(false);
+describe("catalog.foldText", () => {
+  it("lowercases and strips accents for accent-insensitive search", () => {
+    expect(foldText("Cámara")).toBe("camara");
+    expect(foldText("Organización")).toBe("organizacion");
   });
 });

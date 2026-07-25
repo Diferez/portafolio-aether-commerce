@@ -20,7 +20,7 @@ export const productImageSchema = z.object({
   alt: z.string().min(1),
   width: z.number().int().positive().optional(),
   height: z.number().int().positive().optional(),
-  source: z.enum(["dummyjson", "cloudinary", "fallback"])
+  source: z.enum(["dummyjson", "cloudinary", "fallback", "local"])
 });
 
 export const productRatingSchema = z.object({
@@ -99,7 +99,7 @@ export const productSchema = z.object({
   visible: z.boolean(),
   seoTitle: z.string().nullable(),
   seoDescription: z.string().nullable(),
-  catalogSource: z.literal("dummyjson"),
+  catalogSource: z.enum(["dummyjson", "local"]),
   externalStock: z.number().int().min(0).nullable(),
   lastSyncedAt: z.string().datetime(),
   shippingInformation: z.string().nullable(),

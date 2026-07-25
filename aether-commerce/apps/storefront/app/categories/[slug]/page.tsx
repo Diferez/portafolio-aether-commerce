@@ -1,36 +1,20 @@
 import { humanizeCategorySlug } from "@aether/core";
 import { ProductGrid } from "../../../components/ProductGrid";
 
-// DummyJSON's real category taxonomy plus the couple of custom slugs used by
-// Aether's own bonus fallback products (see apps/api/src/services/catalog.ts).
+// The 10 real category slugs in the local catalog (see
+// apps/storefront/data/products.json and apps/api/src/services/catalog.ts).
 export function generateStaticParams() {
   return [
     "smartphones",
     "laptops",
-    "fragrances",
-    "skin-care",
-    "groceries",
-    "home-decoration",
-    "furniture",
-    "tops",
-    "womens-dresses",
-    "womens-shoes",
-    "mens-shirts",
-    "mens-shoes",
-    "mens-watches",
-    "womens-watches",
-    "womens-bags",
-    "womens-jewellery",
-    "sunglasses",
-    "automotive",
-    "motorcycle",
-    "lighting",
     "mobile-accessories",
     "tablets",
-    "sports-accessories",
-    "beauty",
-    "audio",
-    "accessories"
+    "mens-watches",
+    "womens-watches",
+    "sunglasses",
+    "furniture",
+    "home-decoration",
+    "sports-accessories"
   ].map((slug) => ({ slug }));
 }
 
