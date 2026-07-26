@@ -756,18 +756,18 @@ export function AssistantWidget() {
           ref={triggerRef}
           type="button"
           onClick={() => setIsOpen(true)}
-          className="focus-ring fixed bottom-5 left-5 z-50 flex min-h-14 items-center gap-3 rounded-full bg-chat-accent px-4 text-white shadow-2xl transition hover:-translate-y-0.5"
+          className="focus-ring fixed left-5 z-50 flex h-14 w-14 items-center justify-center gap-3 rounded-full bg-chat-accent text-white shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 sm:w-auto sm:justify-start sm:px-4"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.25rem)" }}
           aria-expanded={isOpen}
           aria-label={copy.title}
         >
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/15 text-white">
             <Bot size={19} aria-hidden />
           </span>
           <span className="hidden text-left sm:block">
             <span className="block text-xs text-white/70">Aether</span>
             <span className="block text-sm font-semibold">{copy.title}</span>
           </span>
-          <ShoppingBag size={17} aria-hidden className="sm:hidden" />
         </button>
       )}
     </>
