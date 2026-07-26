@@ -46,7 +46,7 @@ export function FloatingCart() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-40">
+    <div className="fixed right-5 z-40" style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.25rem)" }}>
       {isOpen ? (
         <div
           className="mb-3 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-chat border border-chat-border bg-chat-bg shadow-2xl"
@@ -113,7 +113,7 @@ export function FloatingCart() {
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="focus-ring group flex min-h-14 items-center gap-3 rounded-full bg-chat-surface px-4 text-chat-text shadow-2xl transition hover:-translate-y-0.5 hover:bg-chat-surface-alt"
+        className="focus-ring group flex h-14 w-14 items-center justify-center gap-3 rounded-full border border-chat-border bg-chat-surface text-chat-text shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-chat-surface-alt sm:w-auto sm:justify-start sm:px-4"
         aria-expanded={isOpen}
         aria-label={locale === "es" ? "Abrir carrito rapido" : "Open quick cart"}
       >

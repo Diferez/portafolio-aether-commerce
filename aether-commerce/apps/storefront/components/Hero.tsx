@@ -22,13 +22,13 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="border-b border-zinc-200/60 py-12 sm:py-16">
-      <div className="aether-shell grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+    <section className="border-b border-zinc-200/60 py-8 sm:py-16">
+      <div className="aether-shell grid items-center gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-accent">{t.heroEyebrow}</p>
-          <h1 className="mt-3 text-4xl font-semibold leading-tight text-zinc-950 sm:text-5xl">{t.heroTitle}</h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-zinc-600">{t.heroDescription}</p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <h1 className="mt-2 text-3xl font-semibold leading-tight text-zinc-950 sm:mt-3 sm:text-4xl lg:text-5xl">{t.heroTitle}</h1>
+          <p className="mt-3 max-w-xl text-base leading-7 text-zinc-600">{t.heroDescription}</p>
+          <div className="mt-5 flex flex-wrap gap-3 sm:mt-7">
             <a
               href={storefrontPath("/products")}
               className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-white transition hover:bg-accent-hover"
@@ -51,8 +51,8 @@ export function Hero() {
             <a
               key={product?.id ?? index}
               href={product ? storefrontPath(`/products/detail?slug=${encodeURIComponent(product.slug)}`) : undefined}
-              className={`relative aspect-square overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 ${
-                index === 0 ? "col-span-2 aspect-[2/1]" : ""
+              className={`relative overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 ${
+                index === 0 ? "col-span-2 aspect-[7/3] sm:aspect-[2/1]" : "aspect-square"
               }`}
             >
               {product ? (
