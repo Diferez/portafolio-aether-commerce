@@ -83,7 +83,7 @@ export function ProductCard({
         </p>
         <a
           href={detailHref}
-          className={`line-clamp-2 min-h-[2.6em] text-sm font-semibold leading-tight ${
+          className={`line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-tight ${
             outOfStock ? "text-ink-muted" : "text-zinc-950 hover:text-accent"
           }`}
         >
@@ -98,34 +98,54 @@ export function ProductCard({
           <span>{product.rating.average.toFixed(1)}</span>
           <span className={outOfStock ? "text-ink-subtle" : "text-zinc-500"}>({product.reviewCount})</span>
         </div>
-        <div className="mt-auto flex items-end justify-between gap-2 pt-1">
-          <div className="min-w-0">
-            <p className={`truncate text-lg font-semibold ${outOfStock ? "text-ink-muted" : "text-zinc-950"}`}>
+        <div className="mt-auto flex flex-col gap-2 pt-1">
+          {/* min-h reserves room for the wrapped (2-line) case - price plus
+              strikethrough plus savings can wrap to a second line on narrow
+              cards, and without a fixed reservation that would misalign the
+              anchored block again, just like the chip slot below. */}
+          <div className="flex min-h-[46px] flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <p className={`text-lg font-semibold ${outOfStock ? "text-ink-muted" : "text-zinc-950"}`}>
               {formatUsd(product.finalPrice, priceLocale)}
             </p>
             {product.originalPrice ? (
-              <p className="truncate text-xs text-zinc-500 line-through">{formatUsd(product.originalPrice, priceLocale)}</p>
+              <p className="text-xs text-zinc-500 line-through">{formatUsd(product.originalPrice, priceLocale)}</p>
             ) : null}
             {!outOfStock && product.originalPrice ? (
-              <p className="truncate text-xs font-medium text-success [font-variant-numeric:tabular-nums]">
+              <span className="text-xs font-medium text-success [font-variant-numeric:tabular-nums]">
                 {t.savings.replace("{amount}", formatUsd(product.originalPrice - product.finalPrice, priceLocale))}
-              </p>
+              </span>
             ) : null}
           </div>
-          <div className="flex shrink-0 gap-2">
+
+          {/* Always rendered so the row below never shifts depending on
+              whether this product happens to be low on stock - only the
+              chip inside is conditional. */}
+          <div className="flex min-h-[26px] items-center">
+            {lowStock ? (
+              <div
+                role="status"
+                className="inline-flex w-fit items-center gap-1.5 rounded-md bg-warning-tint px-[9px] py-1 text-xs text-warning [font-variant-numeric:tabular-nums]"
+              >
+                <Flame size={13} aria-hidden />
+                <span>{getLowStockLabel(product.availableStock, t)}</span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={(event) => {
                 event.preventDefault();
                 onToggleFavorite(product);
               }}
-              className={`focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md border transition hover:bg-zinc-100 ${
+              className={`focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-md border transition hover:bg-zinc-100 ${
                 isFavorite ? "border-rose-300 bg-rose-50 text-rose-700" : "border-zinc-300"
               }`}
               aria-label={locale === "es" ? `Guardar ${product.name}` : `Save ${product.name}`}
               aria-pressed={isFavorite}
             >
-              <Heart size={17} fill={isFavorite ? "currentColor" : "none"} aria-hidden />
+              <Heart size={16} fill={isFavorite ? "currentColor" : "none"} aria-hidden />
             </button>
             {outOfStock ? (
               <button
@@ -141,10 +161,11 @@ export function ProductCard({
                     console.info(`[notify-restock] ${product.id} - no endpoint wired yet`);
                   }
                 }}
-                className="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md border border-border-strong bg-surface text-ink transition hover:bg-surface-hover"
+                className="focus-ring flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border-strong bg-surface px-3 text-sm font-medium text-ink transition hover:bg-surface-hover"
                 aria-label={t.notifyWhenBackInStock.replace("{name}", product.name)}
               >
-                <Bell size={17} aria-hidden />
+                <Bell size={16} aria-hidden />
+                <span>{t.notifyMe}</span>
               </button>
             ) : (
               <button
@@ -154,7 +175,7 @@ export function ProductCard({
                   onAddToCart(product);
                 }}
                 disabled={isAdding}
-                className={`focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-md text-white transition ${
+                className={`focus-ring flex h-9 flex-1 items-center justify-center rounded-md text-white transition ${
                   isAdded ? "scale-105 bg-emerald-600" : isAdding ? "bg-accent-hover" : "bg-accent hover:bg-accent-hover"
                 }`}
                 aria-label={locale === "es" ? `Agregar ${product.name} al carrito` : `Add ${product.name} to cart`}
@@ -169,15 +190,6 @@ export function ProductCard({
             )}
           </div>
         </div>
-        {lowStock ? (
-          <div
-            role="status"
-            className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-md bg-warning-tint px-[9px] py-1 text-xs text-warning [font-variant-numeric:tabular-nums]"
-          >
-            <Flame size={13} aria-hidden />
-            <span>{getLowStockLabel(product.availableStock, t)}</span>
-          </div>
-        ) : null}
       </div>
     </article>
   );
