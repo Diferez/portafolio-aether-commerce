@@ -54,7 +54,12 @@ export default function RegisterPage() {
 
         <div className="mt-6 flex justify-center">
           {isLoaded && !isSignedIn ? (
-            <SignUp routing="hash" signInUrl={storefrontPath("/login")} appearance={clerkAppearance} />
+            <SignUp
+              routing="hash"
+              signInUrl={storefrontPath("/login")}
+              fallbackRedirectUrl={storefrontPath(nextPath())}
+              appearance={clerkAppearance}
+            />
           ) : null}
         </div>
       </section>
