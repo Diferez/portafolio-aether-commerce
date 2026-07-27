@@ -56,9 +56,9 @@ importers:
       '@aether/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
-      '@clerk/nextjs':
-        specifier: ^7.5.18
-        version: 7.5.18(next@16.2.0)(react-dom@19.2.3)(react@19.2.3)
+      '@clerk/react':
+        specifier: ^6.12.3
+        version: 6.12.3(react-dom@19.2.3)(react@19.2.3)
       '@tanstack/react-query':
         specifier: ^5.90.0
         version: 5.90.1(react@19.2.3)

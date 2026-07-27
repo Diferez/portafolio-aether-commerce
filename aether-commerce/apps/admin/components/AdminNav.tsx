@@ -1,4 +1,7 @@
+"use client";
+
 import { BarChart3, Boxes, ClipboardList, Mail, Settings, ShieldCheck } from "lucide-react";
+import { useAuth, UserButton } from "@clerk/react";
 import { storefrontUrl } from "./config";
 
 const nav = [
@@ -11,6 +14,8 @@ const nav = [
 ];
 
 export function AdminNav() {
+  const { isSignedIn } = useAuth();
+
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white">
       <div className="admin-shell flex min-h-16 items-center justify-between gap-4">
@@ -26,9 +31,12 @@ export function AdminNav() {
             </a>
           ))}
         </nav>
-        <a href={storefrontUrl} className="focus-ring rounded-md border border-zinc-300 px-3 py-2 text-sm font-semibold">
-          Storefront
-        </a>
+        <div className="flex items-center gap-3">
+          <a href={storefrontUrl} className="focus-ring rounded-md border border-zinc-300 px-3 py-2 text-sm font-semibold">
+            Storefront
+          </a>
+          {isSignedIn ? <UserButton /> : null}
+        </div>
       </div>
     </header>
   );

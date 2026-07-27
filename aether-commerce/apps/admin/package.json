@@ -13,7 +13,7 @@
     "@aether/api-client": "workspace:*",
     "@aether/i18n": "workspace:*",
     "@aether/schemas": "workspace:*",
-    "@clerk/nextjs": "^7.5.18",
+    "@clerk/react": "^6.12.3",
     "@tanstack/react-query": "^5.90.0",
     "framer-motion": "^12.42.0",
     "lucide-react": "^1.24.0",

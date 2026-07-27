@@ -37,6 +37,7 @@ jobs:
       APP_ORIGIN_ADMIN: ${{ vars.APP_ORIGIN_ADMIN }}
       APP_STORE_BASE_PATH: ${{ vars.APP_STORE_BASE_PATH || '/store' }}
       NEXT_PUBLIC_AETHER_AI_URL: ${{ vars.NEXT_PUBLIC_AETHER_AI_URL }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
     steps:
       - name: Checkout repository
@@ -71,6 +72,7 @@ jobs:
           test -n "${NEXT_PUBLIC_AETHER_API_URL}"
           test -n "${NEXT_PUBLIC_PORTFOLIO_URL}"
           test -n "${APP_ORIGIN_ADMIN}"
+          test -n "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}"
 
       - name: Verify Cloudflare secrets
         env:
