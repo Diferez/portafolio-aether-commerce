@@ -1,6 +1,6 @@
 "use client";
 
-import { SignIn } from "@clerk/nextjs";
+import { SignIn } from "@clerk/react";
 import { LogIn } from "lucide-react";
 import { storefrontPath } from "../../components/config";
 import { useLanguage } from "../../components/LanguageProvider";

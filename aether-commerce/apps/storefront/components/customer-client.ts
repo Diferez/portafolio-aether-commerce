@@ -1,6 +1,6 @@
 "use client";
 
-import { useClerk, useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/react";
 
 export type CustomerSession = {
   id: string;

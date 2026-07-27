@@ -15,7 +15,7 @@
     "@aether/i18n": "workspace:*",
     "@aether/schemas": "workspace:*",
     "@aether/ui": "workspace:*",
-    "@clerk/nextjs": "^7.5.18",
+    "@clerk/react": "^6.12.3",
     "@hookform/resolvers": "^5.2.0",
     "@tanstack/react-query": "^5.90.0",
     "framer-motion": "^12.42.0",

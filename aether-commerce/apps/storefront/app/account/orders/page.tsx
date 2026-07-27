@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@clerk/react";
 import { PackageCheck, ShoppingBag } from "lucide-react";
 import { formatUsd } from "@aether/core";
 import { createAetherClient } from "@aether/api-client";

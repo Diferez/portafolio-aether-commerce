@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { ClerkAuthProvider } from "../components/ClerkAuthProvider";
 import { LanguageProvider } from "../components/LanguageProvider";
 import { FloatingCart } from "../components/FloatingCart";
 import { SiteHeader } from "../components/SiteHeader";
@@ -34,14 +34,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <ClerkProvider>
+        <ClerkAuthProvider>
           <LanguageProvider>
             <SiteHeader />
             {children}
             <AssistantWidget />
             <FloatingCart />
           </LanguageProvider>
-        </ClerkProvider>
+        </ClerkAuthProvider>
       </body>
     </html>
   );
