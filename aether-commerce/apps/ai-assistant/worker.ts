@@ -1057,8 +1057,19 @@ async function searchProducts(env: Env, message: string, sessionHash?: string): 
     apiUrl.searchParams.set("hasDiscount", "true");
     apiUrl.searchParams.set("sort", "discount");
   } else {
-    const query = await extractSearchQuery(message, env, sessionHash);
-    if (query) apiUrl.searchParams.set("q", query);
+    const categoryMatch = matchCategorySynonym(message);
+    if (categoryMatch) {
+      // Once a category synonym resolves the request (e.g. "cellphones" ->
+      // the smartphones category), skip the q= text filter entirely rather
+      // than ANDing it with whatever Gemini/the heuristic extracted. That
+      // extracted text is usually the same synonym word, which never
+      // appears verbatim in the catalog (see matchCategorySynonym) and
+      // would zero out the results the category filter just found.
+      apiUrl.searchParams.set("category", categoryMatch.slug);
+    } else {
+      const query = await extractSearchQuery(message, env, sessionHash);
+      if (query) apiUrl.searchParams.set("q", query);
+    }
   }
   const response = await apiFetch(env, apiUrl, undefined, 5000);
   if (!response.ok) return [];
@@ -1182,6 +1193,82 @@ function extractQueryHeuristic(message: string): string {
     .replace(/agrega|anade|añade|add|busca|buscar|search|show|find|recomienda|recommend|producto|product|oferta|deal/gi, "")
     .trim()
     .slice(0, 80);
+}
+
+// Strips diacritics for accent-insensitive matching (e.g. "célular" folds to
+// "celular"). Mirrors the catalog service's own foldText so synonym matching
+// stays consistent with how the catalog's q= filter compares text.
+function foldText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
+// The catalog's `q` filter is a plain substring match against each product's
+// name/brand/description/tags (see aether-api's getCatalogProducts), and this
+// store's catalog data is tagged in Spanish (e.g. smartphones are tagged
+// "smartphone", never "cellphone" or "celular"). Shoppers routinely ask for a
+// category using words that never appear in that text - "cellphones",
+// "celulares", "phones" - so the substring search finds nothing even though
+// the category is fully in stock. Map those category-level synonyms to the
+// catalog's real category slug so the assistant can filter by category
+// instead of guessing at text. Keys are folded (lowercased, accents
+// stripped); multi-word keys are checked before single-word ones.
+const CATEGORY_SYNONYMS: Record<string, string> = {
+  "cell phones": "smartphones",
+  "cell phone": "smartphones",
+  "mobile phones": "smartphones",
+  "mobile phone": "smartphones",
+  "telefono celular": "smartphones",
+  "telefonos celulares": "smartphones",
+  cellphones: "smartphones",
+  cellphone: "smartphones",
+  celulares: "smartphones",
+  celular: "smartphones",
+  moviles: "smartphones",
+  movil: "smartphones",
+  telefonos: "smartphones",
+  telefono: "smartphones",
+  phones: "smartphones",
+  phone: "smartphones",
+  tablets: "tablets",
+  tabletas: "tablets",
+  tableta: "tablets",
+  laptops: "laptops",
+  computadoras: "laptops",
+  computadora: "laptops",
+  notebooks: "laptops",
+  notebook: "laptops",
+  accessories: "mobile-accessories",
+  accessory: "mobile-accessories",
+  accesorios: "mobile-accessories",
+  accesorio: "mobile-accessories",
+  headphones: "mobile-accessories",
+  headphone: "mobile-accessories",
+  // "watches"/"reloj" are deliberately not mapped: the catalog splits watches
+  // into "mens-watches"/"womens-watches" with no unified slug, so guessing
+  // one gender would silently hide the other's products from a generic
+  // "watches" search.
+  sunglasses: "sunglasses",
+  gafas: "sunglasses",
+  furniture: "furniture",
+  muebles: "furniture",
+  mueble: "furniture",
+};
+
+// Longest keys first so "cell phones" is tried before "phones" would
+// otherwise shadow it via a looser match.
+const CATEGORY_SYNONYM_KEYS = Object.keys(CATEGORY_SYNONYMS).sort((a, b) => b.length - a.length);
+
+function matchCategorySynonym(message: string): { key: string; slug: string } | null {
+  const folded = foldText(message);
+  for (const key of CATEGORY_SYNONYM_KEYS) {
+    if (new RegExp(`\\b${key.replace(/\s+/g, "\\s+")}\\b`).test(folded)) {
+      return { key, slug: CATEGORY_SYNONYMS[key] };
+    }
+  }
+  return null;
 }
 
 function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutMs = 5000): Promise<Response> {
