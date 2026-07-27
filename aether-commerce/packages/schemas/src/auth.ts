@@ -21,6 +21,7 @@ export const permissionSchema = z.enum([
   "refunds.create",
   "users.read",
   "reviews.moderate",
+  "contacts.read",
   "coupons.manage",
   "settings.manage",
   "audit.read",

@@ -201,6 +201,13 @@ adminRoutes.patch("/reviews/:id/moderation", requirePermission("reviews.moderate
   return ok(c, { id: c.req.param("id"), status: c.req.valid("json").status });
 });
 
+adminRoutes.get("/contact-messages", requirePermission("contacts.read"), async (c) => {
+  const rows = await c.env.DB.prepare(
+    "select id, name, email, subject, message, locale, email_status, created_at from contact_messages order by created_at desc limit 100"
+  ).all<Record<string, unknown>>();
+  return ok(c, rows.results);
+});
+
 adminRoutes.post("/refunds", requirePermission("refunds.create"), (c) => ok(c, { simulated: true, provider: "stripe_sandbox" }, 201));
 adminRoutes.get("/audit", requirePermission("audit.read"), async (c) => ok(c, (await c.env.DB.prepare("select * from audit_logs order by created_at desc limit 100").all()).results));
 adminRoutes.get("/settings", requirePermission("settings.manage"), async (c) => ok(c, (await c.env.DB.prepare("select * from application_settings").all()).results));
