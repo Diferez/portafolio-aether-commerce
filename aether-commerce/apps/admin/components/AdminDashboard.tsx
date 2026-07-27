@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/react";
 import { AlertTriangle, Boxes, ChevronDown, Download, Mail, PackageCheck, Shield, UsersRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { apiBaseUrl } from "./config";
@@ -49,6 +50,7 @@ export function AdminDashboard({ demo = false }: { demo?: boolean }) {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [messagesStatus, setMessagesStatus] = useState<"loading" | "ready" | "forbidden" | "error">("loading");
   const [openMessageId, setOpenMessageId] = useState<string | null>(null);
+  const { isLoaded, getToken } = useAuth();
 
   useEffect(() => {
     const path = demo ? "/api/v1/admin/demo/summary" : "/api/v1/admin/summary";
@@ -64,8 +66,16 @@ export function AdminDashboard({ demo = false }: { demo?: boolean }) {
   }, [demo]);
 
   useEffect(() => {
-    fetch(`${apiBaseUrl}/api/v1/admin/contact-messages`)
-      .then(async (response) => {
+    if (!isLoaded) return;
+    let cancelled = false;
+
+    void (async () => {
+      const token = await getToken().catch(() => null);
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/v1/admin/contact-messages`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        if (cancelled) return;
         if (response.status === 403) {
           setMessagesStatus("forbidden");
           return;
@@ -77,9 +87,15 @@ export function AdminDashboard({ demo = false }: { demo?: boolean }) {
         } else {
           setMessagesStatus("error");
         }
-      })
-      .catch(() => setMessagesStatus("error"));
-  }, [demo]);
+      } catch {
+        if (!cancelled) setMessagesStatus("error");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [demo, isLoaded, getToken]);
 
   const metrics: Array<[string, string, LucideIcon]> = [
     ["Revenue", money(summary.revenue), PackageCheck],
