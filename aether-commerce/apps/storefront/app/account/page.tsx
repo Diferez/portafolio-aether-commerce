@@ -11,7 +11,7 @@ export default function AccountPage() {
   const signOut = useSignOutCustomer();
 
   function logout() {
-    signOut(() => {
+    void signOut(() => {
       window.location.href = storefrontPath("/login");
     });
   }
