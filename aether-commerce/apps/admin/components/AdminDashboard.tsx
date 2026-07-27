@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Boxes, Download, PackageCheck, Shield, UsersRound } from "lucide-react";
+import { AlertTriangle, Boxes, ChevronDown, Download, Mail, PackageCheck, Shield, UsersRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { apiBaseUrl } from "./config";
 
@@ -15,6 +15,17 @@ type Summary = {
 };
 
 type AdminModule = [title: string, body: string, rows: string[]];
+
+type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  locale: string;
+  email_status: string | null;
+  created_at: string;
+};
 
 const fallback: Summary = {
   mode: "demo",
@@ -35,6 +46,9 @@ function money(cents: number) {
 export function AdminDashboard({ demo = false }: { demo?: boolean }) {
   const [summary, setSummary] = useState<Summary>(fallback);
   const [status, setStatus] = useState(demo ? "Demo data" : "Private admin");
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [messagesStatus, setMessagesStatus] = useState<"loading" | "ready" | "forbidden" | "error">("loading");
+  const [openMessageId, setOpenMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     const path = demo ? "/api/v1/admin/demo/summary" : "/api/v1/admin/summary";
@@ -47,6 +61,24 @@ export function AdminDashboard({ demo = false }: { demo?: boolean }) {
         }
       })
       .catch(() => setStatus("Offline demo"));
+  }, [demo]);
+
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/api/v1/admin/contact-messages`)
+      .then(async (response) => {
+        if (response.status === 403) {
+          setMessagesStatus("forbidden");
+          return;
+        }
+        const payload = (await response.json()) as { success: boolean; data?: ContactMessage[] };
+        if (payload.success && payload.data) {
+          setMessages(payload.data);
+          setMessagesStatus("ready");
+        } else {
+          setMessagesStatus("error");
+        }
+      })
+      .catch(() => setMessagesStatus("error"));
   }, [demo]);
 
   const metrics: Array<[string, string, LucideIcon]> = [
@@ -128,6 +160,65 @@ export function AdminDashboard({ demo = false }: { demo?: boolean }) {
             </button>
           </div>
         ))}
+      </section>
+
+      <section id="messages" className="mt-6 rounded-lg border border-zinc-200 bg-white">
+        <div className="border-b border-zinc-200 p-4">
+          <h2 className="text-lg font-semibold">Contact messages</h2>
+          <p className="text-sm text-zinc-500">
+            Every submission from the portfolio and storefront contact forms lands in the same D1 table.
+          </p>
+        </div>
+        {messagesStatus === "forbidden" ? (
+          <p className="p-4 text-sm text-zinc-500">
+            {demo
+              ? "Public demo mode hides real visitor messages."
+              : "Your role does not have the contacts.read permission."}
+          </p>
+        ) : messagesStatus === "error" ? (
+          <p className="p-4 text-sm text-zinc-500">Could not load contact messages.</p>
+        ) : messagesStatus === "loading" ? (
+          <p className="p-4 text-sm text-zinc-500">Loading...</p>
+        ) : messages.length === 0 ? (
+          <p className="p-4 text-sm text-zinc-500">No messages yet.</p>
+        ) : (
+          messages.map((entry) => {
+            const isOpen = openMessageId === entry.id;
+            return (
+              <div key={entry.id} className="border-b border-zinc-200 last:border-b-0">
+                <button
+                  type="button"
+                  onClick={() => setOpenMessageId(isOpen ? null : entry.id)}
+                  aria-expanded={isOpen}
+                  className="focus-ring grid w-full gap-1 p-4 text-left md:grid-cols-[1fr_1fr_180px_24px] md:items-center md:gap-3"
+                >
+                  <span className="font-semibold text-zinc-950">{entry.name}</span>
+                  <span className="truncate text-sm text-zinc-600">{entry.subject}</span>
+                  <span className="text-xs text-zinc-500">
+                    {new Date(entry.created_at).toLocaleString()}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    aria-hidden
+                    className={`justify-self-end text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {isOpen ? (
+                  <div className="grid gap-2 border-t border-zinc-100 bg-zinc-50 p-4 text-sm">
+                    <p className="flex items-center gap-2 text-zinc-600">
+                      <Mail size={14} aria-hidden />
+                      <a href={`mailto:${entry.email}`} className="underline">
+                        {entry.email}
+                      </a>
+                      <span className="text-zinc-400">&middot; {entry.locale}</span>
+                    </p>
+                    <p className="whitespace-pre-wrap text-zinc-700">{entry.message}</p>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })
+        )}
       </section>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">
