@@ -6,6 +6,7 @@ import type { Product } from "@aether/schemas";
 import { Badge, Button, Input, Select, Sheet } from "@aether/ui";
 import { apiBaseUrl, storefrontPath } from "./config";
 import { addProductToCart } from "./cart-client";
+import { useCustomerSession } from "./customer-client";
 import { demoProducts } from "./demo-products";
 import { readFavoriteProducts, toggleFavoriteProduct } from "./favorites-client";
 import { useLanguage } from "./LanguageProvider";
@@ -87,6 +88,7 @@ export function ProductGrid({
 }) {
   const syncUrl = !compact;
   const { locale, t } = useLanguage();
+  const { customer } = useCustomerSession();
   const [urlParams, setUrlParams] = useQueryState(syncUrl);
 
   const [queryInput, setQueryInput] = useState(() => urlParams.get("q") ?? "");
@@ -200,15 +202,11 @@ export function ProductGrid({
   }, [compact, page, pageSize, sort, debouncedQuery, flag, fixedCategory, category, brand, minPrice, maxPrice, minRating, hasDiscount, inStock, excludeSlug]);
 
   useEffect(() => {
-    const syncFavorites = () => setFavoriteIds(readFavoriteProducts().map((product) => product.id));
+    const syncFavorites = () => setFavoriteIds(readFavoriteProducts(customer).map((product) => product.id));
     syncFavorites();
     window.addEventListener("aether-favorites-changed", syncFavorites);
-    window.addEventListener("aether-customer-changed", syncFavorites);
-    return () => {
-      window.removeEventListener("aether-favorites-changed", syncFavorites);
-      window.removeEventListener("aether-customer-changed", syncFavorites);
-    };
-  }, []);
+    return () => window.removeEventListener("aether-favorites-changed", syncFavorites);
+  }, [customer]);
 
   const sortOptions: Array<{ value: SortValue; label: string }> = useMemo(
     () => [
@@ -245,8 +243,8 @@ export function ProductGrid({
   }
 
   function toggleFavorite(product: Product) {
-    toggleFavoriteProduct(product);
-    setFavoriteIds(readFavoriteProducts().map((candidate) => candidate.id));
+    toggleFavoriteProduct(product, customer);
+    setFavoriteIds(readFavoriteProducts(customer).map((candidate) => candidate.id));
   }
 
   function goToPage(nextPage: number) {

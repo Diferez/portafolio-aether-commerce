@@ -1,23 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Heart, LogOut, MapPin, PackageCheck, ShieldCheck, UserRound } from "lucide-react";
 import { storefrontPath } from "../../components/config";
-import { getCurrentCustomer, logoutCustomer, type CustomerSession } from "../../components/customer-client";
+import { useCustomerSession, useSignOutCustomer } from "../../components/customer-client";
 import { useLanguage } from "../../components/LanguageProvider";
 
 export default function AccountPage() {
   const { t } = useLanguage();
-  const [customer, setCustomer] = useState<CustomerSession | null>(null);
-
-  useEffect(() => {
-    setCustomer(getCurrentCustomer());
-  }, []);
+  const { customer, isLoaded } = useCustomerSession();
+  const signOut = useSignOutCustomer();
 
   function logout() {
-    logoutCustomer();
-    setCustomer(null);
-    window.location.href = storefrontPath("/login");
+    signOut(() => {
+      window.location.href = storefrontPath("/login");
+    });
+  }
+
+  if (!isLoaded) {
+    return null;
   }
 
   if (!customer) {

@@ -5,8 +5,8 @@ import { Heart, Menu, Search, ShoppingCart, Sparkles, UserRound, X } from "lucid
 import { Badge } from "@aether/ui";
 import { portfolioUrl, storefrontPath } from "./config";
 import { readLocalCartItems } from "./cart-client";
-import { getCurrentCustomer, type CustomerSession } from "./customer-client";
-import { readFavoriteProducts } from "./favorites-client";
+import { useCustomerSession } from "./customer-client";
+import { migrateGuestFavoritesToCustomer, readFavoriteProducts } from "./favorites-client";
 import { useLanguage } from "./LanguageProvider";
 import { migrateLegacyAetherStorage } from "./legacy-storage";
 import { ThemeToggle } from "./ThemeToggle";
@@ -24,7 +24,7 @@ function useQueryParam(name: string) {
 
 export function SiteHeader() {
   const { locale, setLocale, t } = useLanguage();
-  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const { customer } = useCustomerSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
@@ -44,26 +44,21 @@ export function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    const syncCustomer = () => setCustomer(getCurrentCustomer());
-    syncCustomer();
-    window.addEventListener("aether-customer-changed", syncCustomer);
-    return () => window.removeEventListener("aether-customer-changed", syncCustomer);
-  }, []);
+    if (customer) migrateGuestFavoritesToCustomer(customer);
+  }, [customer]);
 
   useEffect(() => {
     const syncCart = () => setCartCount(readLocalCartItems().reduce((sum, item) => sum + item.quantity, 0));
-    const syncFavorites = () => setFavoriteCount(readFavoriteProducts().length);
+    const syncFavorites = () => setFavoriteCount(readFavoriteProducts(customer).length);
     syncCart();
     syncFavorites();
     window.addEventListener("aether-cart-changed", syncCart);
     window.addEventListener("aether-favorites-changed", syncFavorites);
-    window.addEventListener("aether-customer-changed", syncFavorites);
     return () => {
       window.removeEventListener("aether-cart-changed", syncCart);
       window.removeEventListener("aether-favorites-changed", syncFavorites);
-      window.removeEventListener("aether-customer-changed", syncFavorites);
     };
-  }, []);
+  }, [customer]);
 
   const accountHref = customer ? "/account" : "/login";
   const accountLabel = customer ? customer.name.split(" ")[0] : t.signIn;

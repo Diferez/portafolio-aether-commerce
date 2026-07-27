@@ -16,7 +16,7 @@ import {
   updateCartItemQuantity,
   getCartToken
 } from "../../components/cart-client";
-import { getCurrentCustomer } from "../../components/customer-client";
+import { useCustomerSession } from "../../components/customer-client";
 import { useLanguage } from "../../components/LanguageProvider";
 
 type CheckoutPayload = {
@@ -27,6 +27,7 @@ type CheckoutPayload = {
 
 export default function CartPage() {
   const { locale, t } = useLanguage();
+  const { customer } = useCustomerSession();
   const [cart, setCart] = useState<Cart | null>(null);
   const [status, setStatus] = useState<string>(t.loadingCart);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,7 +133,7 @@ export default function CartPage() {
   }
 
   async function checkout() {
-    if (!getCurrentCustomer()) {
+    if (!customer) {
       window.location.href = storefrontPath("/register?next=/cart&checkout=1");
       return;
     }

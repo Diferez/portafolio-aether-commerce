@@ -7,35 +7,27 @@ import type { Product } from "@aether/schemas";
 import { Badge, Button } from "@aether/ui";
 import { storefrontPath } from "../../../components/config";
 import { addProductToCart } from "../../../components/cart-client";
-import { getCurrentCustomer, type CustomerSession } from "../../../components/customer-client";
+import { useCustomerSession } from "../../../components/customer-client";
 import { readFavoriteProducts, removeFavoriteProduct } from "../../../components/favorites-client";
 import { useLanguage } from "../../../components/LanguageProvider";
 import { getLocalizedProduct } from "../../../components/product-localization";
 
 export default function FavoritesPage() {
   const { locale, t } = useLanguage();
-  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const { customer } = useCustomerSession();
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [movingId, setMovingId] = useState<string | null>(null);
 
-  function syncFavorites() {
-    setCustomer(getCurrentCustomer());
-    setFavorites(readFavoriteProducts());
-  }
-
   useEffect(() => {
+    const syncFavorites = () => setFavorites(readFavoriteProducts(customer));
     syncFavorites();
     window.addEventListener("aether-favorites-changed", syncFavorites);
-    window.addEventListener("aether-customer-changed", syncFavorites);
-    return () => {
-      window.removeEventListener("aether-favorites-changed", syncFavorites);
-      window.removeEventListener("aether-customer-changed", syncFavorites);
-    };
-  }, []);
+    return () => window.removeEventListener("aether-favorites-changed", syncFavorites);
+  }, [customer]);
 
   function remove(productId: string) {
-    removeFavoriteProduct(productId);
-    syncFavorites();
+    removeFavoriteProduct(productId, customer);
+    setFavorites(readFavoriteProducts(customer));
   }
 
   async function moveToCart(product: Product) {

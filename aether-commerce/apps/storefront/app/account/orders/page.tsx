@@ -1,46 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { PackageCheck, ShoppingBag } from "lucide-react";
 import { formatUsd } from "@aether/core";
+import { createAetherClient } from "@aether/api-client";
 import type { Order } from "@aether/schemas";
 import { apiBaseUrl, storefrontPath } from "../../../components/config";
-import { getCurrentCustomer, type CustomerSession } from "../../../components/customer-client";
+import { useCustomerSession } from "../../../components/customer-client";
 import { useLanguage } from "../../../components/LanguageProvider";
 
 type OrderStatus = "loading" | "ready" | "empty" | "signed-out" | "error";
 
 export default function OrdersPage() {
   const { locale, t } = useLanguage();
-  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const { customer, isLoaded } = useCustomerSession();
+  const { getToken } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [status, setStatus] = useState<OrderStatus>("loading");
 
   useEffect(() => {
-    const currentCustomer = getCurrentCustomer();
-    setCustomer(currentCustomer);
-    if (!currentCustomer) {
+    if (!isLoaded) return;
+    if (!customer) {
       setStatus("signed-out");
       return;
     }
 
-    fetch(`${apiBaseUrl}/api/v1/account/orders`, {
-      headers: {
-        "x-aether-customer-email": currentCustomer.email
-      }
-    })
-      .then((response) => response.json() as Promise<{ success?: boolean; data?: Order[] }>)
+    setStatus("loading");
+    const client = createAetherClient({
+      baseUrl: apiBaseUrl,
+      getToken: async () => (await getToken()) ?? undefined
+    });
+    client
+      .orders()
       .then((payload) => {
         if (!payload.success) {
           setStatus("error");
           return;
         }
-        const nextOrders = payload.data ?? [];
+        const nextOrders = payload.data;
         setOrders(nextOrders);
         setStatus(nextOrders.length > 0 ? "ready" : "empty");
       })
       .catch(() => setStatus("error"));
-  }, []);
+  }, [isLoaded, customer, getToken]);
 
   return (
     <main className="aether-shell py-8">

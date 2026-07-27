@@ -7,6 +7,7 @@ import { formatUsd } from "@aether/core";
 import { Badge, Button } from "@aether/ui";
 import { apiBaseUrl, storefrontPath } from "../../../components/config";
 import { addProductToCart } from "../../../components/cart-client";
+import { useCustomerSession } from "../../../components/customer-client";
 import { demoProducts } from "../../../components/demo-products";
 import { readFavoriteProducts, toggleFavoriteProduct } from "../../../components/favorites-client";
 import { useLanguage } from "../../../components/LanguageProvider";
@@ -34,6 +35,7 @@ function useSlug() {
 
 export default function ProductDetailByQueryPage() {
   const { locale, t } = useLanguage();
+  const { customer } = useCustomerSession();
   const slug = useSlug();
   const fallback = useMemo(() => demoProducts.find((candidate) => candidate.slug === slug) ?? null, [slug]);
   const [product, setProduct] = useState<Product | null>(null);
@@ -73,8 +75,8 @@ export default function ProductDetailByQueryPage() {
 
   useEffect(() => {
     if (!product) return;
-    setIsFavorite(readFavoriteProducts().some((candidate) => candidate.id === product.id));
-  }, [product]);
+    setIsFavorite(readFavoriteProducts(customer).some((candidate) => candidate.id === product.id));
+  }, [product, customer]);
 
   async function addToCart() {
     if (!product) return;
@@ -91,7 +93,7 @@ export default function ProductDetailByQueryPage() {
 
   function toggleFavorite() {
     if (!product) return;
-    const result = toggleFavoriteProduct(product);
+    const result = toggleFavoriteProduct(product, customer);
     setIsFavorite(result === "added");
   }
 

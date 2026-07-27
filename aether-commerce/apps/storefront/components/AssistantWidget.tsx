@@ -6,7 +6,7 @@ import { formatUsd } from "@aether/core";
 import { addProductReferenceToCart, getCartId, getCartToken, readLocalCart, replaceLocalCartItems } from "./cart-client";
 import type { Cart, CartItem } from "@aether/schemas";
 import { aiAssistantUrl, storefrontPath } from "./config";
-import { getCurrentCustomer, type CustomerSession } from "./customer-client";
+import { useCustomerSession } from "./customer-client";
 import { useLanguage } from "./LanguageProvider";
 
 type AssistantProduct = {
@@ -128,15 +128,8 @@ export function AssistantWidget() {
     [locale]
   );
 
-  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const { customer } = useCustomerSession();
   const [footerCart, setFooterCart] = useState<Cart | null>(null);
-
-  useEffect(() => {
-    const syncCustomer = () => setCustomer(getCurrentCustomer());
-    syncCustomer();
-    window.addEventListener("aether-customer-changed", syncCustomer);
-    return () => window.removeEventListener("aether-customer-changed", syncCustomer);
-  }, []);
 
   // Lets other components (e.g. the Hero's "Talk to Aether AI" CTA) open the
   // widget without prop-drilling, matching the aether-cart-changed pattern.

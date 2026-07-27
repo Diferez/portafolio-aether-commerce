@@ -1,12 +1,12 @@
 "use client";
 
 import type { Product } from "@aether/schemas";
-import { getCurrentCustomer, type CustomerSession } from "./customer-client";
+import type { CustomerSession } from "./customer-client";
 
 // Versioned for the same reason as cart-client.ts's keys - see legacy-storage.ts.
 const guestFavoritesKey = "aether.favoritesItems.guest.dummyjson.v1";
 
-function favoritesKey(customer: CustomerSession | null = getCurrentCustomer()) {
+function favoritesKey(customer: CustomerSession | null) {
   return customer ? `aether.favoritesItems.${customer.id}.dummyjson.v1` : guestFavoritesKey;
 }
 
@@ -22,16 +22,16 @@ function writeProductsToKey(key: string, products: Product[]) {
   window.localStorage.setItem(key, JSON.stringify(products));
 }
 
-export function readFavoriteProducts() {
-  return readProductsFromKey(favoritesKey());
+export function readFavoriteProducts(customer: CustomerSession | null) {
+  return readProductsFromKey(favoritesKey(customer));
 }
 
-export function isFavoriteProduct(productId: string) {
-  return readFavoriteProducts().some((product) => product.id === productId);
+export function isFavoriteProduct(productId: string, customer: CustomerSession | null) {
+  return readFavoriteProducts(customer).some((product) => product.id === productId);
 }
 
-export function toggleFavoriteProduct(product: Product) {
-  const key = favoritesKey();
+export function toggleFavoriteProduct(product: Product, customer: CustomerSession | null) {
+  const key = favoritesKey(customer);
   const products = readProductsFromKey(key);
   const exists = products.some((candidate) => candidate.id === product.id);
   const nextProducts = exists ? products.filter((candidate) => candidate.id !== product.id) : [product, ...products];
@@ -40,8 +40,8 @@ export function toggleFavoriteProduct(product: Product) {
   return exists ? "removed" : "added";
 }
 
-export function removeFavoriteProduct(productId: string) {
-  const key = favoritesKey();
+export function removeFavoriteProduct(productId: string, customer: CustomerSession | null) {
+  const key = favoritesKey(customer);
   writeProductsToKey(
     key,
     readProductsFromKey(key).filter((product) => product.id !== productId)
