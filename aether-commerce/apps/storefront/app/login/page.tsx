@@ -28,7 +28,7 @@ const clerkAppearance = {
 
 export default function LoginPage() {
   const { t } = useLanguage();
-  const { isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
 
   function nextPath() {
     if (typeof window === "undefined") return "/account";
@@ -53,7 +53,9 @@ export default function LoginPage() {
         <p className="mt-3 text-sm leading-6 text-ink-muted">{t.loginDescription}</p>
 
         <div className="mt-6 flex justify-center">
-          <SignIn routing="hash" signUpUrl={storefrontPath("/register")} appearance={clerkAppearance} />
+          {isLoaded && !isSignedIn ? (
+            <SignIn routing="hash" signUpUrl={storefrontPath("/register")} appearance={clerkAppearance} />
+          ) : null}
         </div>
       </section>
     </main>
