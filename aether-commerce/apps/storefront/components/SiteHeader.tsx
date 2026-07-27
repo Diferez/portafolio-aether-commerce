@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Heart, Menu, Search, ShoppingCart, Sparkles, UserRound, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ExternalLink, Heart, Menu, Search, Settings2, ShoppingCart, Sparkles, UserRound, X } from "lucide-react";
 import { Badge } from "@aether/ui";
 import { portfolioUrl, storefrontPath } from "./config";
 import { readLocalCartItems } from "./cart-client";
@@ -129,10 +129,7 @@ export function SiteHeader() {
           </a>
         </nav>
 
-        <div className="hidden shrink-0 items-center rounded-md border border-border bg-surface-hover p-1 sm:flex" aria-label={locale === "es" ? "Idioma" : "Language"}>
-          <LanguageButtons locale={locale} setLocale={setLocale} />
-        </div>
-        <ThemeToggle className="focus-ring hidden h-10 w-10 items-center justify-center rounded-md border border-border text-ink-muted hover:bg-surface-hover hover:text-ink sm:inline-flex" />
+        <SettingsMenu locale={locale} setLocale={setLocale} />
         <a
           href={storefrontPath(accountHref)}
           className="focus-ring hidden min-h-10 items-center gap-2 rounded-md border border-border px-3 text-sm font-semibold text-ink hover:bg-surface-hover lg:inline-flex"
@@ -140,14 +137,6 @@ export function SiteHeader() {
           <UserRound size={16} aria-hidden />
           {accountLabel}
         </a>
-        {portfolioUrl ? (
-          <a
-            href={portfolioUrl}
-            className="focus-ring hidden rounded-md border border-border px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-hover sm:inline-flex"
-          >
-            {t.portfolio}
-          </a>
-        ) : null}
 
         <button
           type="button"
@@ -294,5 +283,98 @@ function LanguageButtons({
         </button>
       ))}
     </>
+  );
+}
+
+// Bundles language, theme, and the portfolio link (all low-frequency, "site
+// preferences" style controls) behind a single trigger instead of three
+// separate always-visible bordered buttons - that's what made the header
+// feel crowded next to the actual shopping actions (cart, favorites, account).
+function SettingsMenu({
+  locale,
+  setLocale
+}: {
+  locale: "en" | "es";
+  setLocale: (locale: "en" | "es") => void;
+}) {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(event: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className="relative hidden shrink-0 sm:block">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t.settings}
+        className="focus-ring inline-flex h-10 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-medium text-ink-muted hover:bg-surface-hover hover:text-ink"
+      >
+        <Settings2 size={16} aria-hidden />
+        <span className="hidden xl:inline">{locale.toUpperCase()}</span>
+      </button>
+
+      {open ? (
+        <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-56 rounded-lg border border-border bg-surface p-2 shadow-lg">
+          <p className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-ink-subtle">{t.language}</p>
+          <div className="grid grid-cols-2 gap-1 px-1 pb-2">
+            {(["en", "es"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => {
+                  setLocale(option);
+                  setOpen(false);
+                }}
+                aria-pressed={locale === option}
+                className={`min-h-9 rounded-md text-sm font-semibold ${
+                  locale === option ? "bg-accent text-white" : "text-ink-muted hover:bg-surface-hover"
+                }`}
+              >
+                {option.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="my-1 h-px bg-border" />
+          <ThemeToggle label={{ light: t.lightMode, dark: t.darkMode }} />
+
+          {portfolioUrl ? (
+            <>
+              <div className="my-1 h-px bg-border" />
+              <a
+                href={portfolioUrl}
+                role="menuitem"
+                className="focus-ring flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-ink hover:bg-surface-hover"
+              >
+                <ExternalLink size={16} aria-hidden />
+                {t.viewPortfolio}
+              </a>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }

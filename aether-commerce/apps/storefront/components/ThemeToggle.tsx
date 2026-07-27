@@ -15,7 +15,14 @@ function applyTheme(theme: "light" | "dark") {
   window.dispatchEvent(new Event("aether-theme-changed"));
 }
 
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({
+  className,
+  label
+}: {
+  className?: string;
+  /** When provided, renders as a full-width labeled row (for menus) instead of an icon-only square button. */
+  label?: { light: string; dark: string };
+}) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
@@ -27,6 +34,23 @@ export function ThemeToggle({ className }: { className?: string }) {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     applyTheme(next);
+  }
+
+  if (label) {
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        aria-pressed={theme === "dark"}
+        className={
+          className ??
+          "focus-ring flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-ink hover:bg-surface-hover"
+        }
+      >
+        {theme === "dark" ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
+        {theme === "dark" ? label.light : label.dark}
+      </button>
+    );
   }
 
   return (
