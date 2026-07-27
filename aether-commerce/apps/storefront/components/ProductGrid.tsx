@@ -105,7 +105,7 @@ export function ProductGrid({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [flag] = useState<"featured" | "deal" | "new" | "">(initialFlag);
 
-  const [products, setProducts] = useState<Product[]>(compact ? [] : demoProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<CatalogStatus>("demo");
   const [statusMessage, setStatusMessage] = useState("");

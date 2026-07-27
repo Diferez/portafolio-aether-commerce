@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useLayoutEffect, useMemo, useState } from "react";
 import { dictionaries, type Locale } from "@aether/i18n";
 
 type Dictionary = (typeof dictionaries)[Locale];
@@ -29,11 +29,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // is "es". The real locale is applied right after mount instead.
   const [locale, setLocaleState] = useState<Locale>("en");
 
-  useEffect(() => {
+  // useLayoutEffect (not useEffect) so this correction lands before the
+  // browser paints - combined with the data-locale-pending attribute set by
+  // the blocking inline script in app/layout.tsx (which hides <body> until
+  // this runs), that avoids ever painting the "en" default for clients whose
+  // real locale is "es".
+  useLayoutEffect(() => {
     setLocaleState(detectLocale());
+    document.documentElement.removeAttribute("data-locale-pending");
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
 
