@@ -1,6 +1,7 @@
 "use client";
 
-import { SignIn } from "@clerk/react";
+import { useEffect } from "react";
+import { SignIn, useAuth } from "@clerk/react";
 import { LogIn } from "lucide-react";
 import { storefrontPath } from "../../components/config";
 import { useLanguage } from "../../components/LanguageProvider";
@@ -27,12 +28,19 @@ const clerkAppearance = {
 
 export default function LoginPage() {
   const { t } = useLanguage();
+  const { isSignedIn } = useAuth();
 
   function nextPath() {
     if (typeof window === "undefined") return "/account";
     const next = new URLSearchParams(window.location.search).get("next");
     return next?.startsWith("/") ? next : "/account";
   }
+
+  useEffect(() => {
+    if (isSignedIn) {
+      window.location.href = storefrontPath(nextPath());
+    }
+  }, [isSignedIn]);
 
   return (
     <main className="aether-shell py-8">
@@ -45,12 +53,7 @@ export default function LoginPage() {
         <p className="mt-3 text-sm leading-6 text-ink-muted">{t.loginDescription}</p>
 
         <div className="mt-6 flex justify-center">
-          <SignIn
-            routing="hash"
-            signUpUrl={storefrontPath("/register")}
-            fallbackRedirectUrl={storefrontPath(nextPath())}
-            appearance={clerkAppearance}
-          />
+          <SignIn routing="hash" signUpUrl={storefrontPath("/register")} appearance={clerkAppearance} />
         </div>
       </section>
     </main>
