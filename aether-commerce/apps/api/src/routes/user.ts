@@ -18,9 +18,12 @@ const reviewSchema = z.object({
   body: z.string().min(10).max(1200)
 });
 
-function actorId(c: Context<AppBindings>) {
-  const actor = c.get("actor");
-  return actor.userId ?? c.req.header("x-aether-anonymous-id") ?? "anonymous-demo";
+// Every route below scopes data by this id, so it must only ever come from a
+// verified Clerk session (set by the auth middleware from a validated JWT) -
+// never from a client-supplied header, which would let any caller impersonate
+// another user's id with no credentials at all.
+function requireUserId(c: Context<AppBindings>): string | null {
+  return c.get("actor").userId ?? null;
 }
 
 export const userRoutes = new Hono<AppBindings>();
@@ -40,11 +43,17 @@ userRoutes.patch("/me", zValidator("json", profileSchema), async (c) => {
   return ok(c, { id: actor.userId, ...c.req.valid("json") });
 });
 
-userRoutes.get("/cart", async (c) => ok(c, await readCart(c.env, actorId(c))));
+userRoutes.get("/cart", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view your cart.");
+  return ok(c, await readCart(c.env, userId));
+});
 
 userRoutes.post("/cart/items", zValidator("json", cartItemInputSchema), async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your cart.");
   try {
-    return ok(c, await addItem(c.env, actorId(c), c.req.valid("json")), 201);
+    return ok(c, await addItem(c.env, userId, c.req.valid("json")), 201);
   } catch {
     return fail(c, 404, "PRODUCT_NOT_FOUND", "Product not found.");
   }
@@ -54,55 +63,77 @@ userRoutes.patch(
   "/cart/items/:id",
   zValidator("json", z.object({ quantity: z.number().int().min(1).max(25) })),
   async (c) => {
+    const userId = requireUserId(c);
+    if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your cart.");
     const itemId = c.req.param("id");
     const quantity = c.req.valid("json").quantity;
-    return ok(c, await updateItemQuantity(c.env, actorId(c), itemId, quantity));
+    return ok(c, await updateItemQuantity(c.env, userId, itemId, quantity));
   }
 );
 
 userRoutes.delete("/cart/items/:id", async (c) => {
-  const cart = await readCart(c.env, actorId(c));
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your cart.");
+  const cart = await readCart(c.env, userId);
   const itemId = c.req.param("id");
   return ok(c, await writeCart(c.env, { ...cart, items: cart.items.filter((item) => item.productId !== itemId && item.variantId !== itemId) }));
 });
 
-userRoutes.delete("/cart", async (c) => ok(c, await writeCart(c.env, { ...(await readCart(c.env, actorId(c))), items: [] })));
+userRoutes.delete("/cart", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your cart.");
+  return ok(c, await writeCart(c.env, { ...(await readCart(c.env, userId)), items: [] }));
+});
 
 userRoutes.post(
   "/cart/coupon",
   zValidator("json", z.object({ code: z.string().min(3).max(32) })),
-  async (c) => ok(c, await applyCoupon(c.env, actorId(c), c.req.valid("json").code))
+  async (c) => {
+    const userId = requireUserId(c);
+    if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your cart.");
+    return ok(c, await applyCoupon(c.env, userId, c.req.valid("json").code));
+  }
 );
 
 userRoutes.get("/favorites", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view your favorites.");
   const rows = await c.env.DB.prepare("select product_id from favorites where user_id = ? order by created_at desc")
-    .bind(actorId(c))
+    .bind(userId)
     .all<{ product_id: string }>();
   return ok(c, rows.results.map((row) => row.product_id));
 });
 
 userRoutes.post("/favorites/:productId", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to save favorites.");
   await c.env.DB.prepare("insert or ignore into favorites (id, user_id, product_id) values (?, ?, ?)")
-    .bind(crypto.randomUUID(), actorId(c), c.req.param("productId"))
+    .bind(crypto.randomUUID(), userId, c.req.param("productId"))
     .run();
   return ok(c, { productId: c.req.param("productId"), saved: true }, 201);
 });
 
 userRoutes.delete("/favorites/:productId", async (c) => {
-  await c.env.DB.prepare("delete from favorites where user_id = ? and product_id = ?").bind(actorId(c), c.req.param("productId")).run();
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your favorites.");
+  await c.env.DB.prepare("delete from favorites where user_id = ? and product_id = ?").bind(userId, c.req.param("productId")).run();
   return ok(c, { productId: c.req.param("productId"), saved: false });
 });
 
 userRoutes.get("/compare", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view your comparison list.");
   const row = await c.env.DB.prepare("select product_ids_json from product_comparisons where id = ?")
-    .bind(actorId(c))
+    .bind(userId)
     .first<{ product_ids_json: string }>();
   return ok(c, row ? JSON.parse(row.product_ids_json) : []);
 });
 
 userRoutes.post("/compare/:productId", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your comparison list.");
   const row = await c.env.DB.prepare("select product_ids_json from product_comparisons where id = ?")
-    .bind(actorId(c))
+    .bind(userId)
     .first<{ product_ids_json: string }>();
   const ids = new Set<string>(row ? (JSON.parse(row.product_ids_json) as string[]) : []);
   ids.add(c.req.param("productId"));
@@ -112,25 +143,29 @@ userRoutes.post("/compare/:productId", async (c) => {
      values (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
      on conflict(id) do update set product_ids_json = excluded.product_ids_json, updated_at = CURRENT_TIMESTAMP`
   )
-    .bind(actorId(c), c.get("actor").userId ?? null, c.get("actor").userId ? null : actorId(c), JSON.stringify(next))
+    .bind(userId, userId, null, JSON.stringify(next))
     .run();
   return ok(c, next, 201);
 });
 
 userRoutes.delete("/compare/:productId", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your comparison list.");
   const row = await c.env.DB.prepare("select product_ids_json from product_comparisons where id = ?")
-    .bind(actorId(c))
+    .bind(userId)
     .first<{ product_ids_json: string }>();
   const next = (row ? (JSON.parse(row.product_ids_json) as string[]) : []).filter((id) => id !== c.req.param("productId"));
   await c.env.DB.prepare("update product_comparisons set product_ids_json = ?, updated_at = CURRENT_TIMESTAMP where id = ?")
-    .bind(JSON.stringify(next), actorId(c))
+    .bind(JSON.stringify(next), userId)
     .run();
   return ok(c, next);
 });
 
 userRoutes.get("/addresses", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view your addresses.");
   const rows = await c.env.DB.prepare("select payload_json from user_addresses where user_id = ? and deleted_at is null")
-    .bind(actorId(c))
+    .bind(userId)
     .all<{ payload_json: string }>();
   return collection(c, rows.results.map((row) => JSON.parse(row.payload_json) as Record<string, unknown>), {
     page: 1,
@@ -141,34 +176,42 @@ userRoutes.get("/addresses", async (c) => {
 });
 
 userRoutes.post("/addresses", zValidator("json", addressSchema), async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to save an address.");
   const id = crypto.randomUUID();
   const address = { id, ...c.req.valid("json") };
   await c.env.DB.prepare(
     `insert into user_addresses (id, user_id, label, full_name, country, payload_json, created_at, updated_at)
      values (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
   )
-    .bind(id, actorId(c), "Default", address.fullName, address.country, JSON.stringify(address))
+    .bind(id, userId, "Default", address.fullName, address.country, JSON.stringify(address))
     .run();
   return ok(c, address, 201);
 });
 
 userRoutes.patch("/addresses/:id", zValidator("json", addressSchema.partial()), async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your address.");
   await c.env.DB.prepare("update user_addresses set payload_json = json_patch(payload_json, ?), updated_at = CURRENT_TIMESTAMP where id = ? and user_id = ?")
-    .bind(JSON.stringify(c.req.valid("json")), c.req.param("id"), actorId(c))
+    .bind(JSON.stringify(c.req.valid("json")), c.req.param("id"), userId)
     .run();
   return ok(c, { id: c.req.param("id"), updated: true });
 });
 
 userRoutes.delete("/addresses/:id", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your address.");
   await c.env.DB.prepare("update user_addresses set deleted_at = CURRENT_TIMESTAMP where id = ? and user_id = ?")
-    .bind(c.req.param("id"), actorId(c))
+    .bind(c.req.param("id"), userId)
     .run();
   return ok(c, { id: c.req.param("id"), deleted: true });
 });
 
 userRoutes.get("/orders", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view your orders.");
   const rows = await c.env.DB.prepare("select payload_json from orders where user_id = ? order by created_at desc")
-    .bind(actorId(c))
+    .bind(userId)
     .all<{ payload_json: string }>();
   return collection(c, rows.results.map((row) => JSON.parse(row.payload_json) as Record<string, unknown>), {
     page: 1,
@@ -179,36 +222,48 @@ userRoutes.get("/orders", async (c) => {
 });
 
 userRoutes.get("/orders/:id", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to view this order.");
   const row = await c.env.DB.prepare("select payload_json from orders where id = ? and user_id = ?")
-    .bind(c.req.param("id"), actorId(c))
+    .bind(c.req.param("id"), userId)
     .first<{ payload_json: string }>();
   return row ? ok(c, JSON.parse(row.payload_json)) : fail(c, 404, "ORDER_NOT_FOUND", "Order not found.");
 });
 
 for (const action of ["cancel", "return", "refund-request"] as const) {
-  userRoutes.post(`/orders/:id/${action}`, (c) => ok(c, { orderId: c.req.param("id"), action, status: "requested" }, 201));
+  userRoutes.post(`/orders/:id/${action}`, (c) => {
+    const userId = requireUserId(c);
+    if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to manage this order.");
+    return ok(c, { orderId: c.req.param("id"), action, status: "requested" }, 201);
+  });
 }
 
 userRoutes.post("/products/:id/reviews", zValidator("json", reviewSchema), async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to leave a review.");
   const id = crypto.randomUUID();
   await c.env.DB.prepare(
     "insert into reviews (id, user_id, product_id, rating, title, body, status, created_at, updated_at) values (?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
   )
-    .bind(id, actorId(c), c.req.param("id"), c.req.valid("json").rating, c.req.valid("json").title, c.req.valid("json").body)
+    .bind(id, userId, c.req.param("id"), c.req.valid("json").rating, c.req.valid("json").title, c.req.valid("json").body)
     .run();
   return ok(c, { id, status: "pending" }, 201);
 });
 
 userRoutes.patch("/reviews/:id", zValidator("json", reviewSchema.partial()), async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your review.");
   await c.env.DB.prepare("update reviews set title = coalesce(?, title), body = coalesce(?, body), updated_at = CURRENT_TIMESTAMP where id = ? and user_id = ?")
-    .bind(c.req.valid("json").title ?? null, c.req.valid("json").body ?? null, c.req.param("id"), actorId(c))
+    .bind(c.req.valid("json").title ?? null, c.req.valid("json").body ?? null, c.req.param("id"), userId)
     .run();
   return ok(c, { id: c.req.param("id"), updated: true });
 });
 
 userRoutes.delete("/reviews/:id", async (c) => {
+  const userId = requireUserId(c);
+  if (!userId) return fail(c, 401, "AUTH_REQUIRED", "Sign in to update your review.");
   await c.env.DB.prepare("update reviews set status = 'hidden', updated_at = CURRENT_TIMESTAMP where id = ? and user_id = ?")
-    .bind(c.req.param("id"), actorId(c))
+    .bind(c.req.param("id"), userId)
     .run();
   return ok(c, { id: c.req.param("id"), deleted: true });
 });
