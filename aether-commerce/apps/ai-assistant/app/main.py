@@ -10,6 +10,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Res
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, StreamingResponse
 
+from app.cart_token import verify_cart_token
 from app.clients.aether import AetherApiClient
 from app.config import Settings, get_settings, parse_cors_allowed_origins
 from app.graph import AssistantGraph
@@ -148,6 +149,8 @@ async def authorize_conversation_access(
     *,
     session_id: str,
     user_id: str | None,
+    cart_token: str | None,
+    cart_token_secret: str,
 ) -> None:
     conversation = await storage.get_conversation_metadata(conversation_id)
     if not conversation or conversation.get("status") in {"deleted", "expired"}:
@@ -159,6 +162,13 @@ async def authorize_conversation_access(
             raise HTTPException(status_code=403, detail="Forbidden")
         return
 
+    # For anonymous conversations, x-aether-session-id/x-aether-cart-id are
+    # just client-supplied strings - anyone could claim someone else's cart
+    # id. Require the same HMAC-signed cart token used to authorize cart
+    # mutations as proof the caller actually controls that cart/session, not
+    # just the bare header match below.
+    if not verify_cart_token(cart_token, cart_token_secret, session_id):
+        raise HTTPException(status_code=403, detail="Forbidden")
     if conversation.get("session_hash") != (stable_hash(session_id) or "anonymous"):
         raise HTTPException(status_code=403, detail="Forbidden")
 
@@ -457,10 +467,18 @@ async def get_conversation(
     authorization: str | None = Header(default=None),
     x_aether_cart_id: str | None = Header(default=None),
     x_aether_session_id: str | None = Header(default=None),
+    x_aether_cart_token: str | None = Header(default=None),
 ) -> dict[str, object]:
     session_id = x_aether_session_id or x_aether_cart_id or "anonymous"
     user_id = await resolve_actor_user_id(graph, authorization)
-    await authorize_conversation_access(storage, str(thread_id), session_id=session_id, user_id=user_id)
+    await authorize_conversation_access(
+        storage,
+        str(thread_id),
+        session_id=session_id,
+        user_id=user_id,
+        cart_token=x_aether_cart_token,
+        cart_token_secret=settings.aether_cart_token_secret,
+    )
     messages = await storage.list_messages(str(thread_id), settings.ai_max_conversation_messages)
     return {
         "thread_id": str(thread_id),
@@ -475,16 +493,25 @@ async def get_conversation(
 async def delete_conversation(
     thread_id: UUID,
     storage: AssistantStorage = Depends(get_storage),
+    settings: Settings = Depends(get_settings),
     graph: AssistantGraph = Depends(get_graph),
     authorization: str | None = Header(default=None),
     x_aether_cart_id: str | None = Header(default=None),
     x_aether_session_id: str | None = Header(default=None),
+    x_aether_cart_token: str | None = Header(default=None),
 ) -> dict[str, object]:
     if not thread_id:
         raise HTTPException(status_code=404, detail="Conversation not found")
     session_id = x_aether_session_id or x_aether_cart_id or "anonymous"
     user_id = await resolve_actor_user_id(graph, authorization)
-    await authorize_conversation_access(storage, str(thread_id), session_id=session_id, user_id=user_id)
+    await authorize_conversation_access(
+        storage,
+        str(thread_id),
+        session_id=session_id,
+        user_id=user_id,
+        cart_token=x_aether_cart_token,
+        cart_token_secret=settings.aether_cart_token_secret,
+    )
     await storage.delete_conversation(str(thread_id))
     return {"thread_id": str(thread_id), "deleted": True}
 

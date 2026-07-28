@@ -189,7 +189,7 @@ export function AssistantWidget() {
       try {
         const response = await fetch(
           `${aiAssistantUrl.replace(/\/$/, "")}/v1/assistant/conversations/${encodeURIComponent(storedThreadId)}`,
-          { headers: { "x-aether-session-id": getCartId() } }
+          { headers: await assistantRequestHeaders() }
         );
         if (!response.ok) return;
         const payload = (await response.json()) as {

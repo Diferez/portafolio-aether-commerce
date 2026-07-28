@@ -1,3 +1,9 @@
+import base64
+import hashlib
+import hmac
+import json
+import time
+
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
 from starlette.requests import Request
@@ -10,6 +16,13 @@ from app.rate_limit import InMemoryConcurrencyLimiter, InMemoryRateLimiter
 from app.schemas import AssistantMessageRequest
 from app.security import stable_hash
 from app.storage import InMemoryAssistantStorage
+
+
+def _sign_cart_token(secret: str, payload: dict[str, object]) -> str:
+    encoded_payload = base64.urlsafe_b64encode(json.dumps(payload).encode("utf-8")).decode("ascii").rstrip("=")
+    signature = hmac.new(secret.encode("utf-8"), encoded_payload.encode("ascii"), hashlib.sha256).digest()
+    encoded_signature = base64.urlsafe_b64encode(signature).decode("ascii").rstrip("=")
+    return f"{encoded_payload}.{encoded_signature}"
 
 
 def test_health_ready_and_metrics_endpoints() -> None:
@@ -391,23 +404,33 @@ def test_conversation_read_requires_owner_session() -> None:
     import asyncio
 
     asyncio.run(seed(storage))
+    settings = Settings(aether_cart_token_secret="shared-secret")
+    owner_token = _sign_cart_token("shared-secret", {"cartId": "session-hash", "exp": int(time.time()) + 60})
     try:
+        app.dependency_overrides[get_settings] = lambda: settings
         with TestClient(app) as client:
             client.app.state.storage = storage
             allowed = client.get(
                 "/v1/assistant/conversations/11111111-1111-4111-8111-111111111111",
-                headers={"x-aether-session-id": "session-hash"},
+                headers={"x-aether-session-id": "session-hash", "x-aether-cart-token": owner_token},
             )
-            forbidden = client.get(
+            forbidden_wrong_session = client.get(
                 "/v1/assistant/conversations/11111111-1111-4111-8111-111111111111",
-                headers={"x-aether-session-id": "other-session"},
+                headers={"x-aether-session-id": "other-session", "x-aether-cart-token": owner_token},
+            )
+            forbidden_no_token = client.get(
+                "/v1/assistant/conversations/11111111-1111-4111-8111-111111111111",
+                headers={"x-aether-session-id": "session-hash"},
             )
     finally:
         app.dependency_overrides.clear()
 
     assert allowed.status_code == 200
     assert len(allowed.json()["messages"]) == 1
-    assert forbidden.status_code == 403
+    assert forbidden_wrong_session.status_code == 403
+    # Regression check: a bare session-id header claiming ownership, with no
+    # signed proof, must not be enough to read someone else's conversation.
+    assert forbidden_no_token.status_code == 403
 
 
 def test_conversation_delete_requires_owner_session() -> None:
@@ -419,21 +442,31 @@ def test_conversation_delete_requires_owner_session() -> None:
     import asyncio
 
     asyncio.run(seed(storage))
+    settings = Settings(aether_cart_token_secret="shared-secret")
+    owner_token = _sign_cart_token("shared-secret", {"cartId": "session-hash", "exp": int(time.time()) + 60})
     try:
+        app.dependency_overrides[get_settings] = lambda: settings
         with TestClient(app) as client:
             client.app.state.storage = storage
-            forbidden = client.delete(
+            forbidden_no_token = client.delete(
                 "/v1/assistant/conversations/22222222-2222-4222-8222-222222222222",
-                headers={"x-aether-session-id": "other-session"},
+                headers={"x-aether-session-id": "session-hash"},
+            )
+            forbidden_wrong_session = client.delete(
+                "/v1/assistant/conversations/22222222-2222-4222-8222-222222222222",
+                headers={"x-aether-session-id": "other-session", "x-aether-cart-token": owner_token},
             )
             allowed = client.delete(
                 "/v1/assistant/conversations/22222222-2222-4222-8222-222222222222",
-                headers={"x-aether-session-id": "session-hash"},
+                headers={"x-aether-session-id": "session-hash", "x-aether-cart-token": owner_token},
             )
     finally:
         app.dependency_overrides.clear()
 
-    assert forbidden.status_code == 403
+    # Regression check: a bare session-id header claiming ownership, with no
+    # signed proof, must not be enough to delete someone else's conversation.
+    assert forbidden_no_token.status_code == 403
+    assert forbidden_wrong_session.status_code == 403
     assert allowed.status_code == 200
     assert "22222222-2222-4222-8222-222222222222" not in storage.messages
 
