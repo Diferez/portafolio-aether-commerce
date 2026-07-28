@@ -57,7 +57,14 @@ export function CategoryGrid({ limit }: { limit?: number }) {
             </span>
             <h3 className="mt-4 text-base font-semibold text-zinc-950 group-hover:text-accent">{name}</h3>
             <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{body}</p>
-            {count > 0 ? <p className="mt-3 text-xs font-medium text-zinc-500">{t.productsCount.replace("{count}", String(count))}</p> : null}
+            {/* Reserves the count line's height up front - the 10 count
+                fetches below resolve independently over time, and since
+                these cards sit in a CSS grid, any card growing taller
+                shifts the whole row (and everything below it) each time
+                one more count pops in. */}
+            <div className="mt-3 min-h-[1rem]">
+              {count > 0 ? <p className="text-xs font-medium text-zinc-500">{t.productsCount.replace("{count}", String(count))}</p> : null}
+            </div>
           </a>
         );
       })}
