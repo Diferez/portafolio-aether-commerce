@@ -129,7 +129,14 @@ export function SiteHeader() {
             aria-label={t.favorites}
           >
             <Heart size={17} aria-hidden />
-            {favoriteCount > 0 ? <Badge tone="accent">{favoriteCount}</Badge> : null}
+            {/* Always rendered (never conditionally omitted) so this slot's
+                width is reserved from the very first paint - favoriteCount
+                starts at 0 until the layout effect resolves it, and if the
+                badge only mounted once count > 0, its appearance would widen
+                the nav and shift everything after it. */}
+            <Badge tone="accent" className={favoriteCount > 0 ? "" : "invisible"}>
+              {favoriteCount}
+            </Badge>
           </a>
           <a
             href={storefrontPath("/cart")}
@@ -137,7 +144,9 @@ export function SiteHeader() {
             aria-label={t.cart}
           >
             <ShoppingCart size={17} aria-hidden />
-            {cartCount > 0 ? <Badge tone="accent">{cartCount}</Badge> : null}
+            <Badge tone="accent" className={cartCount > 0 ? "" : "invisible"}>
+              {cartCount}
+            </Badge>
           </a>
         </nav>
 
