@@ -53,7 +53,7 @@ export function CategoryGrid({ limit }: { limit?: number }) {
               <Icon size={20} aria-hidden />
             </span>
             <h3 className="mt-4 text-base font-semibold text-zinc-950 group-hover:text-accent">{name}</h3>
-            <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{body}</p>
+            <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-600">{body}</p>
             {/* Reserves the count line's height up front so the card (and
                 the CSS grid row it's in) doesn't resize once the counts
                 fetch below resolves. */}
