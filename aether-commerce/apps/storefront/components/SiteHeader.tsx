@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ExternalLink, Heart, Menu, Search, Settings2, ShoppingCart, Sparkles, UserRound, X } from "lucide-react";
 import { Badge } from "@aether/ui";
 import { portfolioUrl, storefrontPath } from "./config";
@@ -24,7 +24,7 @@ function useQueryParam(name: string) {
 
 export function SiteHeader() {
   const { locale, setLocale, t } = useLanguage();
-  const { customer } = useCustomerSession();
+  const { customer, isLoaded: customerLoaded } = useCustomerSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
@@ -47,18 +47,30 @@ export function SiteHeader() {
     if (customer) migrateGuestFavoritesToCustomer(customer);
   }, [customer]);
 
-  useEffect(() => {
+  // Cart isn't customer-scoped, so it can sync as soon as we mount - no need
+  // to wait on anything. useLayoutEffect (not useEffect) applies it before
+  // the browser paints, so the badge is correct on the very first frame
+  // instead of popping in a beat later.
+  useLayoutEffect(() => {
     const syncCart = () => setCartCount(readLocalCartItems().reduce((sum, item) => sum + item.quantity, 0));
-    const syncFavorites = () => setFavoriteCount(readFavoriteProducts(customer).length);
     syncCart();
-    syncFavorites();
     window.addEventListener("aether-cart-changed", syncCart);
+    return () => window.removeEventListener("aether-cart-changed", syncCart);
+  }, []);
+
+  // Favorites ARE customer-scoped (guest bucket vs. that customer's own
+  // bucket), and Clerk resolves the real session asynchronously. Wait for
+  // customerLoaded before reading favorites at all, instead of reading the
+  // guest bucket first and then re-reading the customer's bucket once Clerk
+  // catches up - that two-step read is what was showing a different count
+  // for a moment, i.e. the header "changing twice" on every navigation.
+  useLayoutEffect(() => {
+    if (!customerLoaded) return;
+    const syncFavorites = () => setFavoriteCount(readFavoriteProducts(customer).length);
+    syncFavorites();
     window.addEventListener("aether-favorites-changed", syncFavorites);
-    return () => {
-      window.removeEventListener("aether-cart-changed", syncCart);
-      window.removeEventListener("aether-favorites-changed", syncFavorites);
-    };
-  }, [customer]);
+    return () => window.removeEventListener("aether-favorites-changed", syncFavorites);
+  }, [customerLoaded, customer]);
 
   const accountHref = customer ? "/account" : "/login";
   const accountLabel = customer ? customer.name.split(" ")[0] : t.signIn;
