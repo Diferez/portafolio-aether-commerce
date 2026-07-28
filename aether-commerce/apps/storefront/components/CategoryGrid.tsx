@@ -26,20 +26,17 @@ export function CategoryGrid({ limit }: { limit?: number }) {
 
   useEffect(() => {
     let cancelled = false;
-    void Promise.all(
-      cards.map(([, , slug]) =>
-        fetch(`${apiBaseUrl}/api/v1/catalog/products?category=${encodeURIComponent(slug)}&pageSize=1`)
-          .then((response) => response.json())
-          .then((payload: { pagination?: { total?: number } }) => [slug, payload.pagination?.total ?? 0] as const)
-          .catch(() => [slug, 0] as const)
-      )
-    ).then((entries) => {
-      if (!cancelled) setCounts(Object.fromEntries(entries));
-    });
+    fetch(`${apiBaseUrl}/api/v1/catalog/categories/counts`)
+      .then((response) => response.json())
+      .then((payload: { success?: boolean; data?: Array<{ slug: string; count: number }> }) => {
+        if (cancelled || !payload.success || !payload.data) return;
+        setCounts(Object.fromEntries(payload.data.map(({ slug, count }) => [slug, count])));
+      })
+      .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [cards]);
+  }, []);
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -57,11 +54,9 @@ export function CategoryGrid({ limit }: { limit?: number }) {
             </span>
             <h3 className="mt-4 text-base font-semibold text-zinc-950 group-hover:text-accent">{name}</h3>
             <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{body}</p>
-            {/* Reserves the count line's height up front - the 10 count
-                fetches below resolve independently over time, and since
-                these cards sit in a CSS grid, any card growing taller
-                shifts the whole row (and everything below it) each time
-                one more count pops in. */}
+            {/* Reserves the count line's height up front so the card (and
+                the CSS grid row it's in) doesn't resize once the counts
+                fetch below resolves. */}
             <div className="mt-3 min-h-[1rem]">
               {count > 0 ? <p className="text-xs font-medium text-zinc-500">{t.productsCount.replace("{count}", String(count))}</p> : null}
             </div>

@@ -4,7 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import { productQuerySchema } from "@aether/schemas";
 import type { AppBindings } from "../types";
 import { collection, fail, ok } from "../http";
-import { getBrands, getCatalogProducts, getCategories, getProductBySlug } from "../services/catalog";
+import { getBrands, getCatalogProducts, getCategories, getCategoryCounts, getProductBySlug } from "../services/catalog";
 
 export const catalogRoutes = new Hono<AppBindings>();
 
@@ -31,6 +31,11 @@ catalogRoutes.get("/products/:slug", async (c) => {
 catalogRoutes.get("/categories", async (c) => {
   cachePublicCatalog(c);
   return ok(c, await getCategories(c.env));
+});
+
+catalogRoutes.get("/categories/counts", async (c) => {
+  cachePublicCatalog(c);
+  return ok(c, await getCategoryCounts(c.env));
 });
 
 catalogRoutes.get("/brands", async (c) => {

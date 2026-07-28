@@ -324,6 +324,19 @@ export async function getCategories(env: Env) {
   return [...map.values()];
 }
 
+// One pass over the already-cached catalog source instead of one filtered
+// query per category - lets callers show per-category counts (e.g. a
+// category grid) without firing N separate requests.
+export async function getCategoryCounts(env: Env) {
+  const data = await getCatalogSource(env);
+  const counts = new Map<string, number>();
+  data.forEach((product) => {
+    const slug = product.category.slug;
+    counts.set(slug, (counts.get(slug) ?? 0) + 1);
+  });
+  return [...counts.entries()].map(([slug, count]) => ({ slug, count }));
+}
+
 export async function clearCatalogCache(env: Env) {
   memoryCatalogCache = null;
   try {
