@@ -51,11 +51,11 @@ export function FloatingCart() {
         <div
           className="mb-3 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-chat border border-chat-border bg-chat-bg shadow-2xl"
           role="dialog"
-          aria-label={locale === "es" ? "Carrito rapido" : "Quick cart"}
+          aria-label={locale === "es" ? "Carrito rápido" : "Quick cart"}
         >
           <div className="flex items-center justify-between border-b border-chat-border bg-chat-surface px-4 py-3">
             <div>
-              <p className="text-sm font-semibold text-chat-text">{locale === "es" ? "Carrito rapido" : "Quick cart"}</p>
+              <p className="text-sm font-semibold text-chat-text">{locale === "es" ? "Carrito rápido" : "Quick cart"}</p>
               <p className="text-xs text-chat-text-muted">
                 {itemCount} {itemCount === 1 ? t.product.toLowerCase() : locale === "es" ? "productos" : "products"}
               </p>
@@ -115,7 +115,7 @@ export function FloatingCart() {
         onClick={() => setIsOpen((current) => !current)}
         className="focus-ring group flex h-14 w-14 items-center justify-center gap-3 rounded-full border border-chat-border bg-chat-surface text-chat-text shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-chat-surface-alt sm:w-auto sm:justify-start sm:px-4"
         aria-expanded={isOpen}
-        aria-label={locale === "es" ? "Abrir carrito rapido" : "Open quick cart"}
+        aria-label={locale === "es" ? "Abrir carrito rápido" : "Open quick cart"}
       >
         <span className="relative grid h-9 w-9 place-items-center rounded-full bg-chat-success/20 text-chat-success">
           <ShoppingCart size={18} aria-hidden />

@@ -110,7 +110,6 @@ export type LandingContent = {
     eyebrow: string;
     title: string;
     description: string;
-    primaryCta: string;
     secondaryCta: string;
     storeCta: string;
     storeUnavailable: string;

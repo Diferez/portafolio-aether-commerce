@@ -187,36 +187,36 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
   },
   es: {
     eyebrow: "Arquitectura",
-    title: "Diseno del sistema Aether",
+    title: "Diseño del sistema Aether",
     description:
-      "Aether esta construido como una demo de comercio conectada al portafolio: una experiencia estatica para clientes, respaldada por una API Worker, persistencia en D1, pagos de prueba con Stripe y despliegues automatizables con una huella operativa pequena.",
+      "Aether está construido como una demo de comercio conectada al portafolio: una experiencia estática para clientes, respaldada por una API Worker, persistencia en D1, pagos de prueba con Stripe y despliegues automatizables con una huella operativa pequeña.",
     items: [
       {
-        title: "Front estatico unificado",
-        body: "El portafolio y la tienda Aether se publican juntos como un front estatico. Las paginas se mantienen rapidas, cacheables e independientes de renderizado en servidor.",
+        title: "Front estático unificado",
+        body: "El portafolio y la tienda Aether se publican juntos como un front estático. Las páginas se mantienen rápidas, cacheables e independientes de renderizado en servidor.",
         Icon: Blocks
       },
       {
         title: "API en Cloudflare Worker",
-        body: "Las rutas con Hono manejan catalogo, carritos, mensajes de contacto, checkout, webhooks, identificadores de request, errores seguros y el limite entre front y backend.",
+        body: "Las rutas con Hono manejan catálogo, carritos, mensajes de contacto, checkout, webhooks, identificadores de request, errores seguros y el límite entre front y backend.",
         Icon: ServerCog
       },
       {
         title: "Capa de datos con Cloudflare D1",
-        body: "D1, basado en SQLite, guarda carritos, ordenes, productos, mensajes de contacto, eventos de webhook, eventos de correo y registros operativos de la demo.",
+        body: "D1, basado en SQLite, guarda carritos, órdenes, productos, mensajes de contacto, eventos de webhook, eventos de correo y registros operativos de la demo.",
         Icon: Database
       },
       {
-        title: "Separacion de secretos",
-        body: "Stripe, autenticacion preparada para Clerk, Resend y la configuracion de Cloudinary permanecen del lado del servidor en secretos del Worker o variables de despliegue.",
+        title: "Separación de secretos",
+        body: "Stripe, autenticación preparada para Clerk, Resend y la configuración de Cloudinary permanecen del lado del servidor en secretos del Worker o variables de despliegue.",
         Icon: KeyRound
       }
     ],
     runtime: {
-      eyebrow: "Mapa de ejecucion",
-      title: "Limites claros entre UI, API, datos y servicios externos.",
-      body: "El front no posee secretos ni toma decisiones finales de comercio. Renderiza la experiencia, envia intenciones al Worker y recibe respuestas normalizadas seguras para el navegador.",
-      client: "Portafolio + tienda estatica",
+      eyebrow: "Mapa de ejecución",
+      title: "Límites claros entre UI, API, datos y servicios externos.",
+      body: "El front no posee secretos ni toma decisiones finales de comercio. Renderiza la experiencia, envía intenciones al Worker y recibe respuestas normalizadas seguras para el navegador.",
+      client: "Portafolio + tienda estática",
       hub: "API Worker con Hono",
       deployNote: "Solo en despliegue",
       services: [
@@ -228,7 +228,7 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
     },
     infra: {
       eyebrow: "Infraestructura",
-      title: "Que se despliega en realidad, y donde.",
+      title: "Qué se despliega en realidad, y dónde.",
       body: "Cada push a main corre el mismo workflow de GitHub Actions: build, tests y despliegue de cada pieza a su propio recurso de Cloudflare. Nada se despliega a mano.",
       repo: "Repositorio en GitHub (main)",
       ci: "GitHub Actions CI/CD",
@@ -249,7 +249,7 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
     },
     charts: {
       apiTitle: "Superficie de API por dominio",
-      apiDescription: "Handlers de ruta definidos realmente en la API Worker, contados directo del codigo fuente - no trafico de muestra.",
+      apiDescription: "Handlers de ruta definidos realmente en la API Worker, contados directo del código fuente - no tráfico de muestra.",
       apiUnit: "endpoints",
       apiTotal: "endpoints en 8 grupos de rutas",
       dataTitle: "Modelo de datos por dominio",
@@ -258,38 +258,38 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
       dataTotal: "tablas en 7 dominios"
     },
     apiDomains: [
-      { label: "Administracion", count: 28 },
+      { label: "Administración", count: 28 },
       { label: "Cuenta del cliente", count: 25 },
-      { label: "Navegacion de tienda", count: 12 },
+      { label: "Navegación de tienda", count: 12 },
       { label: "Carrito", count: 6 },
-      { label: "Catalogo", count: 4 },
+      { label: "Catálogo", count: 4 },
       { label: "Checkout", count: 2 },
       { label: "Contacto", count: 1 },
       { label: "Webhooks", count: 1 }
     ],
     dataDomains: [
-      { label: "Comercio y catalogo", count: 10 },
-      { label: "Ordenes y pagos", count: 9 },
+      { label: "Comercio y catálogo", count: 10 },
+      { label: "Órdenes y pagos", count: 9 },
       { label: "Asistente de IA", count: 6 },
       { label: "Usuarios y accesos", count: 6 },
-      { label: "Resenas y engagement", count: 5 },
-      { label: "Administracion", count: 4 },
+      { label: "Reseñas y engagement", count: 5 },
+      { label: "Administración", count: 4 },
       { label: "Notificaciones", count: 3 }
     ],
     flows: [
       {
-        title: "Flujo de catalogo",
-        body: "Los datos externos de productos se normalizan al contrato de Aether, se filtran por imagenes y nombres utiles, se combinan con reglas locales y se exponen en respuestas paginadas.",
+        title: "Flujo de catálogo",
+        body: "Los datos externos de productos se normalizan al contrato de Aether, se filtran por imágenes y nombres útiles, se combinan con reglas locales y se exponen en respuestas paginadas.",
         Icon: Workflow
       },
       {
         title: "Carrito y checkout",
-        body: "El navegador mantiene el carrito fluido, mientras el Worker recalcula precios, valida cantidades, crea sesiones de checkout de prueba con Stripe y registra ordenes despues de eventos de pago confirmados.",
+        body: "El navegador mantiene el carrito fluido, mientras el Worker recalcula precios, valida cantidades, crea sesiones de checkout de prueba con Stripe y registra órdenes después de eventos de pago confirmados.",
         Icon: ShoppingCart
       },
       {
         title: "Contacto y notificaciones",
-        body: "Los formularios del portafolio y la tienda publican en la misma API Worker. D1 conserva el historial y Resend puede enviar notificaciones cuando las credenciales estan configuradas.",
+        body: "Los formularios del portafolio y la tienda publican en la misma API Worker. D1 conserva el historial y Resend puede enviar notificaciones cuando las credenciales están configuradas.",
         Icon: Mail
       },
       {
@@ -299,12 +299,12 @@ const copy: Record<"en" | "es", ArchitectureCopy> = {
       },
       {
         title: "Controles operativos",
-        body: "La demo usa comportamiento seguro para publico, checkout protegido, validacion en API, webhooks idempotentes y secretos del lado del servidor para evitar exponer claves en el cliente.",
+        body: "La demo usa comportamiento seguro para público, checkout protegido, validación en API, webhooks idempotentes y secretos del lado del servidor para evitar exponer claves en el cliente.",
         Icon: ShieldCheck
       },
       {
-        title: "Diseno consciente del free tier",
-        body: "La arquitectura favorece assets estaticos, endpoints Worker, D1, lecturas cacheadas de catalogo y pagos sandbox para operar dentro de restricciones practicas de una demo en Cloudflare.",
+        title: "Diseño consciente del free tier",
+        body: "La arquitectura favorece assets estáticos, endpoints Worker, D1, lecturas cacheadas de catálogo y pagos sandbox para operar dentro de restricciones prácticas de una demo en Cloudflare.",
         Icon: Cloud
       }
     ]

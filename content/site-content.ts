@@ -38,7 +38,6 @@ export const content = {
       items: [
         { label: "Inicio", href: "#inicio" },
         { label: "Servicios", href: "#servicios" },
-        { label: "Experiencia", href: "#experiencia" },
         { label: "Proyectos", href: "#proyectos" },
         { label: "Inteligencia artificial", href: "#ia" },
         { label: "Tecnologías", href: "#tecnologias" },
@@ -55,7 +54,6 @@ export const content = {
         "Construyo productos digitales completos, escalables y preparados para crecer.",
       description:
         "Desarrollo aplicaciones web, plataformas SaaS, APIs, arquitecturas cloud, sistemas de pago y soluciones de automatización con inteligencia artificial.",
-      primaryCta: "Ver experiencia",
       secondaryCta: "Iniciar un proyecto",
       storeCta: "Explorar tienda demo",
       storeUnavailable: "Tienda demo próximamente",
@@ -672,7 +670,6 @@ export const content = {
       title: "I build complete, scalable digital products designed to grow.",
       description:
         "I develop web applications, SaaS platforms, APIs, cloud architectures, payment systems, and AI-powered automation solutions.",
-      primaryCta: "Explore my experience",
       secondaryCta: "Start a project",
       storeCta: "Explore demo store",
       storeUnavailable: "Demo store coming soon",
