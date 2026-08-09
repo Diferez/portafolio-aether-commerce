@@ -43,7 +43,6 @@ export type ContactContent = {
   eyebrow: string;
   description: string;
   directLabel: string;
-  linkedinLabel: string;
   fields: {
     name: string;
     company: string;
@@ -104,6 +103,7 @@ export type LandingContent = {
     focusLabel: string;
     focus: readonly string[];
     diagramLabel: string;
+    diagramKicker: string;
     diagramNodes: readonly string[];
     diagramCaption: string;
   };

@@ -1,13 +1,12 @@
 export const siteConfig = {
   brandName:
-    process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Diego Fernando Martinez",
+    process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Diego Fernando",
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://portafolio-aether-commerce.pickofwow.workers.dev",
   storeUrl:
     process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
     "https://aether-storefront.pickofwow.workers.dev",
-  githubUrl: "https://github.com/Diferez",
   whatsappUrl: "https://wa.me/message/QUSZJKVQDACUM1",
   availability: {
     es: "Disponible para nuevos proyectos",

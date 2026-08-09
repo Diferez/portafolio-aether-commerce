@@ -4,7 +4,6 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   ExternalLink,
-  GitBranch,
   Globe2,
   Menu,
   MessageSquareText,
@@ -109,7 +108,7 @@ export function LandingPage({ content }: LandingPageProps) {
         <header className="site-header">
           <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
             <span className="brand-mark" aria-hidden="true">
-              DM
+              DF
             </span>
             <span className="brand-copy">
               <strong>{siteConfig.brandName}</strong>
@@ -197,10 +196,6 @@ export function LandingPage({ content }: LandingPageProps) {
                 <a className="button button-dark" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
                   <ArrowDownRight aria-hidden="true" size={17} />
-                </a>
-                <a className="button button-outline" href={siteConfig.githubUrl} target="_blank" rel="noreferrer">
-                  GitHub
-                  <GitBranch aria-hidden="true" size={17} />
                 </a>
                 <a className="text-link" href={`#${ids.contact}`}>
                   {content.hero.contactCta}
@@ -322,7 +317,7 @@ export function LandingPage({ content }: LandingPageProps) {
                   {siteConfig.socialLinks.map((link) => (
                     <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
                       <ExternalLink aria-hidden="true" size={17} />
-                      {content.contact.linkedinLabel}
+                      {link.label}
                       <ArrowUpRight aria-hidden="true" size={15} />
                     </a>
                   ))}
@@ -338,7 +333,7 @@ export function LandingPage({ content }: LandingPageProps) {
         <footer className="site-footer section-frame">
           <div>
             <span className="brand-mark" aria-hidden="true">
-              DM
+              DF
             </span>
             <p>{content.footer.summary}</p>
           </div>
@@ -369,7 +364,7 @@ function SystemDiagram({ content }: { content: LandingContent }) {
   return (
     <figure className="system-diagram">
       <figcaption>
-        <span>SYS / 01</span>
+        <span>{content.hero.diagramKicker}</span>
         {content.hero.diagramLabel}
       </figcaption>
       <div className="diagram-flow" aria-label={content.hero.diagramNodes.join(", ")}>

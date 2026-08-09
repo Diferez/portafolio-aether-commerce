@@ -74,12 +74,18 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.match(en, /used only to respond/);
   assert.match(en, /href="https:\/\/github\.com\/Diferez"/);
   assert.match(en, />GitHub</);
+  assert.doesNotMatch(en, /View professional profile[^]*https:\/\/github\.com\/Diferez/);
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {
   const es = await text("/es");
 
   assert.match(es, /Aether Commerce/);
+  assert.match(es, /Proyectos reales, explicados desde sus decisiones/);
+  assert.match(es, /Entiendo el dominio antes de proponer arquitectura/);
+  assert.match(es, /Del usuario a producción/);
+  assert.doesNotMatch(es, /SYS \/ 01/);
+  assert.doesNotMatch(es, /Sistema \/ producto/);
   assert.match(es, /FastAPI\/LangGraph está validada en Docker/);
   assert.match(es, /PostgreSQL y Redis permanece documentado como siguiente etapa/);
   assert.match(es, /tokens de carrito e idempotencia/);

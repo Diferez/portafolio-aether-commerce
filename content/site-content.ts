@@ -59,10 +59,11 @@ export const content = {
       location: "Colombia · remoto internacional",
       focusLabel: "Áreas de trabajo",
       focus: ["Backend & APIs", "Cloud", "Fintech", "IA aplicada"],
-      diagramLabel: "Sistema / producto",
-      diagramNodes: ["Interfaz", "Servicios", "Datos", "Operación"],
+      diagramKicker: "Lectura técnica",
+      diagramLabel: "Del usuario a producción",
+      diagramNodes: ["Experiencia", "Servicios y reglas", "Datos e integraciones", "Entrega operable"],
       diagramCaption:
-        "Trabajo sobre el sistema completo, con mayor profundidad donde viven la lógica, los datos y las integraciones.",
+        "Conecto lo que el usuario necesita con APIs, persistencia, pagos, seguridad, observabilidad y despliegue.",
     },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
@@ -95,7 +96,7 @@ export const content = {
     },
     projects: {
       eyebrow: "02 / Trabajo seleccionado",
-      title: "Casos de estudio, no vitrinas.",
+      title: "Proyectos reales, explicados desde sus decisiones.",
       description:
         "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto. Sin métricas inventadas ni nombres confidenciales.",
       problemLabel: "Problema",
@@ -278,7 +279,7 @@ export const content = {
     },
     approach: {
       eyebrow: "04 / Enfoque",
-      title: "Primero entiendo el sistema; luego decido la forma.",
+      title: "Entiendo el dominio antes de proponer arquitectura.",
       description:
         "Trabajo por incrementos revisables y hago explícitos los riesgos temprano. La arquitectura debe facilitar el cambio, no volverlo ceremonial.",
       steps: [
@@ -311,7 +312,6 @@ export const content = {
       description:
         "Cuéntame el contexto, el estado actual y qué necesita cambiar. Respondo mejor a problemas concretos que a briefs llenos de adjetivos.",
       directLabel: "Canales directos",
-      linkedinLabel: "Ver perfil profesional",
       fields: {
         name: "Nombre",
         company: "Empresa",
@@ -398,10 +398,11 @@ export const content = {
       location: "Colombia · international remote",
       focusLabel: "Areas of work",
       focus: ["Backend & APIs", "Cloud", "Fintech", "Applied AI"],
-      diagramLabel: "System / product",
-      diagramNodes: ["Interface", "Services", "Data", "Operations"],
+      diagramKicker: "Technical read",
+      diagramLabel: "From user flow to production",
+      diagramNodes: ["Experience", "Services and rules", "Data and integrations", "Operable delivery"],
       diagramCaption:
-        "I work across the system, with the greatest depth where business logic, data, and integrations live.",
+        "I connect what the user needs with APIs, persistence, payments, security, observability, and deployment.",
     },
     expertise: {
       eyebrow: "01 / Value",
@@ -434,7 +435,7 @@ export const content = {
     },
     projects: {
       eyebrow: "02 / Selected work",
-      title: "Case studies, not showcases.",
+      title: "Real projects, explained through technical decisions.",
       description:
         "Each project explains the problem, ownership, and decisions that sustain the product. No invented metrics or confidential names.",
       problemLabel: "Problem",
@@ -617,7 +618,7 @@ export const content = {
     },
     approach: {
       eyebrow: "04 / Approach",
-      title: "Understand the system first; decide the shape second.",
+      title: "I understand the domain before proposing architecture.",
       description:
         "I work in reviewable increments and make risk visible early. Architecture should make change easier, not ceremonial.",
       steps: [
@@ -650,7 +651,6 @@ export const content = {
       description:
         "Tell me the context, the current state, and what needs to change. I respond better to concrete problems than briefs full of adjectives.",
       directLabel: "Direct channels",
-      linkedinLabel: "View professional profile",
       fields: {
         name: "Name",
         company: "Company",
