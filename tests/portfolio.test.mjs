@@ -37,12 +37,12 @@ async function text(pathname) {
 test("renders Spanish and English without mixing hero copy", async () => {
   const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
-  assert.match(es, /Diseño sistemas/);
-  assert.match(es, /Los llevo a producción/);
-  assert.match(en, /I design systems/);
-  assert.match(en, /I take them to production/);
-  assert.doesNotMatch(es, /I design systems/);
-  assert.doesNotMatch(en, /Diseño sistemas/);
+  assert.match(es, /Construyo sistemas para productos reales/);
+  assert.match(es, /De la arquitectura a producción/);
+  assert.match(en, /I build systems for real products/);
+  assert.match(en, /From architecture to production/);
+  assert.doesNotMatch(es, /I build systems for real products/);
+  assert.doesNotMatch(en, /Construyo sistemas para productos reales/);
 });
 
 test("includes localized navigation, hreflang, and production project link", async () => {
