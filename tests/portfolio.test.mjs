@@ -95,6 +95,19 @@ test("renders honest case-study status and the validated AI architecture", async
   assert.doesNotMatch(es, /99%|10x|millones de usuarios/i);
 });
 
+test("hero architecture graph uses a non-overlapping grid layout", async () => {
+  const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
+
+  assert.match(css, /\.architecture-graph\s*{[^}]*display:\s*grid/s);
+  assert.match(css, /\.diagram-flow\s*{[^}]*grid-template-areas:/s);
+  assert.match(css, /"operation \. rules"/);
+  assert.match(css, /\.diagram-step:nth-child\(1\)\s*{[^}]*grid-area:\s*entry/s);
+  assert.match(css, /\.diagram-step:nth-child\(2\)\s*{[^}]*grid-area:\s*rules/s);
+  assert.match(css, /\.diagram-step:nth-child\(3\)\s*{[^}]*grid-area:\s*state/s);
+  assert.match(css, /\.diagram-step:nth-child\(4\)\s*{[^}]*grid-area:\s*operation/s);
+  assert.doesNotMatch(css, /\.diagram-step:nth-child\([1-4]\)\s*{[^}]*(?:top|right|bottom|left):/s);
+});
+
 test("proxy keeps browser language detection and saved preference", async () => {
   const middleware = await readFile(path.join(root, "proxy.ts"), "utf8");
 

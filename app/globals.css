@@ -272,7 +272,7 @@ h3 {
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr) minmax(330px, 0.68fr);
+  grid-template-columns: 136px minmax(0, 1fr) minmax(430px, 0.72fr);
   grid-template-rows: 1fr auto;
   min-height: min(820px, calc(100svh - 74px));
   border-bottom: 1px solid var(--line);
@@ -290,11 +290,11 @@ h3 {
 }
 
 .hero::before {
-  left: calc(var(--page-pad) + 150px);
+  left: calc(var(--page-pad) + 136px);
 }
 
 .hero::after {
-  right: calc(var(--page-pad) + min(330px, 34vw));
+  right: calc(var(--page-pad) + min(430px, 34vw));
 }
 
 .hero-rail,
@@ -442,11 +442,11 @@ h3 {
   z-index: 1;
   display: grid;
   align-items: center;
-  padding-left: clamp(28px, 4vw, 58px);
+  padding-left: clamp(18px, 2.8vw, 42px);
 }
 
 .system-diagram {
-  width: min(100%, 470px);
+  width: min(100%, 560px);
   border: 1px solid var(--line);
   background:
     radial-gradient(circle at 50% 43%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 36%),
@@ -484,6 +484,7 @@ h3 {
 
 .architecture-graph {
   position: relative;
+  display: grid;
   min-height: 390px;
   margin-top: 24px;
   overflow: hidden;
@@ -491,6 +492,7 @@ h3 {
   background:
     radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--paper) 78%, transparent), transparent 42%),
     color-mix(in srgb, var(--paper-raised) 86%, transparent);
+  padding: clamp(18px, 2vw, 26px);
 }
 
 .architecture-graph::before,
@@ -517,14 +519,14 @@ h3 {
 
 .graph-link-horizontal {
   top: 50%;
-  right: 48px;
-  left: 48px;
+  right: clamp(32px, 8%, 58px);
+  left: clamp(32px, 8%, 58px);
   height: 1px;
 }
 
 .graph-link-vertical {
-  top: 48px;
-  bottom: 48px;
+  top: clamp(32px, 8%, 58px);
+  bottom: clamp(32px, 8%, 58px);
   left: 50%;
   width: 1px;
   background: linear-gradient(180deg, transparent, var(--accent), transparent);
@@ -536,10 +538,10 @@ h3 {
   top: 50%;
   left: 50%;
   display: grid;
-  width: min(58%, 224px);
-  min-height: 148px;
+  width: clamp(128px, 29%, 156px);
+  min-height: 126px;
   place-items: center;
-  padding: 20px 18px;
+  padding: 17px 14px;
   border: 1px solid var(--ink);
   background: var(--ink);
   color: var(--paper);
@@ -571,33 +573,41 @@ h3 {
 }
 
 .graph-core strong {
-  margin-top: 9px;
-  font-size: 1.08rem;
+  margin-top: 8px;
+  font-size: clamp(0.92rem, 1.25vw, 1.08rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
 }
 
 .graph-core p {
-  margin: 10px 0 0;
+  margin: 9px 0 0;
   color: color-mix(in srgb, var(--paper) 74%, transparent);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   line-height: 1.45;
 }
 
 .diagram-flow {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-areas:
+    ". entry ."
+    "operation . rules"
+    ". state .";
+  grid-template-columns: minmax(96px, 1fr) minmax(136px, 0.85fr) minmax(96px, 1fr);
+  grid-template-rows: auto minmax(124px, 1fr) auto;
+  gap: clamp(12px, 1.4vw, 20px);
+  min-height: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .diagram-step {
-  position: absolute;
+  position: relative;
   display: grid;
-  width: 166px;
-  min-height: 96px;
+  width: auto;
+  min-height: 100px;
   align-content: start;
   border: 1px solid var(--line-strong);
   background: color-mix(in srgb, var(--paper-raised) 92%, transparent);
@@ -618,42 +628,27 @@ h3 {
 }
 
 .diagram-step:nth-child(1) {
-  top: 26px;
-  left: 50%;
-  transform: translateX(-50%);
+  grid-area: entry;
 }
 
 .diagram-step:nth-child(2) {
-  top: 50%;
-  right: 22px;
-  transform: translateY(-50%);
+  grid-area: rules;
+  align-self: center;
 }
 
 .diagram-step:nth-child(3) {
-  bottom: 26px;
-  left: 50%;
-  transform: translateX(-50%);
+  grid-area: state;
 }
 
 .diagram-step:nth-child(4) {
-  top: 50%;
-  left: 22px;
-  transform: translateY(-50%);
+  grid-area: operation;
+  align-self: center;
 }
 
 .diagram-step:hover {
   border-color: var(--accent);
   background: var(--paper);
-}
-
-.diagram-step:nth-child(1):hover,
-.diagram-step:nth-child(3):hover {
-  transform: translateX(-50%) translateY(-3px);
-}
-
-.diagram-step:nth-child(2):hover,
-.diagram-step:nth-child(4):hover {
-  transform: translateY(-50%) translateY(-3px);
+  transform: translateY(-3px);
 }
 
 .diagram-step > span {
@@ -1535,11 +1530,11 @@ h3 {
   }
 
   .hero {
-    grid-template-columns: 100px minmax(0, 1fr) minmax(300px, 0.62fr);
+    grid-template-columns: 104px minmax(0, 1fr) minmax(390px, 0.68fr);
   }
 
   .hero::before {
-    left: calc(var(--page-pad) + 100px);
+    left: calc(var(--page-pad) + 104px);
   }
 
   .hero::after {
@@ -1547,7 +1542,7 @@ h3 {
   }
 
   .hero-status {
-    grid-template-columns: 100px 1fr auto;
+    grid-template-columns: 104px 1fr auto;
   }
 
   .section-intro,
@@ -1607,7 +1602,7 @@ h3 {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   .header-contact {
     display: none;
   }
@@ -1663,19 +1658,12 @@ h3 {
   }
 
   .system-diagram {
-    width: 100%;
+    width: min(100%, 620px);
+    margin-inline: auto;
   }
 
   .architecture-graph {
-    min-height: 420px;
-  }
-
-  .diagram-step {
-    width: min(40vw, 184px);
-  }
-
-  .graph-core {
-    width: min(48%, 250px);
+    min-height: 430px;
   }
 
   .hero-status {
@@ -1785,6 +1773,22 @@ h3 {
 
   .contact-copy {
     position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .diagram-flow {
+    grid-template-columns: minmax(112px, 1fr) minmax(132px, 0.8fr) minmax(112px, 1fr);
+    gap: 14px;
+  }
+
+  .graph-core {
+    width: 136px;
+  }
+
+  .diagram-step {
+    min-height: 96px;
+    padding: 12px;
   }
 }
 
