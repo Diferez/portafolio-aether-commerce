@@ -1,5 +1,5 @@
 {
-  "name": "full-stack-portfolio-landing",
+  "name": "diego-portfolio",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -7,12 +7,12 @@
   },
   "scripts": {
     "dev": "vinext dev",
-    "build": "node scripts/build-cloudflare-front.mjs",
-    "build:portfolio": "vinext build",
-    "deploy:preflight": "node scripts/check-github-deploy-config.mjs",
+    "build": "vinext build",
+    "build:cloudflare": "npm run build && node scripts/patch-front-worker-config.mjs",
+    "deploy": "npm run build:cloudflare && wrangler deploy --config dist/server/wrangler.json --keep-vars",
     "start": "vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern aether-commerce"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
@@ -36,7 +36,7 @@
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.0.13",
-    "wrangler": "^4.112.0"
+    "wrangler": "^4.120.0"
   },
   "type": "module"
 }

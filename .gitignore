@@ -52,8 +52,6 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
-aether-commerce/apps/api/wrangler.production.json
-aether-commerce/apps/ai-assistant/wrangler.production.json
 
 # graphify
 graphify-out/

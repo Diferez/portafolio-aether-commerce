@@ -4,7 +4,6 @@ import handler from "vinext/server/app-router-entry";
 
 interface Env {
   ASSETS: Fetcher;
-  AETHER_STOREFRONT_ORIGIN?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -17,41 +16,6 @@ interface Env {
 interface ExecutionContext {
   waitUntil(promise: Promise<unknown>): void;
   passThroughOnException(): void;
-}
-
-function storeAssetCandidates(pathname: string) {
-  const candidates = [pathname];
-
-  if (pathname === "/store") {
-    candidates.push("/store/index.html");
-  } else if (pathname.endsWith("/")) {
-    candidates.push(`${pathname}index.html`);
-  } else {
-    const lastSegment = pathname.split("/").pop() ?? "";
-    if (!lastSegment.includes(".")) {
-      candidates.push(`${pathname}/index.html`);
-    }
-  }
-
-  return [...new Set(candidates)];
-}
-
-async function fetchStoreAsset(request: Request, env: Env) {
-  const url = new URL(request.url);
-
-  for (const candidate of storeAssetCandidates(url.pathname)) {
-    const assetUrl = new URL(request.url);
-    assetUrl.pathname = candidate;
-    const response = env?.ASSETS
-      ? await env.ASSETS.fetch(new Request(assetUrl, request))
-      : await fetchLocalClientAsset(candidate);
-
-    if (response && response.status !== 404) {
-      return response;
-    }
-  }
-
-  return null;
 }
 
 async function fetchLocalClientAsset(pathname: string) {
@@ -104,27 +68,6 @@ const worker = {
       if (localAssetResponse) {
         return localAssetResponse;
       }
-    }
-
-    if (url.pathname === "/store" || url.pathname.startsWith("/store/")) {
-      const localStoreResponse = await fetchStoreAsset(request, env);
-      if (localStoreResponse) {
-        return localStoreResponse;
-      }
-
-      if (!env.AETHER_STOREFRONT_ORIGIN) {
-        return new Response("Aether storefront files were not found in this deployment.", {
-          status: 404,
-          headers: { "content-type": "text/plain; charset=utf-8" },
-        });
-      }
-
-      const storeOrigin = new URL(env.AETHER_STOREFRONT_ORIGIN);
-      const storeUrl = new URL(request.url);
-      storeUrl.protocol = storeOrigin.protocol;
-      storeUrl.host = storeOrigin.host;
-      storeUrl.pathname = storeUrl.pathname.replace(/^\/store(?=\/|$)/, "") || "/";
-      return fetch(new Request(storeUrl, request));
     }
 
     if (url.pathname === "/_vinext/image") {
