@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, code: "validation_error" }, { status: 422 });
   }
 
+  const normalizedLocale: "es" | "en" = locale === "es" ? "es" : "en";
+
   const contactRequest = {
     name,
     company,
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
       message,
     ].join("\n"),
     preferredLanguage,
-    locale: locale === "es" ? "es" : "en",
+    locale: normalizedLocale,
     receivedAt: new Date().toISOString(),
     consent,
   };

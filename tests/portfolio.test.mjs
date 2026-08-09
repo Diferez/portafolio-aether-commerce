@@ -37,20 +37,23 @@ async function text(pathname) {
 test("renders Spanish and English without mixing hero copy", async () => {
   const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
-  assert.match(es, /Construyo productos digitales completos/);
-  assert.match(en, /I build complete, scalable digital products/);
-  assert.doesNotMatch(es, /I build complete, scalable digital products/);
-  assert.doesNotMatch(en, /Construyo productos digitales completos/);
+  assert.match(es, /Diseño sistemas/);
+  assert.match(es, /Los llevo a producción/);
+  assert.match(en, /I design systems/);
+  assert.match(en, /I take them to production/);
+  assert.doesNotMatch(es, /I design systems/);
+  assert.doesNotMatch(en, /Diseño sistemas/);
 });
 
-test("includes localized navigation, hreflang, and safe store state", async () => {
+test("includes localized navigation, hreflang, and production project link", async () => {
   const es = await text("/es");
 
-  assert.match(es, /href="#servicios"/);
+  assert.match(es, /href="#proyectos"/);
+  assert.match(es, /href="#experiencia"/);
   assert.match(es, /href="#contacto"/);
   assert.match(es, /hrefLang="es"/);
   assert.match(es, /hrefLang="en"/);
-  assert.match(es, /Tienda demo próximamente/);
+  assert.match(es, /https:\/\/aether-storefront\.pickofwow\.workers\.dev/);
   assert.doesNotMatch(es, /href=""/);
 });
 
@@ -65,7 +68,17 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.doesNotMatch(en, /name="budget"/);
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
-  assert.match(en, /stored securely for follow-up/);
+  assert.match(en, /used only to respond/);
+});
+
+test("renders honest case-study status and the validated AI architecture", async () => {
+  const es = await text("/es");
+
+  assert.match(es, /Aether Commerce/);
+  assert.match(es, /FastAPI\/LangGraph está validada en Docker/);
+  assert.match(es, /PostgreSQL y Redis permanece documentado como siguiente etapa/);
+  assert.match(es, /tokens de carrito e idempotencia/);
+  assert.doesNotMatch(es, /99%|10x|millones de usuarios/i);
 });
 
 test("proxy keeps browser language detection and saved preference", async () => {

@@ -1,86 +1,48 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bot,
-  Boxes,
-  BrainCircuit,
-  Building2,
-  CheckCircle2,
-  Cloud,
-  Code2,
-  CreditCard,
-  Database,
+  ArrowDownRight,
+  ArrowUpRight,
+  Check,
   ExternalLink,
-  Gauge,
   Globe2,
-  Layers3,
   Menu,
   MessageSquareText,
-  Rocket,
-  ServerCog,
-  ShieldCheck,
-  ShoppingCart,
-  Sparkles,
-  Wrench,
   X,
-  type LucideIcon,
 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 import { localeCookieName, type Locale } from "@/i18n/config";
-import type { CardItem, IconName, LandingContent } from "@/types/content";
+import type {
+  ExperienceItem,
+  LandingContent,
+  ProjectItem,
+} from "@/types/content";
+import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
-import { GlowCard } from "../ui/GlowCard";
-import { Reveal } from "../ui/Reveal";
 
 type LandingPageProps = {
   content: LandingContent;
-};
-
-const iconMap: Record<IconName, LucideIcon> = {
-  app: Boxes,
-  api: ServerCog,
-  frontend: Code2,
-  cloud: Cloud,
-  payments: CreditCard,
-  ai: BrainCircuit,
-  devops: Gauge,
-  maintenance: Wrench,
-  consulting: MessageSquareText,
-  startup: Rocket,
-  business: Building2,
-  commerce: ShoppingCart,
-  team: Layers3,
-  individual: BadgeCheck,
-  database: Database,
-  shield: ShieldCheck,
-  workflow: Bot,
-  rocket: Rocket,
-  layers: Layers3,
-  server: ServerCog,
-  globe: Globe2,
 };
 
 function sectionIds(locale: Locale) {
   return locale === "es"
     ? {
         home: "inicio",
-        services: "servicios",
         projects: "proyectos",
-        technologies: "tecnologias",
-        ai: "ia",
+        experience: "experiencia",
+        capabilities: "capacidades",
+        approach: "enfoque",
         contact: "contacto",
       }
     : {
         home: "home",
-        services: "services",
         projects: "projects",
-        technologies: "technologies",
-        ai: "ai",
+        experience: "experience",
+        capabilities: "capabilities",
+        approach: "approach",
         contact: "contact",
       };
 }
@@ -91,34 +53,53 @@ export function LandingPage({ content }: LandingPageProps) {
   const locale = content.locale;
   const ids = sectionIds(locale);
   const alternateLocale = locale === "es" ? "en" : "es";
-  const storeIsExternal = /^https?:\/\//.test(siteConfig.storeUrl);
 
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setMenuOpen(false);
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
   const structuredData = useMemo(
     () => ({
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
+      "@type": "Person",
       name: siteConfig.brandName,
       url: `${siteConfig.siteUrl}/${locale}`,
-      areaServed: ["United States", "Europe", "Colombia", "Latin America"],
-      serviceType: [
-        "Full stack software development",
+      sameAs: siteConfig.socialLinks.map((link) => link.href),
+      jobTitle: "Full-Stack Software Engineer",
+      knowsAbout: [
+        "Backend engineering",
+        "Node.js",
+        "TypeScript",
+        "Python",
         "Cloud architecture",
-        "Payment integrations",
-        "AI automation",
-        "Technical consulting",
+        "Payment systems",
+        "AI agents",
       ],
     }),
     [locale],
   );
 
   function switchLanguage() {
-    const hash = window.location.hash;
+    const currentIds = sectionIds(locale);
+    const nextIds = sectionIds(alternateLocale);
+    const currentHash = window.location.hash.replace("#", "");
+    const semanticKey = (Object.keys(currentIds) as Array<keyof typeof currentIds>).find(
+      (key) => currentIds[key] === currentHash,
+    );
+    const nextHash = semanticKey ? `#${nextIds[semanticKey]}` : "";
+
     document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax`;
-    router.push(`/${alternateLocale}${hash}`);
+    router.push(`/${alternateLocale}${nextHash}`);
+    setMenuOpen(false);
   }
 
   return (
@@ -127,21 +108,27 @@ export function LandingPage({ content }: LandingPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="site-shell">
-        <BackgroundTexture />
+      <a className="skip-link" href={`#${ids.projects}`}>
+        {content.hero.projectsCta}
+      </a>
+      <div className="site-shell" id={ids.home}>
         <header className="site-header">
           <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
-            <span className="brand-mark">DM</span>
-            <span>{siteConfig.brandName}</span>
+            <span className="brand-mark" aria-hidden="true">
+              DM
+            </span>
+            <span className="brand-copy">
+              <strong>{siteConfig.brandName}</strong>
+              <span>{content.nav.role}</span>
+            </span>
           </a>
 
-          <nav className="desktop-nav" aria-label="Primary navigation">
+          <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
             {content.nav.items.map((item) => (
               <a key={item.href} href={item.href}>
                 {item.label}
               </a>
             ))}
-            <a href={siteConfig.storeUrl}>{content.hero.storeCta}</a>
           </nav>
 
           <div className="header-actions">
@@ -151,11 +138,12 @@ export function LandingPage({ content }: LandingPageProps) {
               onClick={switchLanguage}
               aria-label={content.nav.switchLanguage}
             >
-              <Globe2 aria-hidden="true" size={16} />
+              <Globe2 aria-hidden="true" size={15} />
               {alternateLocale.toUpperCase()}
             </button>
-            <a className="nav-cta" href={`#${ids.contact}`}>
+            <a className="header-contact" href={`#${ids.contact}`}>
               {content.nav.cta}
+              <ArrowDownRight aria-hidden="true" size={16} />
             </a>
             <button
               className="menu-button"
@@ -169,142 +157,222 @@ export function LandingPage({ content }: LandingPageProps) {
             </button>
           </div>
 
-          <div
+          <nav
             className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
             id="mobile-menu"
+            aria-label={content.nav.primaryLabel}
             hidden={!menuOpen}
           >
-            {content.nav.items.map((item) => (
+            {content.nav.items.map((item, index) => (
               <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 {item.label}
               </a>
             ))}
-            <a href={siteConfig.storeUrl} onClick={() => setMenuOpen(false)}>
-              {content.hero.storeCta}
-            </a>
-            <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>
-              {content.contact.whatsappCta}
+            <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
+              <span>05</span>
+              {content.nav.cta}
             </a>
             <button type="button" onClick={switchLanguage}>
+              <span>↳</span>
               {content.nav.switchLanguage}
             </button>
-          </div>
+          </nav>
         </header>
 
         <main>
-          <section className="hero-section" id={ids.home}>
-            <div className="hero-copy">
-              <Reveal>
-                <p className="availability">
-                  <Sparkles aria-hidden="true" size={16} />
-                  {content.hero.eyebrow}
-                </p>
-              </Reveal>
-              <Reveal delay={0.08}>
-                <h1>{content.hero.title}</h1>
-              </Reveal>
-              <Reveal delay={0.16}>
-                <p className="hero-description">{content.hero.description}</p>
-              </Reveal>
-              <Reveal className="hero-actions" delay={0.24}>
-                <a className="secondary-button" href={`#${ids.contact}`}>
-                  {content.hero.secondaryCta}
-                </a>
-                {siteConfig.storeUrl ? (
-                  <a
-                    className="primary-button"
-                    href={siteConfig.storeUrl}
-                    target={storeIsExternal ? "_blank" : undefined}
-                    rel={storeIsExternal ? "noreferrer" : undefined}
-                  >
-                    {content.hero.storeCta}
-                    <ExternalLink aria-hidden="true" size={16} />
-                  </a>
-                ) : (
-                  <span className="ghost-button is-disabled" aria-disabled="true">
-                    {content.hero.storeUnavailable}
-                  </span>
-                )}
-              </Reveal>
+          <section className="hero section-frame" aria-labelledby="hero-title">
+            <div className="hero-rail" aria-label={content.hero.focusLabel}>
+              <span className="rail-index">00</span>
+              <p>{content.hero.focusLabel}</p>
+              <ul>
+                {content.hero.focus.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
 
-            <Reveal className="hero-visual" delay={0.16}>
-              <ArchitectureDiagram content={content} />
-            </Reveal>
+            <div className="hero-main">
+              <p className="eyebrow">{content.hero.eyebrow}</p>
+              <h1 id="hero-title">
+                <span>{content.hero.titleLead}</span>
+                <em>{content.hero.titleEmphasis}</em>
+              </h1>
+              <p className="hero-description">{content.hero.description}</p>
+              <div className="hero-actions">
+                <a className="button button-dark" href={`#${ids.projects}`}>
+                  {content.hero.projectsCta}
+                  <ArrowDownRight aria-hidden="true" size={17} />
+                </a>
+                <a className="text-link" href={`#${ids.contact}`}>
+                  {content.hero.contactCta}
+                  <ArrowDownRight aria-hidden="true" size={17} />
+                </a>
+              </div>
+            </div>
+
+            <div className="hero-system">
+              <SystemDiagram content={content} />
+            </div>
+
+            <div className="hero-status" aria-label={content.hero.availability}>
+              <span className="status-indicator" aria-hidden="true" />
+              <span>{content.hero.availability}</span>
+              <span>{content.hero.location}</span>
+            </div>
           </section>
 
-          <Reveal>
-            <section className="positioning-strip" aria-label={content.positioning.title}>
-              <h2>{content.positioning.title}</h2>
-              <div>
-                {content.positioning.stages.map((stage, index) => (
-                  <span key={stage}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    {stage}
-                  </span>
+          <Section
+            eyebrow={content.expertise.eyebrow}
+            title={content.expertise.title}
+            description={content.expertise.description}
+            className="expertise-section"
+          >
+            <div className="expertise-list">
+              {content.expertise.items.map((item) => (
+                <article className="expertise-row" key={item.index}>
+                  <span className="row-index">{item.index}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                  <ul className="inline-list" aria-label={item.title}>
+                    {item.evidence.map((entry) => (
+                      <li key={entry}>{entry}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </Section>
+
+          <section className="experience-section dark-section" id={ids.experience}>
+            <div className="section-frame">
+              <Reveal className="section-intro">
+                <p className="eyebrow">{content.experience.eyebrow}</p>
+                <h2>{content.experience.title}</h2>
+                <p>{content.experience.description}</p>
+                <span className="confidentiality-note">{content.experience.confidentiality}</span>
+              </Reveal>
+              <div className="experience-list">
+                {content.experience.items.map((item, index) => (
+                  <ExperienceRow key={item.title} item={item} index={index} />
                 ))}
               </div>
-            </section>
-          </Reveal>
+            </div>
+          </section>
 
-          <CardGridSection
-            id={ids.services}
-            eyebrow={content.services.eyebrow}
-            title={content.services.title}
-            description={content.services.description}
-            items={content.services.items}
-            columns="three"
-          />
+          <Section
+            id={ids.projects}
+            eyebrow={content.projects.eyebrow}
+            title={content.projects.title}
+            description={content.projects.description}
+            className="projects-section"
+          >
+            <div className="projects-list">
+              {content.projects.items.map((project, index) => (
+                <ProjectCase
+                  key={project.number}
+                  project={project}
+                  labels={content.projects}
+                  featured={index === 0}
+                  reversed={index === 2}
+                />
+              ))}
+            </div>
+          </Section>
 
-          <CardGridSection
-            eyebrow={content.clients.eyebrow}
-            title={content.clients.title}
-            description={content.clients.description}
-            items={content.clients.items}
-            columns="five"
-          />
+          <Section
+            id={ids.capabilities}
+            eyebrow={content.capabilities.eyebrow}
+            title={content.capabilities.title}
+            description={content.capabilities.description}
+            className="capabilities-section"
+          >
+            <div className="capabilities-table">
+              {content.capabilities.items.map((item, index) => (
+                <article className="capability-row" key={item.title}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                  <ul className="inline-list">
+                    {item.tools.map((tool) => (
+                      <li key={tool}>{tool}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </Section>
 
-          <CaseStudiesSection content={content} id={ids.projects} />
-          <AISection content={content} id={ids.ai} />
-          <TechStackSection content={content} id={ids.technologies} />
-          <CloudSection content={content} />
-          <ProcessSection content={content} />
-          <DifferentiatorsSection content={content} />
-          <ContactSection content={content} id={ids.contact} />
+          <section className="approach-section" id={ids.approach}>
+            <div className="section-frame">
+              <Reveal className="approach-intro">
+                <p className="eyebrow">{content.approach.eyebrow}</p>
+                <h2>{content.approach.title}</h2>
+                <p>{content.approach.description}</p>
+              </Reveal>
+              <div className="execution-line">
+                {content.approach.steps.map((step) => (
+                  <article key={step.number}>
+                    <span>{step.number}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </article>
+                ))}
+              </div>
+              <Reveal>
+                <blockquote>{content.approach.principle}</blockquote>
+              </Reveal>
+            </div>
+          </section>
+
+          <section className="contact-section dark-section" id={ids.contact}>
+            <div className="section-frame contact-layout">
+              <Reveal className="contact-copy">
+                <p className="eyebrow">{content.contact.eyebrow}</p>
+                <h2>{content.contact.title}</h2>
+                <p>{content.contact.description}</p>
+                <div className="direct-links" aria-label={content.contact.directLabel}>
+                  <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
+                    <MessageSquareText aria-hidden="true" size={17} />
+                    {content.contact.whatsappCta}
+                    <ArrowUpRight aria-hidden="true" size={15} />
+                  </a>
+                  {siteConfig.socialLinks.map((link) => (
+                    <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                      <ExternalLink aria-hidden="true" size={17} />
+                      {content.contact.linkedinLabel}
+                      <ArrowUpRight aria-hidden="true" size={15} />
+                    </a>
+                  ))}
+                </div>
+              </Reveal>
+              <Reveal>
+                <ContactForm content={content.contact} locale={content.locale} />
+              </Reveal>
+            </div>
+          </section>
         </main>
 
-        <footer className="site-footer">
+        <footer className="site-footer section-frame">
           <div>
-            <a className="brand" href={`#${ids.home}`}>
-              <span className="brand-mark">DM</span>
-              <span>{siteConfig.brandName}</span>
-            </a>
-            <p>{content.footer.remote}</p>
-          </div>
-          <div className="footer-specialties">
-            {content.footer.specialties.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
+            <span className="brand-mark" aria-hidden="true">
+              DM
+            </span>
+            <p>{content.footer.summary}</p>
           </div>
           <div className="footer-links">
-            {content.nav.items.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
+            <a href={siteConfig.storeUrl} target="_blank" rel="noreferrer">
+              Aether Commerce <ArrowUpRight aria-hidden="true" size={14} />
+            </a>
             {siteConfig.socialLinks.map((link) => (
               <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
-                {link.label}
+                {link.label} <ArrowUpRight aria-hidden="true" size={14} />
               </a>
             ))}
-            <a href={siteConfig.storeUrl}>{content.hero.storeCta}</a>
-            <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
-              {content.contact.whatsappCta}
-            </a>
-            <a href="#privacidad">{content.footer.privacyLabel}</a>
             <button type="button" onClick={switchLanguage}>
               {alternateLocale.toUpperCase()}
             </button>
+            <a href={`#${ids.home}`}>{content.footer.backToTop} ↑</a>
           </div>
           <p className="copyright">
             © {new Date().getFullYear()} {siteConfig.brandName}. {content.footer.rights}
@@ -315,324 +383,165 @@ export function LandingPage({ content }: LandingPageProps) {
   );
 }
 
-function BackgroundTexture() {
+function SystemDiagram({ content }: { content: LandingContent }) {
   return (
-    <div className="background-texture" aria-hidden="true">
-      <div className="light-beam beam-one" />
-      <div className="light-beam beam-two" />
-    </div>
-  );
-}
-
-function ArchitectureDiagram({ content }: { content: LandingContent }) {
-  const reducedMotion = useReducedMotion();
-
-  return (
-    <div className="architecture" aria-label={content.hero.diagramTitle}>
-      <div className="architecture-panel web-panel">
-        <span>{content.hero.diagramNodes[0]}</span>
-        <div className="mock-window">
-          <i />
-          <i />
-          <i />
-        </div>
-      </div>
-      <div className="architecture-core">
-        <motion.div
-          className="core-ring"
-          animate={reducedMotion ? undefined : { rotate: 360 }}
-          transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-        />
-        <div className="core-node">
-          <Layers3 aria-hidden="true" />
-          <span>{content.hero.diagramTitle}</span>
-        </div>
-      </div>
-      {content.hero.diagramNodes.slice(1).map((node, index) => (
-        <div className={`architecture-node node-${index + 1}`} key={node}>
-          <span>{node}</span>
-        </div>
-      ))}
-      <div className="connection connection-a" />
-      <div className="connection connection-b" />
-      <div className="connection connection-c" />
-      <div className="connection connection-d" />
-      <div className="connection connection-e" />
-    </div>
-  );
-}
-
-type CardGridSectionProps = {
-  id?: string;
-  eyebrow: string;
-  title: string;
-  description: string;
-  items: readonly CardItem[];
-  columns: "three" | "five";
-};
-
-function CardGridSection({
-  id,
-  eyebrow,
-  title,
-  description,
-  items,
-  columns,
-}: CardGridSectionProps) {
-  return (
-    <SectionShell id={id} eyebrow={eyebrow} title={title} description={description}>
-      <div className={`card-grid card-grid-${columns}`}>
-        {items.map((item, index) => (
-          <Reveal key={item.title} delay={index * 0.025}>
-            <InfoCard item={item} />
-          </Reveal>
+    <figure className="system-diagram">
+      <figcaption>
+        <span>SYS / 01</span>
+        {content.hero.diagramLabel}
+      </figcaption>
+      <div className="diagram-flow" aria-label={content.hero.diagramNodes.join(", ")}>
+        {content.hero.diagramNodes.map((node, index) => (
+          <div className="diagram-step" key={node}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{node}</strong>
+            {index < content.hero.diagramNodes.length - 1 ? (
+              <i aria-hidden="true" />
+            ) : null}
+          </div>
         ))}
       </div>
-    </SectionShell>
+      <p>{content.hero.diagramCaption}</p>
+    </figure>
   );
 }
 
-function InfoCard({ item }: { item: CardItem }) {
-  const Icon = item.icon ? iconMap[item.icon] : CheckCircle2;
-
-  return (
-    <GlowCard className="info-card">
-      <div className="icon-tile">
-        <Icon aria-hidden="true" size={20} />
-      </div>
-      <h3>{item.title}</h3>
-      <p>{item.description}</p>
-      {item.items ? (
-        <div className="mini-tags">
-          {item.items.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-      ) : null}
-    </GlowCard>
-  );
-}
-
-function SectionShell({
+function Section({
   id,
   eyebrow,
   title,
   description,
+  className = "",
   children,
 }: {
   id?: string;
   eyebrow: string;
   title: string;
-  description?: string;
+  description: string;
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <section className="section-shell" id={id}>
-      <Reveal className="section-heading">
+    <section className={`content-section section-frame ${className}`} id={id}>
+      <Reveal className="section-intro">
         <p className="eyebrow">{eyebrow}</p>
         <h2>{title}</h2>
-        {description ? <p>{description}</p> : null}
+        <p>{description}</p>
       </Reveal>
       {children}
     </section>
   );
 }
 
-function CaseStudiesSection({ content, id }: { content: LandingContent; id: string }) {
+function ExperienceRow({
+  item,
+  index,
+}: {
+  item: ExperienceItem;
+  index: number;
+}) {
   return (
-    <SectionShell
-      id={id}
-      eyebrow={content.caseStudies.eyebrow}
-      title={content.caseStudies.title}
-      description={content.caseStudies.description}
-    >
-      <div className="case-grid">
-        {content.caseStudies.items.map((study, index) => (
-          <Reveal key={study.title} delay={index * 0.05}>
-            <GlowCard className="case-card">
-              <p className="eyebrow">{study.eyebrow}</p>
-              <h3>{study.title}</h3>
-              <p>{study.summary}</p>
-              <div className="case-sections">
-                {study.sections.map((section) => (
-                  <div key={section.title}>
-                    <strong>{section.title}</strong>
-                    <span>{section.body}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="tech-pills">
-                {study.technologies.map((technology) => (
-                  <span key={technology}>{technology}</span>
-                ))}
-              </div>
-            </GlowCard>
-          </Reveal>
-        ))}
-      </div>
-    </SectionShell>
-  );
-}
-
-function AISection({ content, id }: { content: LandingContent; id: string }) {
-  return (
-    <SectionShell
-      id={id}
-      eyebrow={content.ai.eyebrow}
-      title={content.ai.title}
-      description={content.ai.description}
-    >
-      <div className="ai-layout">
-        <Reveal>
-          <div className="ai-map">
-            <div className="ai-map-center">
-              <BrainCircuit aria-hidden="true" />
-              <span>LLM</span>
-            </div>
-            <span className="ai-path path-one" />
-            <span className="ai-path path-two" />
-            <span className="ai-path path-three" />
-            {content.ai.items.map((item, index) => (
-              <div className={`ai-node ai-node-${index + 1}`} key={item.title}>
-                {item.title}
-              </div>
+    <Reveal>
+      <article className="experience-row">
+        <span className="experience-number">{String(index + 1).padStart(2, "0")}</span>
+        <div className="experience-context">
+          <p>{item.context}</p>
+          <span>{item.role}</span>
+        </div>
+        <div className="experience-body">
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <ul>
+            {item.responsibilities.map((responsibility) => (
+              <li key={responsibility}>
+                <Check aria-hidden="true" size={14} />
+                {responsibility}
+              </li>
             ))}
-          </div>
-        </Reveal>
-        <div className="ai-cards">
-          {content.ai.items.map((item, index) => (
-            <Reveal key={item.title} delay={index * 0.04}>
-              <InfoCard item={item} />
-            </Reveal>
+          </ul>
+        </div>
+        <ul className="experience-tech inline-list">
+          {item.technologies.map((technology) => (
+            <li key={technology}>{technology}</li>
           ))}
-        </div>
-      </div>
-      <Reveal>
-        <p className="ai-note">{content.ai.note}</p>
-      </Reveal>
-    </SectionShell>
+        </ul>
+      </article>
+    </Reveal>
   );
 }
 
-function TechStackSection({ content, id }: { content: LandingContent; id: string }) {
-  return (
-    <SectionShell
-      id={id}
-      eyebrow={content.stack.eyebrow}
-      title={content.stack.title}
-      description={content.stack.description}
-    >
-      <div className="stack-grid">
-        {content.stack.categories.map((category, index) => (
-          <Reveal key={category.title} delay={index * 0.02}>
-            <div className="stack-category">
-              <h3>{category.title}</h3>
-              <div>
-                {category.items.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </SectionShell>
-  );
-}
+function ProjectCase({
+  project,
+  labels,
+  featured,
+  reversed,
+}: {
+  project: ProjectItem;
+  labels: LandingContent["projects"];
+  featured?: boolean;
+  reversed?: boolean;
+}) {
+  const projectHref = project.href === "store" ? siteConfig.storeUrl : project.href;
 
-function CloudSection({ content }: { content: LandingContent }) {
   return (
-    <SectionShell
-      eyebrow={content.cloud.eyebrow}
-      title={content.cloud.title}
-      description={content.cloud.description}
-    >
-      <Reveal>
-        <div className="cloud-panel">
-          <div className="cloud-platforms">
-            {content.cloud.platforms.map((platform) => (
-              <span key={platform}>{platform}</span>
-            ))}
-          </div>
-          <div className="cloud-factors">
-            {content.cloud.factors.map((factor) => (
-              <div key={factor}>
-                <CheckCircle2 aria-hidden="true" size={18} />
-                {factor}
-              </div>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-    </SectionShell>
-  );
-}
+    <Reveal>
+      <article
+        className={`project-case ${featured ? "project-featured" : ""} ${
+          reversed ? "project-reversed" : ""
+        }`}
+      >
+        <header className="project-header">
+          <span className="project-number">{project.number}</span>
+          <p>{project.category}</p>
+          <span className={`project-status status-${project.statusTone}`}>
+            <i aria-hidden="true" />
+            {project.status}
+          </span>
+        </header>
 
-function ProcessSection({ content }: { content: LandingContent }) {
-  return (
-    <SectionShell
-      eyebrow={content.process.eyebrow}
-      title={content.process.title}
-      description={content.process.description}
-    >
-      <div className="process-grid">
-        {content.process.steps.map((step, index) => (
-          <Reveal key={step.title} delay={index * 0.04}>
-            <div className="process-step">
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </SectionShell>
-  );
-}
-
-function DifferentiatorsSection({ content }: { content: LandingContent }) {
-  return (
-    <SectionShell
-      eyebrow={content.differentiators.eyebrow}
-      title={content.differentiators.title}
-    >
-      <div className="differentiators">
-        {content.differentiators.items.map((item, index) => (
-          <Reveal key={item} delay={index * 0.035}>
-            <div>
-              <ShieldCheck aria-hidden="true" size={20} />
-              <p>{item}</p>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </SectionShell>
-  );
-}
-
-function ContactSection({ content, id }: { content: LandingContent; id: string }) {
-  return (
-    <section className="contact-section section-shell" id={id}>
-      <Reveal className="contact-copy">
-        <p className="eyebrow">{content.contact.eyebrow}</p>
-        <h2>{content.contact.title}</h2>
-        <p>{content.contact.description}</p>
-        <div className="contact-links">
-          <a className="whatsapp-button" href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
-            <MessageSquareText aria-hidden="true" size={16} />
-            {content.contact.whatsappCta}
-          </a>
-          {siteConfig.socialLinks.map((link) => (
-            <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
-              <ExternalLink aria-hidden="true" size={16} />
-              {link.label}
+        <div className="project-summary">
+          <h3>{project.title}</h3>
+          <p>{project.summary}</p>
+          {projectHref && project.hrefLabel ? (
+            <a href={projectHref} target="_blank" rel="noreferrer">
+              {project.hrefLabel}
+              <ArrowUpRight aria-hidden="true" size={17} />
             </a>
-          ))}
+          ) : null}
         </div>
-      </Reveal>
-      <Reveal>
-        <ContactForm content={content.contact} locale={content.locale} />
-      </Reveal>
-    </section>
+
+        {project.architecture ? (
+          <div className="project-architecture">
+            <p>{labels.architectureLabel}</p>
+            <ol>
+              {project.architecture.map((node, index) => (
+                <li key={node}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{node}</strong>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+
+        <dl className="project-details">
+          {project.sections.map((section) => (
+            <div key={section.label}>
+              <dt>{section.label}</dt>
+              <dd>{section.body}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <footer className="project-footer">
+          <ul className="inline-list">
+            {project.technologies.map((technology) => (
+              <li key={technology}>{technology}</li>
+            ))}
+          </ul>
+          {project.note ? <p>{project.note}</p> : null}
+        </footer>
+      </article>
+    </Reveal>
   );
 }

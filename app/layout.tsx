@@ -9,7 +9,23 @@ export const metadata: Metadata = {
     template: "%s | Diego Fernando Martinez",
   },
   description:
-    "Full stack software engineering for web platforms, cloud architecture, payments, automation, and AI-enabled products.",
+    "Backend-focused full-stack engineering for fintech, payments, cloud products, and applied AI.",
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.brandName,
+    images: [
+      {
+        url: new URL("/og.png", siteConfig.siteUrl),
+        width: 1728,
+        height: 904,
+        alt: "Diego Fernando Martinez — Systems Engineer, Backend First",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [new URL("/og.png", siteConfig.siteUrl)],
+  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

@@ -3,618 +3,398 @@ import type { LandingContent } from "@/types/content";
 
 const sharedKeywords = [
   "Diego Fernando Martinez",
-  "Backend Developer",
-  "Next.js Developer",
-  "Node.js Developer",
-  "Cloud Software Engineer",
-  "AWS Developer",
-  "Azure Developer",
-  "Google Cloud Developer",
-  "SaaS Developer",
-  "Stripe Integration Developer",
-  "AI Automation Developer",
-  "LLM Agent Developer",
-  "Freelance Software Developer",
+  "Systems Engineer",
+  "Full-Stack Software Engineer",
+  "Backend Engineer",
+  "Node.js",
+  "TypeScript",
+  "React",
+  "Next.js",
+  "Python",
+  "AWS",
+  "Google Cloud",
+  "Stripe",
+  "LangGraph",
+  "AI agents",
 ] as const;
 
 export const content = {
   es: {
     locale: "es",
     metadata: {
-      title: "Desarrollador Full Stack para productos web, cloud e IA",
+      title: "Ingeniero de Sistemas · Full-Stack con foco backend",
       description:
-        "Desarrollo aplicaciones web, plataformas SaaS, APIs, sistemas cloud, pagos, automatizaciones y soluciones con inteligencia artificial listas para producción.",
+        "Portafolio de Diego Fernando Martinez: ingeniería full-stack con foco en backend, fintech, pagos, cloud y agentes de IA.",
       keywords: [
         ...sharedKeywords,
-        "Desarrollador Full Stack",
-        "Desarrollo de aplicaciones web",
-        "Desarrollo de plataformas SaaS",
-        "Automatización con inteligencia artificial",
-        "Integraciones de pago",
+        "Ingeniero de Sistemas",
+        "Desarrollador backend",
         "Arquitectura cloud",
+        "Integraciones de pago",
+        "Agentes de IA",
       ],
     },
     nav: {
+      role: "Ingeniero de Sistemas",
+      primaryLabel: "Navegación principal",
       items: [
-        { label: "Inicio", href: "#inicio" },
-        { label: "Servicios", href: "#servicios" },
         { label: "Proyectos", href: "#proyectos" },
-        { label: "Inteligencia artificial", href: "#ia" },
-        { label: "Tecnologías", href: "#tecnologias" },
-        { label: "Contacto", href: "#contacto" },
+        { label: "Experiencia", href: "#experiencia" },
+        { label: "Capacidades", href: "#capacidades" },
+        { label: "Enfoque", href: "#enfoque" },
       ],
-      cta: "Iniciar un proyecto",
+      cta: "Contacto",
       openMenu: "Abrir menú",
       closeMenu: "Cerrar menú",
       switchLanguage: "Cambiar a inglés",
     },
     hero: {
-      eyebrow: "Disponible para nuevos proyectos",
-      title:
-        "Construyo productos digitales completos, escalables y preparados para crecer.",
+      eyebrow: "Full-Stack Software Engineer · backend first",
+      titleLead: "Diseño sistemas.",
+      titleEmphasis: "Los llevo a producción.",
       description:
-        "Desarrollo aplicaciones web, plataformas SaaS, APIs, arquitecturas cloud, sistemas de pago y soluciones de automatización con inteligencia artificial.",
-      secondaryCta: "Iniciar un proyecto",
-      storeCta: "Explorar tienda demo",
-      storeUnavailable: "Tienda demo próximamente",
-      diagramTitle: "Plataforma completa",
-      diagramNodes: [
-        "Interfaz web",
-        "API",
-        "Base de datos",
-        "Cloud",
-        "Pagos",
-        "IA",
-        "Automatizaciones",
-      ],
+        "Ingeniero de Sistemas especializado en backend, APIs y arquitectura cloud. Construyo productos completos con Node.js, TypeScript, Python, React y Next.js; especialmente en fintech, comercio electrónico, pagos e IA aplicada.",
+      projectsCta: "Ver casos de estudio",
+      contactCta: "Hablar conmigo",
+      availability: "Disponible para proyectos seleccionados",
+      location: "Colombia · remoto internacional",
+      focusLabel: "Áreas de trabajo",
+      focus: ["Backend & APIs", "Cloud", "Fintech", "IA aplicada"],
+      diagramLabel: "Sistema / producto",
+      diagramNodes: ["Interfaz", "Servicios", "Datos", "Operación"],
+      diagramCaption:
+        "Trabajo sobre el sistema completo, con mayor profundidad donde viven la lógica, los datos y las integraciones.",
     },
-    positioning: {
-      title: "De la idea a producción.",
-      stages: [
-        "Diseño de solución",
-        "Desarrollo",
-        "Despliegue cloud",
-        "Evolución continua",
-      ],
-    },
-    services: {
-      eyebrow: "Servicios",
-      title:
-        "Soluciones completas para construir, mejorar y operar productos digitales.",
+    expertise: {
+      eyebrow: "01 / Propuesta de valor",
+      title: "No separo el código del contexto operativo.",
       description:
-        "Cada servicio se orienta a resultados de negocio: publicar más rápido, reducir riesgo técnico, integrar sistemas y sostener productos en producción.",
+        "Una interfaz es solo una parte del producto. Mi trabajo conecta decisiones de arquitectura, reglas de negocio, datos, integraciones y entrega continua.",
       items: [
         {
-          title: "Aplicaciones web completas",
+          index: "A",
+          title: "Backend y arquitectura",
           description:
-            "Diseño y desarrollo de plataformas SaaS, herramientas internas, portales, dashboards, sistemas administrativos y productos digitales completos.",
-          icon: "app",
+            "Diseño APIs, servicios y modelos de datos alrededor de límites claros, flujos críticos y mantenimiento a largo plazo.",
+          evidence: ["Node.js / TypeScript", "Python", "REST / eventos", "SQL / NoSQL"],
         },
+        {
+          index: "B",
+          title: "Producto de extremo a extremo",
+          description:
+            "Puedo llevar una funcionalidad desde la definición técnica hasta la interfaz, las pruebas y su despliegue.",
+          evidence: ["React / Next.js", "Integraciones", "Testing", "CI/CD"],
+        },
+        {
+          index: "C",
+          title: "Sistemas sensibles",
+          description:
+            "Experiencia en banca, fintech y pagos, donde la trazabilidad, la idempotencia y el control de cambios importan.",
+          evidence: ["Stripe", "Webhooks", "Microservicios", "Observabilidad"],
+        },
+      ],
+    },
+    experience: {
+      eyebrow: "02 / Experiencia",
+      title: "Responsabilidad técnica en productos reales.",
+      description:
+        "La experiencia se presenta por contexto y contribución. Los nombres de organizaciones y las fechas no se publican en esta versión del portafolio.",
+      confidentiality: "Detalle comercial reservado · información técnica verificable",
+      items: [
+        {
+          context: "Banca · entorno empresarial",
+          role: "Contratista externo",
+          title: "Plataforma bancaria basada en microservicios",
+          description:
+            "Desarrollo y mantenimiento de funcionalidades y servicios para flujos bancarios con despliegues controlados.",
+          responsibilities: [
+            "Servicios desacoplados y funciones serverless",
+            "Pipelines de entrega continua",
+            "Trazabilidad, estabilidad y separación de responsabilidades",
+          ],
+          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps"],
+        },
+        {
+          context: "Fintech · plataforma SaaS",
+          role: "Ingeniería full-stack",
+          title: "Pagos flexibles e integraciones transaccionales",
+          description:
+            "Producto para dividir pagos en cuotas personalizables y coordinar Stripe, webhooks y sistemas externos.",
+          responsibilities: [
+            "Separación entre interfaz, negocio, datos y eventos",
+            "Integración de flujos de pago",
+            "Backend serverless y operación cloud",
+          ],
+          technologies: ["Next.js", "Google Cloud", "Firestore", "Stripe"],
+        },
+        {
+          context: "Operaciones financieras · AWS",
+          role: "Diseño e implementación",
+          title: "APIs y persistencia para flujos financieros",
+          description:
+            "Aplicación con autenticación, persistencia relacional e infraestructura automatizada para una operación mantenible.",
+          responsibilities: [
+            "Separación de frontend, backend e infraestructura",
+            "Modelado relacional en Amazon RDS",
+            "Despliegues con infraestructura como código",
+          ],
+          technologies: ["AWS", "SST", "Amazon RDS", "IaC"],
+        },
+      ],
+    },
+    projects: {
+      eyebrow: "03 / Trabajo seleccionado",
+      title: "Casos de estudio, no vitrinas.",
+      description:
+        "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto. Sin métricas inventadas ni nombres confidenciales.",
+      problemLabel: "Problema",
+      responsibilityLabel: "Responsabilidad",
+      decisionLabel: "Decisiones",
+      resultLabel: "Estado / resultado",
+      architectureLabel: "Flujo principal",
+      items: [
+        {
+          number: "01",
+          category: "Comercio electrónico + agentes de IA",
+          title: "Aether Commerce",
+          summary:
+            "Un producto de comercio electrónico bilingüe con storefront, panel administrativo, API, pagos y un asistente capaz de consultar productos y operar el carrito con controles explícitos.",
+          status: "Demo pública desplegada",
+          statusTone: "live",
+          sections: [
+            {
+              label: "Problema",
+              body: "Construir una tienda que demostrara algo más que una interfaz: catálogo, carrito firmado, checkout, operación administrativa y asistencia conversacional conectada al dominio real.",
+            },
+            {
+              label: "Responsabilidad",
+              body: "Arquitectura e implementación del monorepo, contratos compartidos, Worker API, D1, storefront, panel administrativo, integración de Stripe y servicio de IA.",
+            },
+            {
+              label: "Decisiones",
+              body: "El backend recalcula precio e inventario; las mutaciones del asistente usan tokens de carrito e idempotencia; LangGraph coordina intención, restricciones, herramientas, validación y auditoría en la ruta Python validada.",
+            },
+            {
+              label: "Estado / resultado",
+              body: "Storefront, API, admin y asistente Worker están desplegados. La variante completa FastAPI/LangGraph está validada en Docker; su hosting separado con PostgreSQL y Redis permanece documentado como siguiente etapa.",
+            },
+          ],
+          architecture: ["Storefront", "Asistente", "Worker API", "D1 / Stripe"],
+          technologies: [
+            "Next.js",
+            "TypeScript",
+            "Cloudflare Workers",
+            "D1",
+            "Python",
+            "FastAPI",
+            "LangGraph",
+            "Gemini",
+            "Stripe",
+          ],
+          href: "store",
+          hrefLabel: "Abrir demo en producción",
+          note: "El agente busca, compara y consulta variantes; las acciones mutables requieren autorización, validación y registro de auditoría.",
+        },
+        {
+          number: "02",
+          category: "Fintech + pagos",
+          title: "SaaS de pagos flexibles",
+          summary:
+            "Plataforma para dividir pagos en cuotas configurables y coordinar procesos transaccionales entre la aplicación y servicios externos.",
+          status: "Caso privado",
+          statusTone: "private",
+          sections: [
+            {
+              label: "Problema",
+              body: "Modelar una experiencia flexible sin perder consistencia entre la interfaz, el estado del pago y los eventos externos.",
+            },
+            {
+              label: "Responsabilidad",
+              body: "Desarrollo full-stack e integración del frontend con un backend serverless y flujos transaccionales.",
+            },
+            {
+              label: "Decisiones",
+              body: "Separar presentación, lógica de negocio, persistencia y eventos; procesar cambios de estado mediante Stripe y webhooks.",
+            },
+            {
+              label: "Estado / resultado",
+              body: "Caso presentado sin identidad del cliente, métricas ni enlace público para respetar la confidencialidad.",
+            },
+          ],
+          architecture: ["Next.js", "Cloud Functions", "Firestore", "Stripe"],
+          technologies: ["Next.js", "Vercel", "Google Cloud", "Firestore", "Stripe"],
+        },
+        {
+          number: "03",
+          category: "Banca + microservicios",
+          title: "Servicios para una plataforma bancaria",
+          summary:
+            "Trabajo en un entorno financiero donde cada cambio debía convivir con controles de entrega, separación de responsabilidades y estabilidad operativa.",
+          status: "Experiencia profesional privada",
+          statusTone: "private",
+          sections: [
+            {
+              label: "Problema",
+              body: "Evolucionar funcionalidades bancarias en una arquitectura distribuida sin comprometer trazabilidad ni confiabilidad.",
+            },
+            {
+              label: "Responsabilidad",
+              body: "Desarrollo y mantenimiento de servicios y funcionalidades como contratista externo.",
+            },
+            {
+              label: "Decisiones",
+              body: "Servicios desacoplados, funciones serverless, automatización de entrega y control cuidadoso de cambios.",
+            },
+            {
+              label: "Estado / resultado",
+              body: "Experiencia en producción descrita al nivel permitido; sin publicar datos internos de la organización.",
+            },
+          ],
+          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
+        },
+        {
+          number: "04",
+          category: "Cloud + operaciones financieras",
+          title: "Plataforma financiera sobre AWS",
+          summary:
+            "Arquitectura con APIs, autenticación, datos relacionales e infraestructura reproducible para flujos financieros.",
+          status: "Caso privado",
+          statusTone: "validated",
+          sections: [
+            {
+              label: "Problema",
+              body: "Mantener una base técnica escalable y comprensible para una aplicación con reglas y datos financieros.",
+            },
+            {
+              label: "Responsabilidad",
+              body: "Diseño de la separación entre frontend, backend, datos e infraestructura.",
+            },
+            {
+              label: "Decisiones",
+              body: "Persistencia relacional en RDS, autenticación y despliegues automatizados con infraestructura como código.",
+            },
+            {
+              label: "Estado / resultado",
+              body: "Caso técnico publicable sin información comercial ni métricas no verificadas.",
+            },
+          ],
+          technologies: ["AWS", "SST", "Amazon RDS", "APIs", "IaC"],
+        },
+      ],
+    },
+    capabilities: {
+      eyebrow: "04 / Capacidades",
+      title: "Tecnología organizada por el problema que resuelve.",
+      description:
+        "No uso porcentajes ni una pared de logos. Estas son las áreas en las que conecto herramientas con decisiones de producto y operación.",
+      items: [
         {
           title: "Backend y APIs",
-          description:
-            "APIs REST, autenticación, autorización, lógica de negocio, integraciones, procesamiento asíncrono y arquitecturas orientadas a eventos.",
-          icon: "api",
+          description: "Servicios, reglas de negocio, autenticación, asincronía, eventos y contratos mantenibles.",
+          tools: ["Node.js", "TypeScript", "NestJS", "Express", "Fastify", "Python"],
         },
         {
-          title: "Frontend moderno",
-          description:
-            "Interfaces rápidas, accesibles y responsive desarrolladas con React, Next.js, Angular, TypeScript y Tailwind CSS.",
-          icon: "frontend",
+          title: "Frontend de producto",
+          description: "Interfaces accesibles que reflejan con claridad el estado y las restricciones del dominio.",
+          tools: ["React", "Next.js", "Angular", "SSR", "Accesibilidad"],
         },
         {
-          title: "Cloud y serverless",
-          description:
-            "Diseño, despliegue y mantenimiento de soluciones en AWS, Microsoft Azure, Google Cloud, Vercel y Supabase.",
-          icon: "cloud",
+          title: "Cloud e infraestructura",
+          description: "Sistemas serverless, observables y desplegables de forma reproducible.",
+          tools: ["AWS", "Google Cloud", "Cloudflare", "Docker", "Terraform", "CI/CD"],
+        },
+        {
+          title: "Datos",
+          description: "Modelos relacionales y documentales, migraciones, índices y persistencia orientada a flujos reales.",
+          tools: ["PostgreSQL", "MySQL", "RDS", "Firestore", "D1", "Redis"],
         },
         {
           title: "Pagos e integraciones",
-          description:
-            "Integración de Stripe, webhooks, suscripciones, reembolsos, flujos transaccionales y servicios externos.",
-          icon: "payments",
+          description: "Checkout, webhooks, suscripciones, reembolsos e idempotencia alrededor de eventos externos.",
+          tools: ["Stripe", "Webhooks", "Clerk", "Resend", "APIs externas"],
         },
         {
-          title: "Inteligencia artificial y automatización",
-          description:
-            "Agentes basados en LLM, chatbots, tool calling, flujos inteligentes, asistentes empresariales y extracción estructurada de información.",
-          icon: "ai",
+          title: "IA aplicada y agentes",
+          description: "Agentes con herramientas, RAG, grounding, validación, guardrails y respuestas ligadas a evidencia disponible.",
+          tools: ["LangGraph", "Gemini", "Tool calling", "RAG", "SSE", "Evaluación"],
         },
         {
-          title: "DevOps y CI/CD",
-          description:
-            "Docker, pipelines automatizados, infraestructura como código, despliegues reproducibles, configuración por ambientes, monitoreo y logging.",
-          icon: "devops",
-        },
-        {
-          title: "Mantenimiento y optimización",
-          description:
-            "Corrección de errores, refactorización, modernización de aplicaciones, optimización de bases de datos, rendimiento, seguridad y escalabilidad.",
-          icon: "maintenance",
-        },
-        {
-          title: "Consultoría técnica",
-          description:
-            "Evaluación de arquitectura, selección de tecnologías, planificación de proyectos, identificación de riesgos y acompañamiento técnico.",
-          icon: "consulting",
+          title: "Calidad y entrega",
+          description: "Pruebas, contratos, observabilidad, seguridad y despliegues por ambiente antes de producción.",
+          tools: ["GitHub Actions", "Playwright", "OpenAPI", "Logging", "Métricas"],
         },
       ],
     },
-    clients: {
-      eyebrow: "Para quién",
-      title: "Trabajo con equipos que necesitan llevar software real a producción.",
+    approach: {
+      eyebrow: "05 / Enfoque",
+      title: "Primero entiendo el sistema; luego decido la forma.",
       description:
-        "La misma base técnica se adapta a startups, empresas en crecimiento, comercios y equipos que necesitan apoyo especializado.",
-      items: [
-        {
-          title: "Startups",
-          description:
-            "Construcción de MVP, validación técnica, arquitectura inicial y evolución hacia una plataforma escalable.",
-          icon: "startup",
-        },
-        {
-          title: "Pequeñas y medianas empresas",
-          description:
-            "Digitalización de procesos, sistemas administrativos, automatización, integraciones y modernización de herramientas.",
-          icon: "business",
-        },
-        {
-          title: "Comercio y eCommerce",
-          description:
-            "Catálogos, pagos, pedidos, inventario, paneles administrativos, notificaciones y análisis comercial.",
-          icon: "commerce",
-        },
-        {
-          title: "Equipos de desarrollo",
-          description:
-            "Apoyo backend o frontend, mantenimiento, resolución de problemas, integraciones cloud y ampliación temporal del equipo.",
-          icon: "team",
-        },
-        {
-          title: "Clientes individuales",
-          description:
-            "Desarrollo de productos personalizados, plataformas especializadas y acompañamiento desde la idea hasta la publicación.",
-          icon: "individual",
-        },
-      ],
-    },
-    caseStudies: {
-      eyebrow: "Casos de estudio",
-      title:
-        "Proyectos presentados con contexto técnico sin revelar información confidencial.",
-      description:
-        "Los casos priorizan arquitectura, responsabilidades y consideraciones de seguridad sobre nombres privados o enlaces inexistentes.",
-      items: [
-        {
-          eyebrow: "Banca y microservicios",
-          title: "Plataforma bancaria basada en microservicios",
-          summary:
-            "Solución empresarial con servicios desacoplados, despliegues controlados y foco en confiabilidad para flujos bancarios.",
-          sections: [
-            {
-              title: "Contexto",
-              body: "Participación como contratista externo en una aplicación bancaria construida con microservicios.",
-            },
-            {
-              title: "Responsabilidades",
-              body: "Desarrollo y mantenimiento de funcionalidades, servicios y pipelines de entrega continua.",
-            },
-            {
-              title: "Seguridad y confiabilidad",
-              body: "Trabajo bajo consideraciones propias de sistemas financieros: control de cambios, trazabilidad, estabilidad operativa y separación de responsabilidades.",
-            },
-          ],
-          technologies: [
-            "AWS Lambda",
-            "Node.js",
-            "Angular",
-            "Azure DevOps",
-            "CI/CD",
-            "Microservicios",
-          ],
-        },
-        {
-          eyebrow: "Fintech y propiedades",
-          title: "Plataforma SaaS de pagos flexibles",
-          summary:
-            "Producto SaaS para dividir pagos en cuotas personalizables, integrar sistemas externos y operar flujos transaccionales.",
-          sections: [
-            {
-              title: "Solución",
-              body: "Frontend en Next.js, despliegue en Vercel y backend serverless en Google Cloud.",
-            },
-            {
-              title: "Integraciones",
-              body: "Conexión con sistemas externos, Stripe, webhooks y procesos transaccionales.",
-            },
-            {
-              title: "Operación",
-              body: "Separación entre interfaz, lógica de negocio, datos y eventos para facilitar mantenimiento y evolución.",
-            },
-          ],
-          technologies: [
-            "Next.js",
-            "Vercel",
-            "Google Cloud",
-            "Firestore",
-            "Cloud Functions",
-            "Stripe",
-            "Serverless",
-          ],
-        },
-        {
-          eyebrow: "Operaciones financieras",
-          title: "Plataforma de operaciones financieras en AWS",
-          summary:
-            "Aplicación escalable para APIs, autenticación, persistencia relacional y despliegues automatizados.",
-          sections: [
-            {
-              title: "Arquitectura",
-              body: "Separación clara entre frontend, backend e infraestructura para mejorar mantenibilidad.",
-            },
-            {
-              title: "Datos",
-              body: "Persistencia relacional con Amazon RDS y modelado orientado a flujos financieros.",
-            },
-            {
-              title: "Despliegue",
-              body: "Automatización con infraestructura como código y pipelines de publicación.",
-            },
-          ],
-          technologies: [
-            "AWS",
-            "SST Framework",
-            "Amazon RDS",
-            "APIs",
-            "Autenticación",
-            "Infraestructura como código",
-          ],
-        },
-      ],
-    },
-    ai: {
-      eyebrow: "IA aplicada",
-      title: "Automatización con IA conectada a procesos reales.",
-      description:
-        "La inteligencia artificial se integra con reglas de negocio, datos, seguridad, observabilidad y supervisión humana.",
-      note:
-        "No se plantea la IA como una solución mágica: se diseña con validaciones, guardrails, registro de eventos y puntos claros de control humano.",
-      items: [
-        {
-          title: "Agentes basados en LLM",
-          description:
-            "Agentes que usan herramientas, razonamiento estructurado, APIs, bases de datos, memoria, contexto y validación de resultados.",
-          icon: "ai",
-          items: [
-            "Tool calling",
-            "Procesamiento de documentos",
-            "Extracción de datos",
-            "Validación",
-          ],
-        },
-        {
-          title: "Chatbots empresariales",
-          description:
-            "Asistentes para atención al cliente, consultas internas, bases de conocimiento, integración con sistemas y escalamiento humano.",
-          icon: "workflow",
-          items: [
-            "Soporte",
-            "Consultas internas",
-            "Bases de conocimiento",
-            "Escalamiento",
-          ],
-        },
-        {
-          title: "Automatización inteligente",
-          description:
-            "Procesamiento de correos, clasificación de información, reportes, tareas operativas e integraciones activadas por eventos.",
-          icon: "rocket",
-          items: ["Correos", "Reportes", "Eventos", "Integraciones"],
-        },
-        {
-          title: "Dashboards y datos en tiempo real",
-          description:
-            "WebSockets, métricas, alertas, visualización operativa, procesamiento de eventos y actualización en tiempo real.",
-          icon: "database",
-          items: ["WebSockets", "Métricas", "Alertas", "Eventos"],
-        },
-      ],
-    },
-    stack: {
-      eyebrow: "Stack tecnológico",
-      title: "Herramientas organizadas por capa, sin porcentajes artificiales.",
-      description:
-        "La tecnología se selecciona según el producto, el equipo, los costos, la seguridad, la escalabilidad y las necesidades operativas.",
-      categories: [
-        {
-          title: "Lenguajes",
-          items: ["JavaScript", "TypeScript", "Python", "SQL", "HTML", "CSS"],
-        },
-        {
-          title: "Frontend",
-          items: [
-            "React",
-            "Next.js",
-            "Angular",
-            "Tailwind CSS",
-            "Diseño responsive",
-            "Accesibilidad",
-            "Gestión de estado",
-            "Integración con APIs",
-            "Server-side rendering",
-            "Static generation",
-          ],
-        },
-        {
-          title: "Backend",
-          items: [
-            "Node.js",
-            "NestJS",
-            "Express",
-            "Fastify",
-            "Django",
-            "Flask",
-            "APIs REST",
-            "WebSockets",
-            "Webhooks",
-            "Hono",
-            "Zod",
-            "Procesamiento asíncrono",
-            "Eventos",
-            "Microservicios",
-            "Serverless",
-          ],
-        },
-        {
-          title: "Inteligencia artificial",
-          items: [
-            "Agentes basados en LLM",
-            "Chatbots",
-            "Tool calling",
-            "RAG",
-            "Automatización inteligente",
-            "Procesamiento de documentos",
-            "Validación y guardrails",
-            "Dashboards asistidos por IA",
-          ],
-        },
-        {
-          title: "AWS",
-          items: [
-            "AWS Lambda",
-            "EC2",
-            "RDS",
-            "S3",
-            "SES",
-            "API Gateway",
-            "SQS",
-            "CloudWatch",
-            "Cognito",
-            "ECS",
-            "CloudFront",
-            "Serverless",
-            "Infraestructura como código",
-          ],
-        },
-        {
-          title: "Microsoft Azure",
-          items: [
-            "Azure Functions",
-            "App Service",
-            "Azure DevOps",
-            "Azure SQL",
-            "Blob Storage",
-            "Key Vault",
-            "Pipelines de CI/CD",
-          ],
-        },
-        {
-          title: "Google Cloud",
-          items: [
-            "Cloud Functions",
-            "Compute Engine",
-            "Cloud Run",
-            "Firestore",
-            "Firebase",
-            "Cloud Storage",
-            "Pub/Sub",
-            "Serverless",
-          ],
-        },
-        {
-          title: "Cloudflare",
-          items: [
-            "Cloudflare Workers",
-            "Cloudflare Pages",
-            "Cloudflare D1",
-            "Wrangler",
-            "Edge runtime",
-            "Bindings",
-            "Variables de entorno",
-            "Despliegue serverless",
-          ],
-        },
-        {
-          title: "Plataformas gestionadas",
-          items: [
-            "Vercel",
-            "Supabase",
-            "Firebase",
-            "Clerk",
-            "Cloudinary",
-            "Preview deployments",
-            "Authentication",
-            "Databases",
-            "Storage",
-            "Edge functions",
-          ],
-        },
-        {
-          title: "Bases de datos y datos",
-          items: [
-            "PostgreSQL",
-            "MySQL",
-            "MongoDB",
-            "Firestore",
-            "Supabase",
-            "Redis",
-            "SQLite",
-            "Cloudflare D1",
-            "Drizzle ORM",
-            "Amazon RDS",
-            "Azure SQL",
-            "Parquet",
-            "Migraciones",
-            "Índices",
-            "Backups",
-            "Procesamiento de datasets",
-          ],
-        },
-        {
-          title: "Integraciones y pagos",
-          items: [
-            "Stripe",
-            "Stripe Checkout",
-            "Resend",
-            "Cloudinary",
-            "Clerk",
-            "Pagos",
-            "Suscripciones",
-            "Reembolsos",
-            "Webhooks",
-            "Correos transaccionales",
-            "APIs externas",
-          ],
-        },
-        {
-          title: "DevOps e ingeniería",
-          items: [
-            "Docker",
-            "Kubernetes",
-            "Terraform",
-            "GitHub Actions",
-            "Wrangler",
-            "pnpm workspace",
-            "Azure DevOps",
-            "CI/CD",
-            "Pruebas unitarias",
-            "Pruebas de integración",
-            "Monitoreo",
-            "Logging",
-            "Seguridad",
-            "Gestión de secretos",
-            "Rendimiento",
-          ],
-        },
-      ],
-    },
-    cloud: {
-      eyebrow: "Multicloud",
-      title: "Soluciones cloud sin limitarse a un solo proveedor.",
-      description:
-        "No todos los proyectos necesitan usar varias nubes al mismo tiempo. La arquitectura se define según el contexto, el presupuesto y las necesidades operativas.",
-      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Cloudflare", "Vercel", "Supabase"],
-      factors: [
-        "Requisitos del producto",
-        "Costos",
-        "Escalabilidad",
-        "Velocidad de desarrollo",
-        "Seguridad",
-        "Integraciones",
-        "Experiencia del equipo",
-        "Necesidades operativas",
-      ],
-    },
-    process: {
-      eyebrow: "Proceso",
-      title: "Un flujo claro para pasar de incertidumbre a entregas progresivas.",
-      description:
-        "El trabajo combina descubrimiento, decisiones técnicas, comunicación frecuente y mantenimiento posterior al despliegue.",
+        "Trabajo por incrementos revisables y hago explícitos los riesgos temprano. La arquitectura debe facilitar el cambio, no volverlo ceremonial.",
       steps: [
         {
-          title: "Discovery",
-          description:
-            "Alineación de objetivos, usuarios, restricciones, sistemas existentes y riesgos iniciales.",
+          number: "01",
+          title: "Contexto",
+          description: "Objetivos, usuarios, restricciones, flujos críticos y sistemas existentes.",
         },
         {
-          title: "Definición de alcance",
-          description:
-            "Priorización de entregables, fases, criterios de aceptación y dependencias.",
+          number: "02",
+          title: "Modelo",
+          description: "Límites, datos, contratos, amenazas, integraciones y decisiones reversibles.",
         },
         {
-          title: "Diseño técnico",
-          description:
-            "Arquitectura, modelo de datos, integraciones, seguridad, despliegue y observabilidad.",
+          number: "03",
+          title: "Entrega",
+          description: "Incrementos pequeños, pruebas útiles, revisión y ambientes previos a producción.",
         },
         {
-          title: "Desarrollo iterativo",
-          description:
-            "Implementación por incrementos revisables con comunicación frecuente.",
-        },
-        {
-          title: "Pruebas y despliegue",
-          description:
-            "Validación funcional, accesibilidad, rendimiento y publicación controlada.",
-        },
-        {
-          title: "Mantenimiento y evolución",
-          description:
-            "Correcciones, mejoras, monitoreo, nuevas funcionalidades y optimización.",
+          number: "04",
+          title: "Operación",
+          description: "Despliegue controlado, señales observables, mantenimiento y evolución.",
         },
       ],
-    },
-    differentiators: {
-      eyebrow: "Diferenciadores",
-      title: "Más que escribir código: construir sistemas sostenibles.",
-      items: [
-        "Visión completa de frontend, backend, datos e infraestructura para reducir fricciones entre capas.",
-        "Experiencia en productos financieros y flujos de pago donde la confiabilidad y la trazabilidad importan.",
-        "Capacidad para trabajar con AWS, Azure, Google Cloud y plataformas gestionadas según el caso.",
-        "Automatización e inteligencia artificial integradas a procesos reales, con validaciones y supervisión.",
-        "Enfoque en mantenibilidad: código legible, separación de responsabilidades, pruebas, monitoreo y despliegues reproducibles.",
-      ],
+      principle: "La complejidad debe justificar su costo operativo.",
     },
     contact: {
-      eyebrow: "Contacto",
-      title: "Hablemos de tu proyecto.",
+      eyebrow: "06 / Contacto",
+      title: "¿Hay un problema serio que resolver?",
       description:
-        "Comparte el contexto esencial y la solicitud quedara registrada de forma segura para seguimiento.",
+        "Cuéntame el contexto, el estado actual y qué necesita cambiar. Respondo mejor a problemas concretos que a briefs llenos de adjetivos.",
+      directLabel: "Canales directos",
+      linkedinLabel: "Ver perfil profesional",
       fields: {
         name: "Nombre",
         company: "Empresa",
         email: "Correo",
         projectType: "Tipo de proyecto",
-        message: "Mensaje",
+        message: "Contexto",
         preferredLanguage: "Idioma preferido",
-        consent:
-          "Acepto que la información enviada se use para responder esta solicitud.",
+        consent: "Acepto que la información enviada se use para responder esta solicitud.",
         website: "Sitio web",
       },
       placeholders: {
         name: "Tu nombre",
         company: "Empresa o equipo",
         email: "tu@empresa.com",
-        message: "Cuéntame qué necesitas construir, mejorar o mantener.",
+        message: "Qué existe hoy, qué problema enfrenta y qué resultado necesitas.",
       },
       projectTypes: [
-        "Aplicación completa",
+        "Producto completo",
         "Backend o API",
-        "Frontend",
-        "Cloud o DevOps",
+        "Cloud o arquitectura",
+        "Pagos e integraciones",
         "Inteligencia artificial",
         "Mantenimiento",
         "Consultoría",
         "Otro",
       ],
       languageOptions: { es: "Español", en: "Inglés" },
-      submit: "Solicitar una evaluación",
-      whatsappCta: "Contactar por WhatsApp",
-      sending: "Enviando solicitud...",
-      success: "Solicitud recibida. Gracias por compartir el contexto.",
-      error:
-        "No fue posible enviar la solicitud. Inténtalo nuevamente en unos minutos.",
+      submit: "Enviar contexto",
+      whatsappCta: "Escribir por WhatsApp",
+      sending: "Enviando...",
+      success: "Recibí el contexto. Gracias.",
+      error: "No fue posible enviar el mensaje. Inténtalo de nuevo en unos minutos.",
       privacy:
-        "La información se usa únicamente para responder tu solicitud. No publiques secretos, claves ni datos sensibles en el mensaje.",
+        "La información se usa únicamente para responder. No incluyas claves, secretos ni datos sensibles.",
       validation: {
         required: "Este campo es obligatorio.",
         email: "Ingresa un correo válido.",
@@ -623,612 +403,386 @@ export const content = {
       },
     },
     footer: {
-      specialties: [
-        "Web apps",
-        "APIs",
-        "Cloud",
-        "Pagos",
-        "IA aplicada",
-        "DevOps",
-      ],
+      summary: "Ingeniería full-stack con foco en backend, cloud y productos en producción.",
       rights: "Todos los derechos reservados.",
-      remote: "Disponible para proyectos remotos e internacionales.",
-      privacyLabel: "Política de privacidad",
+      backToTop: "Volver arriba",
     },
   },
   en: {
     locale: "en",
     metadata: {
-      title: "Diego Fernando Martinez | Full Stack Software Engineer",
+      title: "Systems Engineer · Backend-focused Full-Stack",
       description:
-        "I build web applications, SaaS platforms, APIs, cloud systems, payments, automation, and AI-enabled solutions ready for production.",
+        "Diego Fernando Martinez's portfolio: backend-focused full-stack engineering for fintech, payments, cloud, and AI agents.",
       keywords: [
         ...sharedKeywords,
-        "Web application development",
-        "SaaS platform development",
-        "AI automation development",
-        "Payment integrations",
+        "Backend developer",
         "Cloud architecture",
+        "Payment integrations",
+        "AI agent engineer",
       ],
     },
     nav: {
+      role: "Systems Engineer",
+      primaryLabel: "Primary navigation",
       items: [
-        { label: "Home", href: "#home" },
-        { label: "Services", href: "#services" },
         { label: "Projects", href: "#projects" },
-        { label: "Artificial intelligence", href: "#ai" },
-        { label: "Technologies", href: "#technologies" },
-        { label: "Contact", href: "#contact" },
+        { label: "Experience", href: "#experience" },
+        { label: "Capabilities", href: "#capabilities" },
+        { label: "Approach", href: "#approach" },
       ],
-      cta: "Start a project",
+      cta: "Contact",
       openMenu: "Open menu",
       closeMenu: "Close menu",
       switchLanguage: "Switch to Spanish",
     },
     hero: {
-      eyebrow: "Available for selected projects",
-      title: "I build complete, scalable digital products designed to grow.",
+      eyebrow: "Full-Stack Software Engineer · backend first",
+      titleLead: "I design systems.",
+      titleEmphasis: "I take them to production.",
       description:
-        "I develop web applications, SaaS platforms, APIs, cloud architectures, payment systems, and AI-powered automation solutions.",
-      secondaryCta: "Start a project",
-      storeCta: "Explore demo store",
-      storeUnavailable: "Demo store coming soon",
-      diagramTitle: "Complete platform",
-      diagramNodes: [
-        "Web interface",
-        "API",
-        "Database",
-        "Cloud",
-        "Payments",
-        "AI",
-        "Automations",
-      ],
+        "Systems Engineer specializing in backend, APIs, and cloud architecture. I build complete products with Node.js, TypeScript, Python, React, and Next.js—particularly in fintech, commerce, payments, and applied AI.",
+      projectsCta: "View case studies",
+      contactCta: "Talk to me",
+      availability: "Available for selected projects",
+      location: "Colombia · international remote",
+      focusLabel: "Areas of work",
+      focus: ["Backend & APIs", "Cloud", "Fintech", "Applied AI"],
+      diagramLabel: "System / product",
+      diagramNodes: ["Interface", "Services", "Data", "Operations"],
+      diagramCaption:
+        "I work across the system, with the greatest depth where business logic, data, and integrations live.",
     },
-    positioning: {
-      title: "From idea to production.",
-      stages: [
-        "Product design",
-        "Development",
-        "Cloud deployment",
-        "Continuous improvement",
-      ],
-    },
-    services: {
-      eyebrow: "Services",
-      title: "Complete solutions to build, improve, and operate digital products.",
+    expertise: {
+      eyebrow: "01 / Value",
+      title: "I do not separate code from its operating context.",
       description:
-        "Each service is focused on business outcomes: shipping faster, reducing technical risk, integrating systems, and sustaining production products.",
+        "An interface is only one part of a product. My work connects architecture, business rules, data, integrations, and continuous delivery.",
       items: [
         {
-          title: "Complete web applications",
+          index: "A",
+          title: "Backend and architecture",
           description:
-            "Design and development of SaaS platforms, internal tools, portals, dashboards, admin systems, and complete digital products.",
-          icon: "app",
+            "I design APIs, services, and data models around clear boundaries, critical flows, and long-term maintenance.",
+          evidence: ["Node.js / TypeScript", "Python", "REST / events", "SQL / NoSQL"],
         },
+        {
+          index: "B",
+          title: "End-to-end product work",
+          description:
+            "I can take a feature from technical definition to interface, tests, and deployment.",
+          evidence: ["React / Next.js", "Integrations", "Testing", "CI/CD"],
+        },
+        {
+          index: "C",
+          title: "Sensitive systems",
+          description:
+            "Experience in banking, fintech, and payments, where traceability, idempotency, and change control matter.",
+          evidence: ["Stripe", "Webhooks", "Microservices", "Observability"],
+        },
+      ],
+    },
+    experience: {
+      eyebrow: "02 / Experience",
+      title: "Technical ownership in real products.",
+      description:
+        "Experience is presented by context and contribution. Organization names and dates are not published in this portfolio version.",
+      confidentiality: "Commercial detail withheld · technical information verifiable",
+      items: [
+        {
+          context: "Banking · enterprise environment",
+          role: "External contractor",
+          title: "Microservices-based banking platform",
+          description:
+            "Feature and service development for banking workflows with controlled releases.",
+          responsibilities: [
+            "Decoupled services and serverless functions",
+            "Continuous delivery pipelines",
+            "Traceability, stability, and separation of responsibilities",
+          ],
+          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps"],
+        },
+        {
+          context: "Fintech · SaaS platform",
+          role: "Full-stack engineering",
+          title: "Flexible payments and transactional integrations",
+          description:
+            "A product for splitting payments into configurable installments and coordinating Stripe, webhooks, and external systems.",
+          responsibilities: [
+            "Separation of interface, business logic, data, and events",
+            "Payment-flow integration",
+            "Serverless backend and cloud operations",
+          ],
+          technologies: ["Next.js", "Google Cloud", "Firestore", "Stripe"],
+        },
+        {
+          context: "Financial operations · AWS",
+          role: "Design and implementation",
+          title: "APIs and persistence for financial workflows",
+          description:
+            "An application with authentication, relational persistence, and automated infrastructure for maintainable operations.",
+          responsibilities: [
+            "Separation of frontend, backend, and infrastructure",
+            "Relational modeling on Amazon RDS",
+            "Infrastructure-as-code deployments",
+          ],
+          technologies: ["AWS", "SST", "Amazon RDS", "IaC"],
+        },
+      ],
+    },
+    projects: {
+      eyebrow: "03 / Selected work",
+      title: "Case studies, not showcases.",
+      description:
+        "Each project explains the problem, ownership, and decisions that sustain the product. No invented metrics or confidential names.",
+      problemLabel: "Problem",
+      responsibilityLabel: "Ownership",
+      decisionLabel: "Decisions",
+      resultLabel: "Status / outcome",
+      architectureLabel: "Main flow",
+      items: [
+        {
+          number: "01",
+          category: "Commerce + AI agents",
+          title: "Aether Commerce",
+          summary:
+            "A bilingual commerce product with a storefront, admin, API, payments, and an assistant that can query products and operate the cart through explicit controls.",
+          status: "Public demo deployed",
+          statusTone: "live",
+          sections: [
+            {
+              label: "Problem",
+              body: "Build a store that demonstrated more than an interface: catalog, signed cart, checkout, admin operations, and conversational assistance connected to the real domain.",
+            },
+            {
+              label: "Ownership",
+              body: "Architecture and implementation of the monorepo, shared contracts, Worker API, D1, storefront, admin, Stripe integration, and AI service.",
+            },
+            {
+              label: "Decisions",
+              body: "The backend recalculates price and inventory; assistant mutations use cart tokens and idempotency; LangGraph coordinates intent, constraints, tools, validation, and audit in the validated Python path.",
+            },
+            {
+              label: "Status / outcome",
+              body: "The storefront, API, admin, and assistant Worker are deployed. The full FastAPI/LangGraph variant is Docker-validated; separate PostgreSQL and Redis hosting remains a documented next stage.",
+            },
+          ],
+          architecture: ["Storefront", "Assistant", "Worker API", "D1 / Stripe"],
+          technologies: [
+            "Next.js",
+            "TypeScript",
+            "Cloudflare Workers",
+            "D1",
+            "Python",
+            "FastAPI",
+            "LangGraph",
+            "Gemini",
+            "Stripe",
+          ],
+          href: "store",
+          hrefLabel: "Open production demo",
+          note: "The agent searches, compares, and checks variants; mutable actions require authorization, validation, and audit records.",
+        },
+        {
+          number: "02",
+          category: "Fintech + payments",
+          title: "Flexible payments SaaS",
+          summary:
+            "A platform for splitting payments into configurable installments and coordinating transactional processes across the application and external services.",
+          status: "Private case",
+          statusTone: "private",
+          sections: [
+            {
+              label: "Problem",
+              body: "Model a flexible experience without losing consistency between the interface, payment state, and external events.",
+            },
+            {
+              label: "Ownership",
+              body: "Full-stack development and integration of the frontend with a serverless backend and transactional flows.",
+            },
+            {
+              label: "Decisions",
+              body: "Separate presentation, business logic, persistence, and events; process state changes through Stripe and webhooks.",
+            },
+            {
+              label: "Status / outcome",
+              body: "Presented without client identity, metrics, or a public link to preserve confidentiality.",
+            },
+          ],
+          architecture: ["Next.js", "Cloud Functions", "Firestore", "Stripe"],
+          technologies: ["Next.js", "Vercel", "Google Cloud", "Firestore", "Stripe"],
+        },
+        {
+          number: "03",
+          category: "Banking + microservices",
+          title: "Services for a banking platform",
+          summary:
+            "Work in a financial environment where every change had to coexist with delivery controls, clear ownership, and operational stability.",
+          status: "Private professional work",
+          statusTone: "private",
+          sections: [
+            {
+              label: "Problem",
+              body: "Evolve banking features in a distributed architecture without compromising traceability or reliability.",
+            },
+            {
+              label: "Ownership",
+              body: "Feature and service development and maintenance as an external contractor.",
+            },
+            {
+              label: "Decisions",
+              body: "Decoupled services, serverless functions, delivery automation, and careful change control.",
+            },
+            {
+              label: "Status / outcome",
+              body: "Production experience described at the permitted level, without internal organization data.",
+            },
+          ],
+          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
+        },
+        {
+          number: "04",
+          category: "Cloud + financial operations",
+          title: "Financial platform on AWS",
+          summary:
+            "An architecture with APIs, authentication, relational data, and reproducible infrastructure for financial workflows.",
+          status: "Private case",
+          statusTone: "validated",
+          sections: [
+            {
+              label: "Problem",
+              body: "Maintain a scalable, understandable technical foundation for an application with financial rules and data.",
+            },
+            {
+              label: "Ownership",
+              body: "Design the separation between frontend, backend, data, and infrastructure.",
+            },
+            {
+              label: "Decisions",
+              body: "Relational persistence on RDS, authentication, and automated infrastructure-as-code deployments.",
+            },
+            {
+              label: "Status / outcome",
+              body: "A publishable technical case without commercial information or unverified metrics.",
+            },
+          ],
+          technologies: ["AWS", "SST", "Amazon RDS", "APIs", "IaC"],
+        },
+      ],
+    },
+    capabilities: {
+      eyebrow: "04 / Capabilities",
+      title: "Technology organized by the problem it solves.",
+      description:
+        "No percentages or logo walls. These are the areas where I connect tools with product and operating decisions.",
+      items: [
         {
           title: "Backend and APIs",
-          description:
-            "REST APIs, authentication, authorization, business logic, integrations, asynchronous processing, and event-driven architectures.",
-          icon: "api",
+          description: "Services, business rules, authentication, async work, events, and maintainable contracts.",
+          tools: ["Node.js", "TypeScript", "NestJS", "Express", "Fastify", "Python"],
         },
         {
-          title: "Modern frontend",
-          description:
-            "Fast, accessible, responsive interfaces built with React, Next.js, Angular, TypeScript, and Tailwind CSS.",
-          icon: "frontend",
+          title: "Product frontend",
+          description: "Accessible interfaces that clearly reflect domain state and constraints.",
+          tools: ["React", "Next.js", "Angular", "SSR", "Accessibility"],
         },
         {
-          title: "Cloud and serverless",
-          description:
-            "Design, deployment, and maintenance of solutions on AWS, Microsoft Azure, Google Cloud, Vercel, and Supabase.",
-          icon: "cloud",
+          title: "Cloud and infrastructure",
+          description: "Serverless, observable systems that can be deployed reproducibly.",
+          tools: ["AWS", "Google Cloud", "Cloudflare", "Docker", "Terraform", "CI/CD"],
+        },
+        {
+          title: "Data",
+          description: "Relational and document models, migrations, indexes, and persistence shaped around real workflows.",
+          tools: ["PostgreSQL", "MySQL", "RDS", "Firestore", "D1", "Redis"],
         },
         {
           title: "Payments and integrations",
-          description:
-            "Stripe integration, webhooks, subscriptions, refunds, transactional flows, and external services.",
-          icon: "payments",
+          description: "Checkout, webhooks, subscriptions, refunds, and idempotency around external events.",
+          tools: ["Stripe", "Webhooks", "Clerk", "Resend", "External APIs"],
         },
         {
-          title: "Artificial intelligence and automation",
-          description:
-            "LLM-based agents, chatbots, tool calling, intelligent workflows, business assistants, and structured data extraction.",
-          icon: "ai",
+          title: "Applied AI and agents",
+          description: "Tool-using agents, RAG, grounding, validation, guardrails, and answers tied to available evidence.",
+          tools: ["LangGraph", "Gemini", "Tool calling", "RAG", "SSE", "Evaluation"],
         },
         {
-          title: "DevOps and CI/CD",
-          description:
-            "Docker, automated pipelines, infrastructure as code, reproducible deployments, environment configuration, monitoring, and logging.",
-          icon: "devops",
-        },
-        {
-          title: "Maintenance and optimization",
-          description:
-            "Bug fixing, refactoring, application modernization, database optimization, performance, security, and scalability.",
-          icon: "maintenance",
-        },
-        {
-          title: "Technical consulting",
-          description:
-            "Architecture assessment, technology selection, project planning, risk identification, and technical guidance.",
-          icon: "consulting",
+          title: "Quality and delivery",
+          description: "Tests, contracts, observability, security, and environment-based releases before production.",
+          tools: ["GitHub Actions", "Playwright", "OpenAPI", "Logging", "Metrics"],
         },
       ],
     },
-    clients: {
-      eyebrow: "Who it helps",
-      title: "I work with teams that need real software shipped to production.",
+    approach: {
+      eyebrow: "05 / Approach",
+      title: "Understand the system first; decide the shape second.",
       description:
-        "The same technical foundation adapts to startups, growing companies, commerce businesses, and teams that need specialized support.",
-      items: [
-        {
-          title: "Startups",
-          description:
-            "MVP development, technical validation, initial architecture, and evolution toward a scalable platform.",
-          icon: "startup",
-        },
-        {
-          title: "Small and midsize businesses",
-          description:
-            "Process digitalization, admin systems, automation, integrations, and modernization of existing tools.",
-          icon: "business",
-        },
-        {
-          title: "Commerce and eCommerce",
-          description:
-            "Catalogs, payments, orders, inventory, admin panels, notifications, and business analytics.",
-          icon: "commerce",
-        },
-        {
-          title: "Development teams",
-          description:
-            "Backend or frontend support, maintenance, troubleshooting, cloud integrations, and temporary team extension.",
-          icon: "team",
-        },
-        {
-          title: "Individual clients",
-          description:
-            "Custom product development, specialized platforms, and guidance from idea to launch.",
-          icon: "individual",
-        },
-      ],
-    },
-    caseStudies: {
-      eyebrow: "Case studies",
-      title:
-        "Projects presented with technical context without exposing confidential information.",
-      description:
-        "These cases prioritize architecture, responsibilities, and security considerations over private names or unavailable links.",
-      items: [
-        {
-          eyebrow: "Banking and microservices",
-          title: "Microservices-based banking platform",
-          summary:
-            "Enterprise solution with decoupled services, controlled deployments, and reliability focus for banking workflows.",
-          sections: [
-            {
-              title: "Context",
-              body: "External contractor participation in a banking application built with microservices.",
-            },
-            {
-              title: "Responsibilities",
-              body: "Development and maintenance of features, services, and continuous delivery pipelines.",
-            },
-            {
-              title: "Security and reliability",
-              body: "Work under financial-system considerations: change control, traceability, operational stability, and separation of responsibilities.",
-            },
-          ],
-          technologies: [
-            "AWS Lambda",
-            "Node.js",
-            "Angular",
-            "Azure DevOps",
-            "CI/CD",
-            "Microservices",
-          ],
-        },
-        {
-          eyebrow: "Fintech and property operations",
-          title: "Flexible Payments SaaS Platform",
-          summary:
-            "SaaS product for splitting payments into customizable installments, integrating external systems, and operating transactional workflows.",
-          sections: [
-            {
-              title: "Solution",
-              body: "Next.js frontend, Vercel deployment, and serverless backend on Google Cloud.",
-            },
-            {
-              title: "Integrations",
-              body: "External systems, Stripe, webhooks, and transactional processes.",
-            },
-            {
-              title: "Operations",
-              body: "Separation between interface, business logic, data, and events to support maintenance and evolution.",
-            },
-          ],
-          technologies: [
-            "Next.js",
-            "Vercel",
-            "Google Cloud",
-            "Firestore",
-            "Cloud Functions",
-            "Stripe",
-            "Serverless",
-          ],
-        },
-        {
-          eyebrow: "Financial operations",
-          title: "AWS financial operations platform",
-          summary:
-            "Scalable application for APIs, authentication, relational persistence, and automated deployments.",
-          sections: [
-            {
-              title: "Architecture",
-              body: "Clear separation between frontend, backend, and infrastructure to improve maintainability.",
-            },
-            {
-              title: "Data",
-              body: "Relational persistence with Amazon RDS and modeling oriented around financial workflows.",
-            },
-            {
-              title: "Deployment",
-              body: "Automation with infrastructure as code and release pipelines.",
-            },
-          ],
-          technologies: [
-            "AWS",
-            "SST Framework",
-            "Amazon RDS",
-            "APIs",
-            "Authentication",
-            "Infrastructure as code",
-          ],
-        },
-      ],
-    },
-    ai: {
-      eyebrow: "Applied AI",
-      title: "AI automation connected to real business processes.",
-      description:
-        "Artificial intelligence is integrated with business rules, data, security, observability, and human supervision.",
-      note:
-        "AI is not treated as magic: systems are designed with validation, guardrails, event logging, and clear human control points.",
-      items: [
-        {
-          title: "LLM-based agents",
-          description:
-            "Agents that use tools, structured reasoning, APIs, databases, memory, context, and result validation.",
-          icon: "ai",
-          items: [
-            "Tool calling",
-            "Document processing",
-            "Data extraction",
-            "Validation",
-          ],
-        },
-        {
-          title: "Business chatbots",
-          description:
-            "Assistants for customer support, internal queries, knowledge bases, system integration, and human escalation.",
-          icon: "workflow",
-          items: [
-            "Support",
-            "Internal queries",
-            "Knowledge bases",
-            "Escalation",
-          ],
-        },
-        {
-          title: "Intelligent automation",
-          description:
-            "Email processing, information classification, report generation, operational tasks, and event-driven integrations.",
-          icon: "rocket",
-          items: ["Email", "Reports", "Events", "Integrations"],
-        },
-        {
-          title: "Real-time dashboards and data",
-          description:
-            "WebSockets, metrics, alerts, operational visualization, event processing, and real-time updates.",
-          icon: "database",
-          items: ["WebSockets", "Metrics", "Alerts", "Events"],
-        },
-      ],
-    },
-    stack: {
-      eyebrow: "Technology stack",
-      title: "Tools organized by layer, without artificial proficiency percentages.",
-      description:
-        "Technology is selected based on the product, team, costs, security, scalability, and operational needs.",
-      categories: [
-        {
-          title: "Languages",
-          items: ["JavaScript", "TypeScript", "Python", "SQL", "HTML", "CSS"],
-        },
-        {
-          title: "Frontend",
-          items: [
-            "React",
-            "Next.js",
-            "Angular",
-            "Tailwind CSS",
-            "Responsive design",
-            "Accessibility",
-            "State management",
-            "API integration",
-            "Server-side rendering",
-            "Static generation",
-          ],
-        },
-        {
-          title: "Backend",
-          items: [
-            "Node.js",
-            "NestJS",
-            "Express",
-            "Fastify",
-            "Django",
-            "Flask",
-            "REST APIs",
-            "WebSockets",
-            "Webhooks",
-            "Hono",
-            "Zod",
-            "Async processing",
-            "Events",
-            "Microservices",
-            "Serverless",
-          ],
-        },
-        {
-          title: "Artificial intelligence",
-          items: [
-            "LLM-based agents",
-            "Chatbots",
-            "Tool calling",
-            "RAG",
-            "Intelligent automation",
-            "Document processing",
-            "Validation and guardrails",
-            "AI-assisted dashboards",
-          ],
-        },
-        {
-          title: "AWS",
-          items: [
-            "AWS Lambda",
-            "EC2",
-            "RDS",
-            "S3",
-            "SES",
-            "API Gateway",
-            "SQS",
-            "CloudWatch",
-            "Cognito",
-            "ECS",
-            "CloudFront",
-            "Serverless",
-            "Infrastructure as code",
-          ],
-        },
-        {
-          title: "Microsoft Azure",
-          items: [
-            "Azure Functions",
-            "App Service",
-            "Azure DevOps",
-            "Azure SQL",
-            "Blob Storage",
-            "Key Vault",
-            "CI/CD pipelines",
-          ],
-        },
-        {
-          title: "Google Cloud",
-          items: [
-            "Cloud Functions",
-            "Compute Engine",
-            "Cloud Run",
-            "Firestore",
-            "Firebase",
-            "Cloud Storage",
-            "Pub/Sub",
-            "Serverless",
-          ],
-        },
-        {
-          title: "Cloudflare",
-          items: [
-            "Cloudflare Workers",
-            "Cloudflare Pages",
-            "Cloudflare D1",
-            "Wrangler",
-            "Edge runtime",
-            "Bindings",
-            "Environment variables",
-            "Serverless deployment",
-          ],
-        },
-        {
-          title: "Managed platforms",
-          items: [
-            "Vercel",
-            "Supabase",
-            "Firebase",
-            "Clerk",
-            "Cloudinary",
-            "Preview deployments",
-            "Authentication",
-            "Databases",
-            "Storage",
-            "Edge functions",
-          ],
-        },
-        {
-          title: "Databases and data",
-          items: [
-            "PostgreSQL",
-            "MySQL",
-            "MongoDB",
-            "Firestore",
-            "Supabase",
-            "Redis",
-            "SQLite",
-            "Cloudflare D1",
-            "Drizzle ORM",
-            "Amazon RDS",
-            "Azure SQL",
-            "Parquet",
-            "Migrations",
-            "Indexes",
-            "Backups",
-            "Dataset processing",
-          ],
-        },
-        {
-          title: "Integrations and payments",
-          items: [
-            "Stripe",
-            "Stripe Checkout",
-            "Resend",
-            "Cloudinary",
-            "Clerk",
-            "Payments",
-            "Subscriptions",
-            "Refunds",
-            "Webhooks",
-            "Transactional email",
-            "External APIs",
-          ],
-        },
-        {
-          title: "DevOps and engineering",
-          items: [
-            "Docker",
-            "Kubernetes",
-            "Terraform",
-            "GitHub Actions",
-            "Wrangler",
-            "pnpm workspace",
-            "Azure DevOps",
-            "CI/CD",
-            "Unit tests",
-            "Integration tests",
-            "Monitoring",
-            "Logging",
-            "Security",
-            "Secret management",
-            "Performance",
-          ],
-        },
-      ],
-    },
-    cloud: {
-      eyebrow: "Multicloud",
-      title: "Cloud solutions without vendor tunnel vision.",
-      description:
-        "Not every project needs several clouds at once. Architecture is defined by context, costs, and operational needs.",
-      platforms: ["AWS", "Microsoft Azure", "Google Cloud", "Cloudflare", "Vercel", "Supabase"],
-      factors: [
-        "Product requirements",
-        "Costs",
-        "Scalability",
-        "Development speed",
-        "Security",
-        "Integrations",
-        "Team experience",
-        "Operational needs",
-      ],
-    },
-    process: {
-      eyebrow: "Process",
-      title: "A clear workflow for moving from uncertainty to progressive delivery.",
-      description:
-        "The work combines discovery, technical decisions, frequent communication, and post-deployment maintenance.",
+        "I work in reviewable increments and make risk visible early. Architecture should make change easier, not ceremonial.",
       steps: [
         {
-          title: "Discovery",
-          description:
-            "Alignment on goals, users, constraints, existing systems, and initial risks.",
+          number: "01",
+          title: "Context",
+          description: "Goals, users, constraints, critical flows, and existing systems.",
         },
         {
-          title: "Scope definition",
-          description:
-            "Prioritization of deliverables, phases, acceptance criteria, and dependencies.",
+          number: "02",
+          title: "Model",
+          description: "Boundaries, data, contracts, threats, integrations, and reversible decisions.",
         },
         {
-          title: "Technical design",
-          description:
-            "Architecture, data model, integrations, security, deployment, and observability.",
+          number: "03",
+          title: "Delivery",
+          description: "Small increments, useful tests, review, and pre-production environments.",
         },
         {
-          title: "Iterative development",
-          description:
-            "Implementation in reviewable increments with frequent communication.",
-        },
-        {
-          title: "Testing and deployment",
-          description:
-            "Functional validation, accessibility, performance, and controlled release.",
-        },
-        {
-          title: "Maintenance and evolution",
-          description:
-            "Fixes, improvements, monitoring, new features, and optimization.",
+          number: "04",
+          title: "Operations",
+          description: "Controlled release, observable signals, maintenance, and evolution.",
         },
       ],
-    },
-    differentiators: {
-      eyebrow: "Differentiators",
-      title: "More than writing code: building systems that can be sustained.",
-      items: [
-        "Full view of frontend, backend, data, and infrastructure to reduce friction between layers.",
-        "Experience with financial products and payment flows where reliability and traceability matter.",
-        "Ability to work with AWS, Azure, Google Cloud, and managed platforms depending on the case.",
-        "Automation and artificial intelligence integrated into real processes, with validation and supervision.",
-        "Maintainability focus: readable code, clear responsibilities, tests, monitoring, and reproducible deployments.",
-      ],
+      principle: "Complexity must justify its operating cost.",
     },
     contact: {
-      eyebrow: "Contact",
-      title: "Let's discuss your idea.",
+      eyebrow: "06 / Contact",
+      title: "Is there a serious problem to solve?",
       description:
-        "Share the essential context and the request will be stored securely for follow-up.",
+        "Tell me the context, the current state, and what needs to change. I respond better to concrete problems than briefs full of adjectives.",
+      directLabel: "Direct channels",
+      linkedinLabel: "View professional profile",
       fields: {
         name: "Name",
         company: "Company",
         email: "Email",
         projectType: "Project type",
-        message: "Message",
+        message: "Context",
         preferredLanguage: "Preferred language",
-        consent:
-          "I agree that the submitted information may be used to respond to this request.",
+        consent: "I agree that the submitted information may be used to respond to this request.",
         website: "Website",
       },
       placeholders: {
         name: "Your name",
         company: "Company or team",
         email: "you@company.com",
-        message: "Tell me what you need to build, improve, or maintain.",
+        message: "What exists today, what problem it faces, and what outcome you need.",
       },
       projectTypes: [
-        "Complete application",
+        "Complete product",
         "Backend or API",
-        "Frontend",
-        "Cloud or DevOps",
+        "Cloud or architecture",
+        "Payments and integrations",
         "Artificial intelligence",
         "Maintenance",
         "Consulting",
         "Other",
       ],
       languageOptions: { es: "Spanish", en: "English" },
-      submit: "Request an assessment",
-      whatsappCta: "Contact on WhatsApp",
-      sending: "Sending request...",
-      success: "Request received. Thanks for sharing the context.",
-      error: "The request could not be sent. Please try again in a few minutes.",
+      submit: "Send context",
+      whatsappCta: "Write on WhatsApp",
+      sending: "Sending...",
+      success: "I received the context. Thank you.",
+      error: "The message could not be sent. Please try again in a few minutes.",
       privacy:
-        "The information is used only to respond to your request. Do not include secrets, keys, or sensitive data in the message.",
+        "The information is used only to respond. Do not include keys, secrets, or sensitive data.",
       validation: {
         required: "This field is required.",
         email: "Enter a valid email address.",
@@ -1237,17 +791,9 @@ export const content = {
       },
     },
     footer: {
-      specialties: [
-        "Web apps",
-        "APIs",
-        "Cloud",
-        "Payments",
-        "Applied AI",
-        "DevOps",
-      ],
+      summary: "Backend-focused full-stack engineering for cloud products in production.",
       rights: "All rights reserved.",
-      remote: "Available for remote and international projects.",
-      privacyLabel: "Privacy policy",
+      backToTop: "Back to top",
     },
   },
 } as const satisfies Record<Locale, LandingContent>;

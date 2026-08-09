@@ -1,65 +1,58 @@
 import type { Locale } from "@/i18n/config";
 
-export type IconName =
-  | "app"
-  | "api"
-  | "frontend"
-  | "cloud"
-  | "payments"
-  | "ai"
-  | "devops"
-  | "maintenance"
-  | "consulting"
-  | "startup"
-  | "business"
-  | "commerce"
-  | "team"
-  | "individual"
-  | "database"
-  | "shield"
-  | "workflow"
-  | "rocket"
-  | "layers"
-  | "server"
-  | "globe";
-
 export type NavItem = {
   label: string;
   href: string;
 };
 
-export type CardItem = {
+export type ExpertiseItem = {
+  index: string;
   title: string;
   description: string;
-  icon?: IconName;
-  items?: readonly string[];
+  evidence: readonly string[];
 };
 
-export type TimelineItem = {
-  company: string;
+export type ExperienceItem = {
+  context: string;
   role: string;
-  period: string;
-  description?: string;
-  highlights?: readonly string[];
-  projects?: readonly {
-    title: string;
-    description: string;
-    highlights: readonly string[];
-  }[];
+  title: string;
+  description: string;
+  responsibilities: readonly string[];
+  technologies: readonly string[];
 };
 
-export type CaseStudy = {
+export type ProjectSection = {
+  label: string;
+  body: string;
+};
+
+export type ProjectItem = {
+  number: string;
+  category: string;
   title: string;
-  eyebrow: string;
   summary: string;
-  sections: readonly { title: string; body: string }[];
+  status: string;
+  statusTone: "live" | "validated" | "private";
+  sections: readonly ProjectSection[];
+  architecture?: readonly string[];
   technologies: readonly string[];
+  href?: string;
+  hrefLabel?: string;
+  note?: string;
+};
+
+export type CapabilityItem = {
+  title: string;
+  description: string;
+  tools: readonly string[];
 };
 
 export type ContactContent = {
   title: string;
   eyebrow: string;
   description: string;
+  directLabel: string;
+  linkedinLabel: string;
   fields: {
     name: string;
     company: string;
@@ -101,79 +94,69 @@ export type LandingContent = {
   };
   nav: {
     items: readonly NavItem[];
+    role: string;
     cta: string;
     openMenu: string;
     closeMenu: string;
     switchLanguage: string;
+    primaryLabel: string;
   };
   hero: {
     eyebrow: string;
-    title: string;
+    titleLead: string;
+    titleEmphasis: string;
     description: string;
-    secondaryCta: string;
-    storeCta: string;
-    storeUnavailable: string;
-    diagramTitle: string;
+    projectsCta: string;
+    contactCta: string;
+    availability: string;
+    location: string;
+    focusLabel: string;
+    focus: readonly string[];
+    diagramLabel: string;
     diagramNodes: readonly string[];
+    diagramCaption: string;
   };
-  positioning: {
-    title: string;
-    stages: readonly string[];
-  };
-  services: {
+  expertise: {
     eyebrow: string;
     title: string;
     description: string;
-    items: readonly CardItem[];
+    items: readonly ExpertiseItem[];
   };
-  clients: {
+  experience: {
     eyebrow: string;
     title: string;
     description: string;
-    items: readonly CardItem[];
+    confidentiality: string;
+    items: readonly ExperienceItem[];
   };
-  caseStudies: {
+  projects: {
     eyebrow: string;
     title: string;
     description: string;
-    items: readonly CaseStudy[];
+    problemLabel: string;
+    decisionLabel: string;
+    responsibilityLabel: string;
+    resultLabel: string;
+    architectureLabel: string;
+    items: readonly ProjectItem[];
   };
-  ai: {
+  capabilities: {
     eyebrow: string;
     title: string;
     description: string;
-    items: readonly CardItem[];
-    note: string;
+    items: readonly CapabilityItem[];
   };
-  stack: {
+  approach: {
     eyebrow: string;
     title: string;
     description: string;
-    categories: readonly { title: string; items: readonly string[] }[];
-  };
-  cloud: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    platforms: readonly string[];
-    factors: readonly string[];
-  };
-  process: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    steps: readonly { title: string; description: string }[];
-  };
-  differentiators: {
-    eyebrow: string;
-    title: string;
-    items: readonly string[];
+    steps: readonly { number: string; title: string; description: string }[];
+    principle: string;
   };
   contact: ContactContent;
   footer: {
-    specialties: readonly string[];
+    summary: string;
     rights: string;
-    remote: string;
-    privacyLabel: string;
+    backToTop: string;
   };
 };

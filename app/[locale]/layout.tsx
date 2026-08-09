@@ -29,11 +29,12 @@ export async function generateMetadata({
   const dictionary = content[locale];
   const alternateLocale = locale === "es" ? "en" : "es";
   const localizedPath = `/${locale}`;
+  const socialImage = new URL("/og.png", siteConfig.siteUrl);
 
   return {
     title: dictionary.metadata.title,
     description: dictionary.metadata.description,
-    keywords: dictionary.metadata.keywords,
+    keywords: [...dictionary.metadata.keywords],
     alternates: {
       canonical: localizedPath,
       languages: {
@@ -50,11 +51,20 @@ export async function generateMetadata({
       locale: locale === "es" ? "es_CO" : "en_US",
       alternateLocale: locale === "es" ? ["en_US"] : ["es_CO"],
       type: "website",
+      images: [
+        {
+          url: socialImage,
+          width: 1728,
+          height: 904,
+          alt: "Diego Fernando Martinez — Systems Engineer, Backend First",
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: dictionary.metadata.title,
       description: dictionary.metadata.description,
+      images: [socialImage],
     },
   };
 }
