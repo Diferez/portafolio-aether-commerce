@@ -27,6 +27,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/config/site";
@@ -85,6 +86,7 @@ function sectionIds(locale: Locale) {
 }
 
 export function LandingPage({ content }: LandingPageProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const locale = content.locale;
   const ids = sectionIds(locale);
@@ -116,7 +118,7 @@ export function LandingPage({ content }: LandingPageProps) {
   function switchLanguage() {
     const hash = window.location.hash;
     document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax`;
-    window.location.href = `/${alternateLocale}${hash}`;
+    router.push(`/${alternateLocale}${hash}`);
   }
 
   return (
