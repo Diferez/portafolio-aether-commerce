@@ -72,6 +72,8 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
   assert.match(en, /used only to respond/);
+  assert.match(en, /href="https:\/\/github\.com\/Diferez"/);
+  assert.match(en, />GitHub</);
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {

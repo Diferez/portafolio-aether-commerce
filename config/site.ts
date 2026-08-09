@@ -7,6 +7,7 @@ export const siteConfig = {
   storeUrl:
     process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
     "https://aether-storefront.pickofwow.workers.dev",
+  githubUrl: "https://github.com/Diferez",
   whatsappUrl: "https://wa.me/message/QUSZJKVQDACUM1",
   availability: {
     es: "Disponible para nuevos proyectos",
@@ -16,6 +17,10 @@ export const siteConfig = {
     {
       label: "LinkedIn",
       href: "https://www.linkedin.com/in/diferez/",
+    },
+    {
+      label: "GitHub",
+      href: "https://github.com/Diferez",
     },
   ] as Array<{ label: string; href: string }>,
 } as const;

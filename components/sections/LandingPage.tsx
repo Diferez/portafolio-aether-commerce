@@ -4,6 +4,7 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   ExternalLink,
+  GitBranch,
   Globe2,
   Menu,
   MessageSquareText,
@@ -196,6 +197,10 @@ export function LandingPage({ content }: LandingPageProps) {
                 <a className="button button-dark" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
                   <ArrowDownRight aria-hidden="true" size={17} />
+                </a>
+                <a className="button button-outline" href={siteConfig.githubUrl} target="_blank" rel="noreferrer">
+                  GitHub
+                  <GitBranch aria-hidden="true" size={17} />
                 </a>
                 <a className="text-link" href={`#${ids.contact}`}>
                   {content.hero.contactCta}

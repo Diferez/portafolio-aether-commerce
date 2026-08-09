@@ -418,6 +418,17 @@ h3 {
   background: var(--accent);
 }
 
+.button-outline {
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-outline:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+}
+
 .text-link {
   display: inline-flex;
   align-items: center;
