@@ -42,6 +42,16 @@ npm test
 
 `npm test` genera el build de producción y ejecuta las pruebas del portafolio. No instala ni compila la tienda.
 
+## Ambiente de desarrollo previo a main
+
+El repo usa `develop` como ambiente de prueba antes de producción:
+
+- PRs de feature -> `develop`.
+- Merge a `develop` -> despliegue del Worker de desarrollo.
+- PR `develop` -> `main` -> despliegue de producción.
+
+Consulta `docs-development.md` para variables, secrets y URLs del ambiente.
+
 ## Despliegue
 
 El portafolio se publica de forma independiente. El repositorio conserva `.openai/hosting.json` para el despliegue administrado por Sites y también incluye un workflow opcional para el Worker público existente de Cloudflare.

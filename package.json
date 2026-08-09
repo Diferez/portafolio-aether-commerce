@@ -9,6 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "build:cloudflare": "npm run build && node scripts/patch-front-worker-config.mjs",
+    "deploy:development": "npm run build:cloudflare && wrangler deploy --config dist/server/wrangler.json --keep-vars",
     "deploy": "npm run build:cloudflare && wrangler deploy --config dist/server/wrangler.json --keep-vars",
     "start": "vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",

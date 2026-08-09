@@ -1,0 +1,56 @@
+name: Deploy portfolio development
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: portfolio-development
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: development
+    env:
+      PORTFOLIO_WORKER_NAME: ${{ vars.PORTFOLIO_WORKER_NAME || 'portafolio-aether-commerce-dev' }}
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL }}
+      NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
+      AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify development connections
+        run: |
+          test -n "${NEXT_PUBLIC_SITE_URL}"
+          test -n "${NEXT_PUBLIC_STORE_URL}"
+          test -n "${NEXT_PUBLIC_AETHER_API_URL}"
+          test -n "${AETHER_API_ORIGIN}"
+      - name: Validate portfolio
+        run: npm run lint && npm test
+      - name: Configure Worker
+        run: node scripts/patch-front-worker-config.mjs
+      - name: Deploy development Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: deploy --config dist/server/wrangler.json
+      - name: Verify development deployment
+        run: |
+          curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_SITE_URL}"
+          curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_STORE_URL}"
