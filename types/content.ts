@@ -12,15 +12,6 @@ export type ExpertiseItem = {
   evidence: readonly string[];
 };
 
-export type ExperienceItem = {
-  context: string;
-  role: string;
-  title: string;
-  description: string;
-  responsibilities: readonly string[];
-  technologies: readonly string[];
-};
-
 export type ProjectSection = {
   label: string;
   body: string;
@@ -121,13 +112,6 @@ export type LandingContent = {
     title: string;
     description: string;
     items: readonly ExpertiseItem[];
-  };
-  experience: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    confidentiality: string;
-    items: readonly ExperienceItem[];
   };
   projects: {
     eyebrow: string;

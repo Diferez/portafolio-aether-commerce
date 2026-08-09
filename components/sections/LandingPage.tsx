@@ -3,7 +3,6 @@
 import {
   ArrowDownRight,
   ArrowUpRight,
-  Check,
   ExternalLink,
   Globe2,
   Menu,
@@ -15,11 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 import { localeCookieName, type Locale } from "@/i18n/config";
-import type {
-  ExperienceItem,
-  LandingContent,
-  ProjectItem,
-} from "@/types/content";
+import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
 
@@ -32,7 +27,6 @@ function sectionIds(locale: Locale) {
     ? {
         home: "inicio",
         projects: "proyectos",
-        experience: "experiencia",
         capabilities: "capacidades",
         approach: "enfoque",
         contact: "contacto",
@@ -40,7 +34,6 @@ function sectionIds(locale: Locale) {
     : {
         home: "home",
         projects: "projects",
-        experience: "experience",
         capabilities: "capabilities",
         approach: "approach",
         contact: "contact",
@@ -170,7 +163,7 @@ export function LandingPage({ content }: LandingPageProps) {
               </a>
             ))}
             <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
-              <span>05</span>
+              <span>{String(content.nav.items.length + 1).padStart(2, "0")}</span>
               {content.nav.cta}
             </a>
             <button type="button" onClick={switchLanguage}>
@@ -243,22 +236,6 @@ export function LandingPage({ content }: LandingPageProps) {
               ))}
             </div>
           </Section>
-
-          <section className="experience-section dark-section" id={ids.experience}>
-            <div className="section-frame">
-              <Reveal className="section-intro">
-                <p className="eyebrow">{content.experience.eyebrow}</p>
-                <h2>{content.experience.title}</h2>
-                <p>{content.experience.description}</p>
-                <span className="confidentiality-note">{content.experience.confidentiality}</span>
-              </Reveal>
-              <div className="experience-list">
-                {content.experience.items.map((item, index) => (
-                  <ExperienceRow key={item.title} item={item} index={index} />
-                ))}
-              </div>
-            </div>
-          </section>
 
           <Section
             id={ids.projects}
@@ -430,43 +407,6 @@ function Section({
       </Reveal>
       {children}
     </section>
-  );
-}
-
-function ExperienceRow({
-  item,
-  index,
-}: {
-  item: ExperienceItem;
-  index: number;
-}) {
-  return (
-    <Reveal>
-      <article className="experience-row">
-        <span className="experience-number">{String(index + 1).padStart(2, "0")}</span>
-        <div className="experience-context">
-          <p>{item.context}</p>
-          <span>{item.role}</span>
-        </div>
-        <div className="experience-body">
-          <h3>{item.title}</h3>
-          <p>{item.description}</p>
-          <ul>
-            {item.responsibilities.map((responsibility) => (
-              <li key={responsibility}>
-                <Check aria-hidden="true" size={14} />
-                {responsibility}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <ul className="experience-tech inline-list">
-          {item.technologies.map((technology) => (
-            <li key={technology}>{technology}</li>
-          ))}
-        </ul>
-      </article>
-    </Reveal>
   );
 }
 

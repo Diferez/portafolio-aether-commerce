@@ -47,13 +47,16 @@ test("renders Spanish and English without mixing hero copy", async () => {
 
 test("includes localized navigation, hreflang, and production project link", async () => {
   const es = await text("/es");
+  const expectedStoreUrl =
+    process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
+    "https://aether-storefront.pickofwow.workers.dev";
 
   assert.match(es, /href="#proyectos"/);
-  assert.match(es, /href="#experiencia"/);
+  assert.doesNotMatch(es, /href="#experiencia"/);
   assert.match(es, /href="#contacto"/);
   assert.match(es, /hrefLang="es"/);
   assert.match(es, /hrefLang="en"/);
-  assert.match(es, /https:\/\/aether-storefront\.pickofwow\.workers\.dev/);
+  assert.ok(es.includes(expectedStoreUrl));
   assert.doesNotMatch(es, /href=""/);
 });
 

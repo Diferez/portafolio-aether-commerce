@@ -39,7 +39,6 @@ export const content = {
       primaryLabel: "Navegación principal",
       items: [
         { label: "Proyectos", href: "#proyectos" },
-        { label: "Experiencia", href: "#experiencia" },
         { label: "Capacidades", href: "#capacidades" },
         { label: "Enfoque", href: "#enfoque" },
       ],
@@ -94,56 +93,8 @@ export const content = {
         },
       ],
     },
-    experience: {
-      eyebrow: "02 / Experiencia",
-      title: "Responsabilidad técnica en productos reales.",
-      description:
-        "La experiencia se presenta por contexto y contribución. Los nombres de organizaciones y las fechas no se publican en esta versión del portafolio.",
-      confidentiality: "Detalle comercial reservado · información técnica verificable",
-      items: [
-        {
-          context: "Banca · entorno empresarial",
-          role: "Contratista externo",
-          title: "Plataforma bancaria basada en microservicios",
-          description:
-            "Desarrollo y mantenimiento de funcionalidades y servicios para flujos bancarios con despliegues controlados.",
-          responsibilities: [
-            "Servicios desacoplados y funciones serverless",
-            "Pipelines de entrega continua",
-            "Trazabilidad, estabilidad y separación de responsabilidades",
-          ],
-          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps"],
-        },
-        {
-          context: "Fintech · plataforma SaaS",
-          role: "Ingeniería full-stack",
-          title: "Pagos flexibles e integraciones transaccionales",
-          description:
-            "Producto para dividir pagos en cuotas personalizables y coordinar Stripe, webhooks y sistemas externos.",
-          responsibilities: [
-            "Separación entre interfaz, negocio, datos y eventos",
-            "Integración de flujos de pago",
-            "Backend serverless y operación cloud",
-          ],
-          technologies: ["Next.js", "Google Cloud", "Firestore", "Stripe"],
-        },
-        {
-          context: "Operaciones financieras · AWS",
-          role: "Diseño e implementación",
-          title: "APIs y persistencia para flujos financieros",
-          description:
-            "Aplicación con autenticación, persistencia relacional e infraestructura automatizada para una operación mantenible.",
-          responsibilities: [
-            "Separación de frontend, backend e infraestructura",
-            "Modelado relacional en Amazon RDS",
-            "Despliegues con infraestructura como código",
-          ],
-          technologies: ["AWS", "SST", "Amazon RDS", "IaC"],
-        },
-      ],
-    },
     projects: {
-      eyebrow: "03 / Trabajo seleccionado",
+      eyebrow: "02 / Trabajo seleccionado",
       title: "Casos de estudio, no vitrinas.",
       description:
         "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto. Sin métricas inventadas ni nombres confidenciales.",
@@ -283,7 +234,7 @@ export const content = {
       ],
     },
     capabilities: {
-      eyebrow: "04 / Capacidades",
+      eyebrow: "03 / Capacidades",
       title: "Tecnología organizada por el problema que resuelve.",
       description:
         "No uso porcentajes ni una pared de logos. Estas son las áreas en las que conecto herramientas con decisiones de producto y operación.",
@@ -326,7 +277,7 @@ export const content = {
       ],
     },
     approach: {
-      eyebrow: "05 / Enfoque",
+      eyebrow: "04 / Enfoque",
       title: "Primero entiendo el sistema; luego decido la forma.",
       description:
         "Trabajo por incrementos revisables y hago explícitos los riesgos temprano. La arquitectura debe facilitar el cambio, no volverlo ceremonial.",
@@ -355,7 +306,7 @@ export const content = {
       principle: "La complejidad debe justificar su costo operativo.",
     },
     contact: {
-      eyebrow: "06 / Contacto",
+      eyebrow: "05 / Contacto",
       title: "¿Hay un problema serio que resolver?",
       description:
         "Cuéntame el contexto, el estado actual y qué necesita cambiar. Respondo mejor a problemas concretos que a briefs llenos de adjetivos.",
@@ -427,7 +378,6 @@ export const content = {
       primaryLabel: "Primary navigation",
       items: [
         { label: "Projects", href: "#projects" },
-        { label: "Experience", href: "#experience" },
         { label: "Capabilities", href: "#capabilities" },
         { label: "Approach", href: "#approach" },
       ],
@@ -482,56 +432,8 @@ export const content = {
         },
       ],
     },
-    experience: {
-      eyebrow: "02 / Experience",
-      title: "Technical ownership in real products.",
-      description:
-        "Experience is presented by context and contribution. Organization names and dates are not published in this portfolio version.",
-      confidentiality: "Commercial detail withheld · technical information verifiable",
-      items: [
-        {
-          context: "Banking · enterprise environment",
-          role: "External contractor",
-          title: "Microservices-based banking platform",
-          description:
-            "Feature and service development for banking workflows with controlled releases.",
-          responsibilities: [
-            "Decoupled services and serverless functions",
-            "Continuous delivery pipelines",
-            "Traceability, stability, and separation of responsibilities",
-          ],
-          technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps"],
-        },
-        {
-          context: "Fintech · SaaS platform",
-          role: "Full-stack engineering",
-          title: "Flexible payments and transactional integrations",
-          description:
-            "A product for splitting payments into configurable installments and coordinating Stripe, webhooks, and external systems.",
-          responsibilities: [
-            "Separation of interface, business logic, data, and events",
-            "Payment-flow integration",
-            "Serverless backend and cloud operations",
-          ],
-          technologies: ["Next.js", "Google Cloud", "Firestore", "Stripe"],
-        },
-        {
-          context: "Financial operations · AWS",
-          role: "Design and implementation",
-          title: "APIs and persistence for financial workflows",
-          description:
-            "An application with authentication, relational persistence, and automated infrastructure for maintainable operations.",
-          responsibilities: [
-            "Separation of frontend, backend, and infrastructure",
-            "Relational modeling on Amazon RDS",
-            "Infrastructure-as-code deployments",
-          ],
-          technologies: ["AWS", "SST", "Amazon RDS", "IaC"],
-        },
-      ],
-    },
     projects: {
-      eyebrow: "03 / Selected work",
+      eyebrow: "02 / Selected work",
       title: "Case studies, not showcases.",
       description:
         "Each project explains the problem, ownership, and decisions that sustain the product. No invented metrics or confidential names.",
@@ -671,7 +573,7 @@ export const content = {
       ],
     },
     capabilities: {
-      eyebrow: "04 / Capabilities",
+      eyebrow: "03 / Capabilities",
       title: "Technology organized by the problem it solves.",
       description:
         "No percentages or logo walls. These are the areas where I connect tools with product and operating decisions.",
@@ -714,7 +616,7 @@ export const content = {
       ],
     },
     approach: {
-      eyebrow: "05 / Approach",
+      eyebrow: "04 / Approach",
       title: "Understand the system first; decide the shape second.",
       description:
         "I work in reviewable increments and make risk visible early. Architecture should make change easier, not ceremonial.",
@@ -743,7 +645,7 @@ export const content = {
       principle: "Complexity must justify its operating cost.",
     },
     contact: {
-      eyebrow: "06 / Contact",
+      eyebrow: "05 / Contact",
       title: "Is there a serious problem to solve?",
       description:
         "Tell me the context, the current state, and what needs to change. I respond better to concrete problems than briefs full of adjectives.",

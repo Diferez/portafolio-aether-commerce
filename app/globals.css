@@ -311,7 +311,6 @@ h3 {
 
 .rail-index,
 .row-index,
-.experience-number,
 .project-number,
 .capability-row > span {
   color: var(--accent);
@@ -620,7 +619,6 @@ h3 {
   color: var(--dark-text);
 }
 
-.experience-section .section-frame,
 .contact-section .section-frame {
   padding-top: var(--section-space);
   padding-bottom: var(--section-space);
@@ -632,80 +630,6 @@ h3 {
 
 .dark-section .section-intro > p:last-of-type,
 .dark-section .contact-copy > p:last-of-type {
-  color: var(--dark-muted);
-}
-
-.confidentiality-note {
-  grid-column: 3;
-  border-left: 2px solid var(--accent);
-  padding: 6px 0 6px 14px;
-  color: var(--dark-muted);
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.experience-list {
-  border-top: 1px solid var(--dark-line);
-}
-
-.experience-row {
-  display: grid;
-  grid-template-columns: 60px 0.7fr 1.25fr 0.78fr;
-  gap: clamp(20px, 4vw, 58px);
-  align-items: start;
-  border-bottom: 1px solid var(--dark-line);
-  padding: 38px 0;
-}
-
-.experience-context p {
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.experience-context span {
-  display: block;
-  margin-top: 9px;
-  color: var(--dark-muted);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-}
-
-.experience-body h3 {
-  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
-  line-height: 1.05;
-}
-
-.experience-body > p {
-  max-width: 650px;
-  margin-top: 15px;
-  color: var(--dark-muted);
-  line-height: 1.7;
-}
-
-.experience-body ul {
-  display: grid;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.experience-body li {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  color: var(--dark-muted);
-  font-size: 0.84rem;
-}
-
-.experience-body li svg {
-  flex: 0 0 auto;
-  margin-top: 3px;
-  color: #ff7855;
-}
-
-.experience-tech li {
-  border-color: var(--dark-line);
   color: var(--dark-muted);
 }
 
@@ -1402,8 +1326,7 @@ h3 {
   }
 
   .section-intro > p:last-child,
-  .approach-intro > p:last-child,
-  .confidentiality-note {
+  .approach-intro > p:last-child {
     grid-column: 2;
   }
 
@@ -1414,14 +1337,6 @@ h3 {
 
   .expertise-row .inline-list,
   .capability-row .inline-list {
-    grid-column: 2 / -1;
-  }
-
-  .experience-row {
-    grid-template-columns: 50px 0.65fr 1.35fr;
-  }
-
-  .experience-tech {
     grid-column: 2 / -1;
   }
 
@@ -1576,8 +1491,7 @@ h3 {
   }
 
   .section-intro > p:last-child,
-  .approach-intro > p:last-child,
-  .confidentiality-note {
+  .approach-intro > p:last-child {
     grid-column: auto;
   }
 
@@ -1588,17 +1502,14 @@ h3 {
   }
 
   .expertise-row,
-  .capability-row,
-  .experience-row {
+  .capability-row {
     grid-template-columns: 48px 1fr;
   }
 
   .expertise-row > p,
   .expertise-row .inline-list,
   .capability-row > p,
-  .capability-row .inline-list,
-  .experience-body,
-  .experience-tech {
+  .capability-row .inline-list {
     grid-column: 2;
   }
 
@@ -1772,8 +1683,7 @@ h3 {
   }
 
   .expertise-row,
-  .capability-row,
-  .experience-row {
+  .capability-row {
     grid-template-columns: 32px 1fr;
     gap: 14px;
   }
@@ -1783,19 +1693,14 @@ h3 {
   .expertise-row .inline-list,
   .capability-row h3,
   .capability-row > p,
-  .capability-row .inline-list,
-  .experience-context,
-  .experience-body,
-  .experience-tech {
+  .capability-row .inline-list {
     grid-column: 2;
   }
 
-  .expertise-row,
-  .experience-row {
+  .expertise-row {
     padding: 28px 0;
   }
 
-  .experience-number,
   .row-index,
   .capability-row > span {
     grid-row: 1;
