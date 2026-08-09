@@ -110,6 +110,8 @@ export type LandingContent = {
     focus: readonly string[];
     diagramLabel: string;
     diagramKicker: string;
+    diagramCoreTitle: string;
+    diagramCoreDetail: string;
     diagramNodes: readonly DiagramNode[];
     diagramCaption: string;
   };

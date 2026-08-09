@@ -61,6 +61,8 @@ export const content = {
       focus: ["Backend & APIs", "Cloud", "Fintech", "IA aplicada"],
       diagramKicker: "Mapa de responsabilidad",
       diagramLabel: "Lo visible es solo la entrada.",
+      diagramCoreTitle: "Arquitectura de producto",
+      diagramCoreDetail: "El punto donde experiencia, backend, datos y operación dejan de ser piezas separadas.",
       diagramNodes: [
         {
           phase: "Entrada",
@@ -421,6 +423,8 @@ export const content = {
       focus: ["Backend & APIs", "Cloud", "Fintech", "Applied AI"],
       diagramKicker: "Responsibility map",
       diagramLabel: "The visible layer is only the entry point.",
+      diagramCoreTitle: "Product architecture",
+      diagramCoreDetail: "Where experience, backend, data, and operations stop being separate pieces.",
       diagramNodes: [
         {
           phase: "Entry",

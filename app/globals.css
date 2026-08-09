@@ -446,13 +446,15 @@ h3 {
 }
 
 .system-diagram {
-  width: min(100%, 430px);
+  width: min(100%, 470px);
   border: 1px solid var(--line);
-  border-left: 4px solid var(--accent);
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 46%),
+    radial-gradient(circle at 50% 43%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 36%),
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
     var(--paper-raised);
-  padding: 18px;
+  background-size: auto, 34px 34px, 34px 34px, auto;
+  padding: 18px 18px 20px;
   box-shadow: 0 18px 45px rgba(44, 37, 25, 0.08);
 }
 
@@ -472,30 +474,186 @@ h3 {
 }
 
 .system-diagram figcaption strong {
-  max-width: 340px;
+  max-width: 360px;
   color: var(--ink);
-  font-size: clamp(1.45rem, 2.1vw, 2.35rem);
+  font-size: clamp(1.5rem, 2.35vw, 2.55rem);
   font-weight: 620;
   line-height: 0.98;
   letter-spacing: -0.055em;
 }
 
-.diagram-flow {
+.architecture-graph {
+  position: relative;
+  min-height: 390px;
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--paper) 78%, transparent), transparent 42%),
+    color-mix(in srgb, var(--paper-raised) 86%, transparent);
+}
+
+.architecture-graph::before,
+.architecture-graph::after {
+  position: absolute;
+  inset: 16px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 65%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.architecture-graph::after {
+  inset: 74px;
+  border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.graph-link {
+  position: absolute;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+.graph-link-horizontal {
+  top: 50%;
+  right: 48px;
+  left: 48px;
+  height: 1px;
+}
+
+.graph-link-vertical {
+  top: 48px;
+  bottom: 48px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+}
+
+.graph-core {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
   display: grid;
-  gap: 10px;
-  margin: 26px 0 0;
+  width: min(58%, 224px);
+  min-height: 148px;
+  place-items: center;
+  padding: 20px 18px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.graph-core::before,
+.graph-core::after {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.graph-core::after {
+  inset: -14px;
+  opacity: 0.36;
+}
+
+.graph-core span {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.graph-core strong {
+  margin-top: 9px;
+  font-size: 1.08rem;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.graph-core p {
+  margin: 10px 0 0;
+  color: color-mix(in srgb, var(--paper) 74%, transparent);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.diagram-flow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .diagram-step {
-  position: relative;
+  position: absolute;
   display: grid;
-  grid-template-columns: 82px minmax(0, 1fr);
-  gap: 8px 14px;
-  align-items: baseline;
-  border-top: 1px solid var(--line);
-  padding: 13px 0 3px;
+  width: 166px;
+  min-height: 96px;
+  align-content: start;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--paper-raised) 92%, transparent);
+  padding: 13px;
+  transition:
+    border-color 160ms ease,
+    transform 160ms var(--ease-out),
+    background 160ms ease;
+}
+
+.diagram-step::before {
+  width: 8px;
+  height: 8px;
+  margin-bottom: 13px;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
+  content: "";
+}
+
+.diagram-step:nth-child(1) {
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.diagram-step:nth-child(2) {
+  top: 50%;
+  right: 22px;
+  transform: translateY(-50%);
+}
+
+.diagram-step:nth-child(3) {
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.diagram-step:nth-child(4) {
+  top: 50%;
+  left: 22px;
+  transform: translateY(-50%);
+}
+
+.diagram-step:hover {
+  border-color: var(--accent);
+  background: var(--paper);
+}
+
+.diagram-step:nth-child(1):hover,
+.diagram-step:nth-child(3):hover {
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.diagram-step:nth-child(2):hover,
+.diagram-step:nth-child(4):hover {
+  transform: translateY(-50%) translateY(-3px);
 }
 
 .diagram-step > span {
@@ -508,19 +666,20 @@ h3 {
 }
 
 .diagram-step strong {
+  margin-top: 3px;
   color: var(--ink);
-  font-size: 0.94rem;
+  font-size: 0.88rem;
+  line-height: 1.08;
 }
 
 .diagram-step p {
-  grid-column: 2;
-  margin: 0;
+  margin: 7px 0 0;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.66rem;
   line-height: 1.45;
 }
 
-.system-diagram > p {
+.diagram-caption {
   margin: 22px 0 0;
   border-top: 1px solid var(--line);
   padding-top: 16px;
@@ -528,6 +687,64 @@ h3 {
   font-size: 0.84rem;
   font-weight: 520;
   line-height: 1.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .graph-link {
+    animation: graphPulse 4.8s ease-in-out infinite;
+  }
+
+  .graph-core::before {
+    animation: corePulse 3.8s ease-in-out infinite;
+  }
+
+  .diagram-step::before {
+    animation: nodePulse 3.6s ease-in-out infinite;
+  }
+
+  .diagram-step:nth-child(2)::before {
+    animation-delay: 0.4s;
+  }
+
+  .diagram-step:nth-child(3)::before {
+    animation-delay: 0.8s;
+  }
+
+  .diagram-step:nth-child(4)::before {
+    animation-delay: 1.2s;
+  }
+}
+
+@keyframes graphPulse {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes corePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.42;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.78;
+  }
+}
+
+@keyframes nodePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 9px color-mix(in srgb, var(--accent) 5%, transparent);
+  }
 }
 
 .hero-status {
@@ -1449,20 +1666,16 @@ h3 {
     width: 100%;
   }
 
-  .diagram-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+  .architecture-graph {
+    min-height: 420px;
   }
 
   .diagram-step {
-    grid-template-columns: 1fr;
-    align-content: start;
-    border: 1px solid var(--line);
-    padding: 14px;
+    width: min(40vw, 184px);
   }
 
-  .diagram-step p {
-    grid-column: auto;
+  .graph-core {
+    width: min(48%, 250px);
   }
 
   .hero-status {
@@ -1644,17 +1857,48 @@ h3 {
     min-height: 48px;
   }
 
-  .diagram-step {
-    grid-template-columns: 1fr;
-    border-bottom: 1px solid var(--line);
+  .architecture-graph {
+    display: grid;
+    min-height: 0;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .architecture-graph::before,
+  .architecture-graph::after,
+  .graph-link {
+    display: none;
+  }
+
+  .graph-core,
+  .diagram-flow,
+  .diagram-step,
+  .diagram-step:nth-child(1),
+  .diagram-step:nth-child(2),
+  .diagram-step:nth-child(3),
+  .diagram-step:nth-child(4),
+  .diagram-step:nth-child(1):hover,
+  .diagram-step:nth-child(2):hover,
+  .diagram-step:nth-child(3):hover,
+  .diagram-step:nth-child(4):hover {
+    position: static;
+    width: auto;
+    transform: none;
+  }
+
+  .graph-core {
+    min-height: 0;
   }
 
   .diagram-flow {
+    display: grid;
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  .diagram-step p {
-    grid-column: auto;
+  .diagram-step {
+    min-height: 0;
+    padding: 14px;
   }
 
   .section-intro {

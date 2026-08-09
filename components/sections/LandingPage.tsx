@@ -367,16 +367,25 @@ function SystemDiagram({ content }: { content: LandingContent }) {
         <span>{content.hero.diagramKicker}</span>
         <strong>{content.hero.diagramLabel}</strong>
       </figcaption>
-      <ol className="diagram-flow" aria-label={content.hero.diagramLabel}>
-        {content.hero.diagramNodes.map((node) => (
-          <li className="diagram-step" key={node.phase}>
-            <span>{node.phase}</span>
-            <strong>{node.title}</strong>
-            <p>{node.detail}</p>
-          </li>
-        ))}
-      </ol>
-      <p>{content.hero.diagramCaption}</p>
+      <div className="architecture-graph">
+        <div className="graph-link graph-link-horizontal" aria-hidden="true" />
+        <div className="graph-link graph-link-vertical" aria-hidden="true" />
+        <div className="graph-core">
+          <span>Core</span>
+          <strong>{content.hero.diagramCoreTitle}</strong>
+          <p>{content.hero.diagramCoreDetail}</p>
+        </div>
+        <ol className="diagram-flow" aria-label={content.hero.diagramLabel}>
+          {content.hero.diagramNodes.map((node) => (
+            <li className="diagram-step" key={node.phase}>
+              <span>{node.phase}</span>
+              <strong>{node.title}</strong>
+              <p>{node.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <p className="diagram-caption">{content.hero.diagramCaption}</p>
     </figure>
   );
 }
