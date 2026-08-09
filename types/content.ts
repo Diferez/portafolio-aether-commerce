@@ -38,6 +38,12 @@ export type CapabilityItem = {
   tools: readonly string[];
 };
 
+export type DiagramNode = {
+  phase: string;
+  title: string;
+  detail: string;
+};
+
 export type ContactContent = {
   title: string;
   eyebrow: string;
@@ -104,7 +110,7 @@ export type LandingContent = {
     focus: readonly string[];
     diagramLabel: string;
     diagramKicker: string;
-    diagramNodes: readonly string[];
+    diagramNodes: readonly DiagramNode[];
     diagramCaption: string;
   };
   expertise: {

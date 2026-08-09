@@ -365,19 +365,17 @@ function SystemDiagram({ content }: { content: LandingContent }) {
     <figure className="system-diagram">
       <figcaption>
         <span>{content.hero.diagramKicker}</span>
-        {content.hero.diagramLabel}
+        <strong>{content.hero.diagramLabel}</strong>
       </figcaption>
-      <div className="diagram-flow" aria-label={content.hero.diagramNodes.join(", ")}>
-        {content.hero.diagramNodes.map((node, index) => (
-          <div className="diagram-step" key={node}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{node}</strong>
-            {index < content.hero.diagramNodes.length - 1 ? (
-              <i aria-hidden="true" />
-            ) : null}
-          </div>
+      <ol className="diagram-flow" aria-label={content.hero.diagramLabel}>
+        {content.hero.diagramNodes.map((node) => (
+          <li className="diagram-step" key={node.phase}>
+            <span>{node.phase}</span>
+            <strong>{node.title}</strong>
+            <p>{node.detail}</p>
+          </li>
         ))}
-      </div>
+      </ol>
       <p>{content.hero.diagramCaption}</p>
     </figure>
   );

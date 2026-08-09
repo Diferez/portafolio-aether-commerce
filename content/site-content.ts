@@ -59,11 +59,32 @@ export const content = {
       location: "Colombia · remoto internacional",
       focusLabel: "Áreas de trabajo",
       focus: ["Backend & APIs", "Cloud", "Fintech", "IA aplicada"],
-      diagramKicker: "Lectura técnica",
-      diagramLabel: "Del usuario a producción",
-      diagramNodes: ["Experiencia", "Servicios y reglas", "Datos e integraciones", "Entrega operable"],
+      diagramKicker: "Mapa de responsabilidad",
+      diagramLabel: "Lo visible es solo la entrada.",
+      diagramNodes: [
+        {
+          phase: "Entrada",
+          title: "Flujo de usuario",
+          detail: "Necesidad, restricción, estado y acción visible.",
+        },
+        {
+          phase: "Núcleo",
+          title: "Reglas y APIs",
+          detail: "Servicios que validan, calculan, autorizan y coordinan.",
+        },
+        {
+          phase: "Estado",
+          title: "Datos e integraciones",
+          detail: "Persistencia, pagos, eventos e idempotencia.",
+        },
+        {
+          phase: "Salida",
+          title: "Operación",
+          detail: "Deploy, observabilidad, seguridad y mantenimiento.",
+        },
+      ],
       diagramCaption:
-        "Conecto lo que el usuario necesita con APIs, persistencia, pagos, seguridad, observabilidad y despliegue.",
+        "Diseño la interfaz como la puerta de un sistema que debe responder bien cuando hay usuarios, fallos y cambios.",
     },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
@@ -398,11 +419,32 @@ export const content = {
       location: "Colombia · international remote",
       focusLabel: "Areas of work",
       focus: ["Backend & APIs", "Cloud", "Fintech", "Applied AI"],
-      diagramKicker: "Technical read",
-      diagramLabel: "From user flow to production",
-      diagramNodes: ["Experience", "Services and rules", "Data and integrations", "Operable delivery"],
+      diagramKicker: "Responsibility map",
+      diagramLabel: "The visible layer is only the entry point.",
+      diagramNodes: [
+        {
+          phase: "Entry",
+          title: "User flow",
+          detail: "Need, constraint, state, and visible action.",
+        },
+        {
+          phase: "Core",
+          title: "Rules and APIs",
+          detail: "Services that validate, calculate, authorize, and coordinate.",
+        },
+        {
+          phase: "State",
+          title: "Data and integrations",
+          detail: "Persistence, payments, events, and idempotency.",
+        },
+        {
+          phase: "Release",
+          title: "Operations",
+          detail: "Deploy, observability, security, and maintenance.",
+        },
+      ],
       diagramCaption:
-        "I connect what the user needs with APIs, persistence, payments, security, observability, and deployment.",
+        "I design the interface as the doorway into a system that must hold up under users, failures, and change.",
     },
     expertise: {
       eyebrow: "01 / Value",

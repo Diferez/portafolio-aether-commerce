@@ -83,7 +83,10 @@ test("renders honest case-study status and the validated AI architecture", async
   assert.match(es, /Aether Commerce/);
   assert.match(es, /Proyectos reales, explicados desde sus decisiones/);
   assert.match(es, /Entiendo el dominio antes de proponer arquitectura/);
-  assert.match(es, /Del usuario a producción/);
+  assert.match(es, /Mapa de responsabilidad/);
+  assert.match(es, /Lo visible es solo la entrada/);
+  assert.match(es, /Servicios que validan, calculan, autorizan y coordinan/);
+  assert.match(es, /Diseño la interfaz como la puerta de un sistema/);
   assert.doesNotMatch(es, /SYS \/ 01/);
   assert.doesNotMatch(es, /Sistema \/ producto/);
   assert.match(es, /FastAPI\/LangGraph está validada en Docker/);
