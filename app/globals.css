@@ -1124,20 +1124,43 @@ h3 {
 }
 
 .capability-row {
+  position: relative;
   display: grid;
   grid-template-columns: 65px 0.75fr 1.25fr 1fr;
   gap: clamp(20px, 4vw, 56px);
   align-items: start;
   border-bottom: 1px solid var(--line);
   padding: 28px 0;
-  transition:
-    background-color 180ms ease,
-    box-shadow 180ms var(--ease-out);
+  transition: background-color 180ms ease;
+}
+
+.capability-row::before {
+  position: absolute;
+  top: 28px;
+  bottom: 28px;
+  left: -12px;
+  width: 3px;
+  background: var(--accent);
+  content: "";
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 180ms var(--ease-out);
+}
+
+.capability-row > * {
+  transition: transform 180ms var(--ease-out);
 }
 
 .capability-row:hover {
   background-color: color-mix(in srgb, var(--paper-raised) 56%, transparent);
-  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.capability-row:hover::before {
+  transform: scaleY(1);
+}
+
+.capability-row:hover > * {
+  transform: translateX(8px);
 }
 
 .capability-row h3 {
