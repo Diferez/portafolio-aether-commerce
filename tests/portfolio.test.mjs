@@ -108,6 +108,16 @@ test("hero architecture graph uses a non-overlapping grid layout", async () => {
   assert.doesNotMatch(css, /\.diagram-step:nth-child\([1-4]\)\s*{[^}]*(?:top|right|bottom|left):/s);
 });
 
+test("capability rows keep their layout stable on hover", async () => {
+  const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
+  const hoverRule = css.match(/\.capability-row:hover\s*{([^}]*)}/s)?.[1] ?? "";
+
+  assert.notEqual(hoverRule, "");
+  assert.doesNotMatch(hoverRule, /\b(?:padding|margin|width|transform)\b/);
+  assert.match(hoverRule, /background-color:/);
+  assert.match(hoverRule, /box-shadow:/);
+});
+
 test("proxy keeps browser language detection and saved preference", async () => {
   const middleware = await readFile(path.join(root, "proxy.ts"), "utf8");
 

@@ -1130,12 +1130,14 @@ h3 {
   align-items: start;
   border-bottom: 1px solid var(--line);
   padding: 28px 0;
-  transition: padding 180ms var(--ease-out);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms var(--ease-out);
 }
 
 .capability-row:hover {
-  padding-right: 12px;
-  padding-left: 12px;
+  background-color: color-mix(in srgb, var(--paper-raised) 56%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .capability-row h3 {
