@@ -225,6 +225,12 @@ export const content = {
               body: "Experiencia en producción descrita al nivel permitido; sin publicar datos internos de la organización.",
             },
           ],
+          architecture: [
+            "Interfaz Angular",
+            "Servicios Node.js",
+            "Funciones AWS Lambda",
+            "Entrega con Azure DevOps",
+          ],
           technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
         },
         {
@@ -586,6 +592,12 @@ export const content = {
               label: "Status / outcome",
               body: "Production experience described at the permitted level, without internal organization data.",
             },
+          ],
+          architecture: [
+            "Angular interface",
+            "Node.js services",
+            "AWS Lambda functions",
+            "Azure DevOps delivery",
           ],
           technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
         },

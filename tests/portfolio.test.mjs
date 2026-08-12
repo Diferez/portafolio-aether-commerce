@@ -78,7 +78,7 @@ test("renders accessible contact form fields and privacy copy", async () => {
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {
-  const es = await text("/es");
+  const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
   assert.match(es, /Aether Commerce/);
   assert.match(es, /Proyectos reales, explicados desde sus decisiones/);
@@ -92,6 +92,12 @@ test("renders honest case-study status and the validated AI architecture", async
   assert.match(es, /FastAPI\/LangGraph está validada en Docker/);
   assert.match(es, /PostgreSQL y Redis permanece documentado como siguiente etapa/);
   assert.match(es, /tokens de carrito e idempotencia/);
+  assert.match(es, /Interfaz Angular/);
+  assert.match(es, /Servicios Node\.js/);
+  assert.match(es, /Funciones AWS Lambda/);
+  assert.match(es, /Entrega con Azure DevOps/);
+  assert.match(en, /Angular interface/);
+  assert.match(en, /Azure DevOps delivery/);
   assert.doesNotMatch(es, /99%|10x|millones de usuarios/i);
 });
 
