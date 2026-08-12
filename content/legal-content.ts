@@ -84,8 +84,8 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
         {
           title: "1. Responsable y alcance",
           paragraphs: [
-            "El responsable del tratamiento es Diego Fernando Martinez, profesional independiente ubicado en Colombia. Esta política aplica al portafolio y a su formulario de contacto.",
-            "Puedes comunicar una consulta de privacidad mediante el formulario del portafolio, indicando “Solicitud de privacidad” como tipo de proyecto, o mediante el canal público de WhatsApp disponible en la página principal.",
+            "El responsable del tratamiento es Diego Fernando Martinez, profesional independiente. Domicilio y dirección: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Correo electrónico: diferez676@gmail.com. Teléfono: +57 304 274 9571. Esta política aplica al portafolio y a su formulario de contacto.",
+            "Puedes comunicar una consulta de privacidad mediante el formulario del portafolio, indicando “Solicitud de privacidad” como tipo de proyecto, por correo a diferez676@gmail.com o por teléfono al +57 304 274 9571.",
           ],
         },
         {
@@ -261,8 +261,8 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
         {
           title: "1. Controller and scope",
           paragraphs: [
-            "The data controller is Diego Fernando Martinez, an independent professional based in Colombia. This policy applies to the portfolio and its contact form.",
-            "You may submit a privacy request through the portfolio form by selecting “Privacy request,” or through the public WhatsApp channel on the home page.",
+            "The data controller is Diego Fernando Martinez, an independent professional. Registered address: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Email: diferez676@gmail.com. Phone: +57 304 274 9571. This policy applies to the portfolio and its contact form.",
+            "You may submit a privacy request through the portfolio form by selecting “Privacy request,” by email at diferez676@gmail.com, or by phone at +57 304 274 9571.",
           ],
         },
         {
