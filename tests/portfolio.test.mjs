@@ -71,10 +71,45 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.doesNotMatch(en, /name="budget"/);
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
-  assert.match(en, /used only to respond/);
+  assert.match(en, /Ordinary maximum retention: 12 months/);
+  assert.match(en, /href="\/en\/legal\/privacy"/);
   assert.match(en, /href="https:\/\/github\.com\/Diferez"/);
   assert.match(en, />GitHub</);
   assert.doesNotMatch(en, /View professional profile[^]*https:\/\/github\.com\/Diferez/);
+});
+
+test("publishes complete localized legal information", async () => {
+  const pages = await Promise.all([
+    text("/es/legal/privacidad"),
+    text("/es/legal/cookies"),
+    text("/es/legal/terminos"),
+    text("/en/legal/privacy"),
+    text("/en/legal/cookies"),
+    text("/en/legal/terms"),
+  ]);
+
+  assert.match(pages[0], /privacidad y tratamiento de datos/);
+  assert.match(pages[0], /Diego Fernando Martinez/);
+  assert.match(pages[0], /12 meses/);
+  assert.match(pages[0], /property="og:url" content="[^"]+\/es\/legal\/privacidad"/);
+  assert.match(pages[1], /portfolio_locale/);
+  assert.match(pages[1], /no usa cookies de publicidad/);
+  assert.match(pages[2], /Propiedad intelectual/);
+  assert.match(pages[3], /Privacy and personal data policy/);
+  assert.match(pages[4], /does not use advertising, analytics/);
+  assert.match(pages[5], /Intellectual property/);
+});
+
+test("adds privacy evidence and defensive response headers", async () => {
+  const response = await render("/en");
+  const route = await readFile(path.join(root, "app", "api", "contact", "route.ts"), "utf8");
+
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("permissions-policy") ?? "", /camera=\(\)/);
+  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
+  assert.match(route, /privacyVersion/);
+  assert.match(route, /2026-08-12/);
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {

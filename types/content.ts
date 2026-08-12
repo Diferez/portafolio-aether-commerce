@@ -57,6 +57,7 @@ export type ContactContent = {
     message: string;
     preferredLanguage: string;
     consent: string;
+    privacyLink: string;
     website: string;
   };
   placeholders: {
@@ -150,5 +151,8 @@ export type LandingContent = {
     summary: string;
     rights: string;
     backToTop: string;
+    privacy: string;
+    cookies: string;
+    terms: string;
   };
 };

@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import type { FormEvent } from "react";
 import type { ContactContent } from "@/types/content";
 import type { Locale } from "@/i18n/config";
+import { legalHref, privacyVersion } from "@/content/legal-content";
 
 type ContactFormProps = {
   content: ContactContent;
@@ -58,7 +59,7 @@ export function ContactForm({ content, locale }: ContactFormProps) {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, locale }),
+        body: JSON.stringify({ ...payload, locale, privacyVersion }),
       });
 
       if (!response.ok) {
@@ -160,15 +161,19 @@ export function ContactForm({ content, locale }: ContactFormProps) {
         </select>
       </label>
 
-      <label className="consent field-full">
+      <div className="consent field-full">
         <input
+          id={`${formId}-consent`}
           name="consent"
           type="checkbox"
           aria-invalid={Boolean(errors.consent)}
           aria-describedby={errors.consent ? `${formId}-consent-error` : undefined}
         />
-        <span>{content.fields.consent}</span>
-      </label>
+        <label htmlFor={`${formId}-consent`}>
+          {content.fields.consent}{" "}
+          <a href={legalHref(locale, "privacy")}>{content.fields.privacyLink}</a>.
+        </label>
+      </div>
 
       {errors.consent ? (
         <span className="field-error field-full" id={`${formId}-consent-error`}>

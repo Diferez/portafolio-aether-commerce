@@ -17,6 +17,8 @@ import { localeCookieName, type Locale } from "@/i18n/config";
 import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
+import { CookieNotice } from "@/components/legal/CookieNotice";
+import { legalHref } from "@/content/legal-content";
 
 type LandingPageProps = {
   content: LandingContent;
@@ -90,7 +92,8 @@ export function LandingPage({ content }: LandingPageProps) {
     );
     const nextHash = semanticKey ? `#${nextIds[semanticKey]}` : "";
 
-    document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax`;
+    const secure = window.location.protocol === "https:" ? "; secure" : "";
+    document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax${secure}`;
     router.push(`/${alternateLocale}${nextHash}`);
     setMenuOpen(false);
   }
@@ -349,12 +352,16 @@ export function LandingPage({ content }: LandingPageProps) {
             <button type="button" onClick={switchLanguage}>
               {alternateLocale.toUpperCase()}
             </button>
+            <a href={legalHref(locale, "privacy")}>{content.footer.privacy}</a>
+            <a href={legalHref(locale, "cookies")}>{content.footer.cookies}</a>
+            <a href={legalHref(locale, "terms")}>{content.footer.terms}</a>
             <a href={`#${ids.home}`}>{content.footer.backToTop} ↑</a>
           </div>
           <p className="copyright">
             © {new Date().getFullYear()} {siteConfig.brandName}. {content.footer.rights}
           </p>
         </footer>
+        <CookieNotice locale={locale} />
       </div>
     </>
   );

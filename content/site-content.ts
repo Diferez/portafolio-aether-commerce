@@ -348,7 +348,8 @@ export const content = {
         projectType: "Tipo de proyecto",
         message: "Contexto",
         preferredLanguage: "Idioma preferido",
-        consent: "Acepto que la información enviada se use para responder esta solicitud.",
+        consent: "Autorizo el tratamiento de mis datos para gestionar y responder esta solicitud conforme a la",
+        privacyLink: "Política de privacidad",
         website: "Sitio web",
       },
       placeholders: {
@@ -365,6 +366,7 @@ export const content = {
         "Inteligencia artificial",
         "Mantenimiento",
         "Consultoría",
+        "Solicitud de privacidad",
         "Otro",
       ],
       languageOptions: { es: "Español", en: "Inglés" },
@@ -374,7 +376,7 @@ export const content = {
       success: "Recibí el contexto. Gracias.",
       error: "No fue posible enviar el mensaje. Inténtalo de nuevo en unos minutos.",
       privacy:
-        "La información se usa únicamente para responder. No incluyas claves, secretos ni datos sensibles.",
+        "Responsable: Diego Fernando Martinez. Conservación máxima ordinaria: 12 meses. No incluyas claves, secretos ni datos sensibles.",
       validation: {
         required: "Este campo es obligatorio.",
         email: "Ingresa un correo válido.",
@@ -386,6 +388,9 @@ export const content = {
       summary: "Ingeniería full-stack con foco en backend, cloud y productos en producción.",
       rights: "Todos los derechos reservados.",
       backToTop: "Volver arriba",
+      privacy: "Privacidad",
+      cookies: "Cookies",
+      terms: "Términos",
     },
   },
   en: {
@@ -716,7 +721,8 @@ export const content = {
         projectType: "Project type",
         message: "Context",
         preferredLanguage: "Preferred language",
-        consent: "I agree that the submitted information may be used to respond to this request.",
+        consent: "I authorize the processing of my data to manage and respond to this request under the",
+        privacyLink: "Privacy policy",
         website: "Website",
       },
       placeholders: {
@@ -733,6 +739,7 @@ export const content = {
         "Artificial intelligence",
         "Maintenance",
         "Consulting",
+        "Privacy request",
         "Other",
       ],
       languageOptions: { es: "Spanish", en: "English" },
@@ -742,7 +749,7 @@ export const content = {
       success: "I received the context. Thank you.",
       error: "The message could not be sent. Please try again in a few minutes.",
       privacy:
-        "The information is used only to respond. Do not include keys, secrets, or sensitive data.",
+        "Controller: Diego Fernando Martinez. Ordinary maximum retention: 12 months. Do not include keys, secrets, or sensitive data.",
       validation: {
         required: "This field is required.",
         email: "Enter a valid email address.",
@@ -754,6 +761,9 @@ export const content = {
       summary: "Backend-focused full-stack engineering for cloud products in production.",
       rights: "All rights reserved.",
       backToTop: "Back to top",
+      privacy: "Privacy",
+      cookies: "Cookies",
+      terms: "Terms",
     },
   },
 } as const satisfies Record<Locale, LandingContent>;

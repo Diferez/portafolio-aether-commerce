@@ -15,6 +15,7 @@ type ContactPayload = {
   locale?: unknown;
   website?: unknown;
   consent?: unknown;
+  privacyVersion?: unknown;
 };
 
 function clientKey(request: NextRequest) {
@@ -63,13 +64,15 @@ export async function POST(request: NextRequest) {
   const preferredLanguage = sanitizeText(payload.preferredLanguage, 30);
   const locale = sanitizeText(payload.locale, 10);
   const consent = payload.consent === "on" || payload.consent === true;
+  const privacyVersion = sanitizeText(payload.privacyVersion, 20);
 
   if (
     name.length < 2 ||
     !isValidEmail(email) ||
     !projectType ||
     message.length < 20 ||
-    !consent
+    !consent ||
+    privacyVersion !== "2026-08-12"
   ) {
     return NextResponse.json({ ok: false, code: "validation_error" }, { status: 422 });
   }
@@ -92,6 +95,7 @@ export async function POST(request: NextRequest) {
     locale: normalizedLocale,
     receivedAt: new Date().toISOString(),
     consent,
+    privacyVersion,
   };
 
   try {
@@ -113,6 +117,7 @@ async function saveContactRequest(contactRequest: {
   locale: "en" | "es";
   receivedAt: string;
   consent: boolean;
+  privacyVersion: string;
 }) {
   const apiOrigin = (
     process.env.AETHER_API_ORIGIN ||
@@ -138,6 +143,7 @@ async function saveContactRequest(contactRequest: {
         subject: contactRequest.subject,
         message: contactRequest.message,
         consent: contactRequest.consent,
+        privacyVersion: contactRequest.privacyVersion,
         locale: contactRequest.locale,
         website: "",
       }),
