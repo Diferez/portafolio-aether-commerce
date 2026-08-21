@@ -2,6 +2,7 @@
 
 import {
   ArrowDownRight,
+  ArrowRight,
   ArrowUpRight,
   ExternalLink,
   Globe2,
@@ -11,7 +12,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 import { localeCookieName, type Locale } from "@/i18n/config";
 import type { LandingContent, ProjectItem } from "@/types/content";
@@ -51,6 +52,8 @@ export function LandingPage({ content }: LandingPageProps) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.documentElement.classList.add("has-js");
+    return () => document.documentElement.classList.remove("has-js");
   }, [locale]);
 
   useEffect(() => {
@@ -107,138 +110,120 @@ export function LandingPage({ content }: LandingPageProps) {
       <a className="skip-link" href={`#${ids.projects}`}>
         {content.hero.projectsCta}
       </a>
+
       <div className="site-shell" id={ids.home}>
         <header className="site-header">
-          <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
-            <span className="brand-mark" aria-hidden="true">
-              DF
-            </span>
-            <span className="brand-copy">
-              <strong>{siteConfig.brandName}</strong>
-              <span>{content.nav.role}</span>
-            </span>
-          </a>
-
-          <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
-            {content.nav.items.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="header-actions">
-            <button
-              className="language-switch"
-              type="button"
-              onClick={switchLanguage}
-              aria-label={content.nav.switchLanguage}
-            >
-              <Globe2 aria-hidden="true" size={15} />
-              {alternateLocale.toUpperCase()}
-            </button>
-            <a className="header-contact" href={`#${ids.contact}`}>
-              {content.nav.cta}
-              <ArrowDownRight aria-hidden="true" size={16} />
+          <div className="header-inner section-frame">
+            <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
+              <span className="brand-mark" aria-hidden="true">
+                DF
+              </span>
+              <span className="brand-copy">
+                <strong>{siteConfig.brandName}</strong>
+                <span>{content.nav.role}</span>
+              </span>
             </a>
-            <button
-              className="menu-button"
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
-              aria-label={menuOpen ? content.nav.closeMenu : content.nav.openMenu}
+
+            <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
+              {content.nav.items.map((item) => (
+                <a key={item.href} href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="header-actions">
+              <button
+                className="language-switch"
+                type="button"
+                onClick={switchLanguage}
+                aria-label={content.nav.switchLanguage}
+              >
+                <Globe2 aria-hidden="true" size={15} />
+                {alternateLocale.toUpperCase()}
+              </button>
+              <a className="header-contact" href={`#${ids.contact}`}>
+                {content.nav.cta}
+                <ArrowDownRight aria-hidden="true" size={16} />
+              </a>
+              <button
+                className="menu-button"
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                aria-label={menuOpen ? content.nav.closeMenu : content.nav.openMenu}
+              >
+                {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+              </button>
+            </div>
+
+            <nav
+              className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
+              id="mobile-menu"
+              aria-label={content.nav.primaryLabel}
+              hidden={!menuOpen}
             >
-              {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-            </button>
+              {content.nav.items.map((item, index) => (
+                <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {item.label}
+                </a>
+              ))}
+              <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
+                <span>{String(content.nav.items.length + 1).padStart(2, "0")}</span>
+                {content.nav.cta}
+              </a>
+              <button type="button" onClick={switchLanguage}>
+                <span>↳</span>
+                {content.nav.switchLanguage}
+              </button>
+            </nav>
           </div>
-
-          <nav
-            className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
-            id="mobile-menu"
-            aria-label={content.nav.primaryLabel}
-            hidden={!menuOpen}
-          >
-            {content.nav.items.map((item, index) => (
-              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {item.label}
-              </a>
-            ))}
-            <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
-              <span>{String(content.nav.items.length + 1).padStart(2, "0")}</span>
-              {content.nav.cta}
-            </a>
-            <button type="button" onClick={switchLanguage}>
-              <span>↳</span>
-              {content.nav.switchLanguage}
-            </button>
-          </nav>
         </header>
 
         <main>
           <section className="hero section-frame" aria-labelledby="hero-title">
-            <div className="hero-rail" aria-label={content.hero.focusLabel}>
-              <span className="rail-index">00</span>
-              <p>{content.hero.focusLabel}</p>
-              <ul>
-                {content.hero.focus.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="hero-main">
+            <div className="hero-copy">
               <p className="eyebrow">{content.hero.eyebrow}</p>
               <h1 id="hero-title">
                 <span>{content.hero.titleLead}</span>
                 <em>{content.hero.titleEmphasis}</em>
               </h1>
-              <p className="hero-description">{content.hero.description}</p>
+            </div>
+
+            <aside className="hero-aside">
+              <p>{content.hero.description}</p>
               <div className="hero-actions">
-                <a className="button button-dark" href={`#${ids.projects}`}>
+                <a className="button button-signal" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
                   <ArrowDownRight aria-hidden="true" size={17} />
                 </a>
                 <a className="text-link" href={`#${ids.contact}`}>
                   {content.hero.contactCta}
-                  <ArrowDownRight aria-hidden="true" size={17} />
+                  <ArrowRight aria-hidden="true" size={17} />
                 </a>
               </div>
-            </div>
+            </aside>
 
-            <div className="hero-system">
-              <SystemDiagram content={content} />
-            </div>
+            <ArchitectureCorridor content={content} />
 
-            <div className="hero-status" aria-label={content.hero.availability}>
-              <span className="status-indicator" aria-hidden="true" />
-              <span>{content.hero.availability}</span>
-              <span>{content.hero.location}</span>
+            <div className="hero-meta">
+              <div className="availability" aria-label={content.hero.availability}>
+                <span className="status-indicator" aria-hidden="true" />
+                <span>{content.hero.availability}</span>
+                <span>{content.hero.location}</span>
+              </div>
+              <div className="focus-list" aria-label={content.hero.focusLabel}>
+                <span>{content.hero.focusLabel}</span>
+                <ul>
+                  {content.hero.focus.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </section>
-
-          <Section
-            eyebrow={content.expertise.eyebrow}
-            title={content.expertise.title}
-            description={content.expertise.description}
-            className="expertise-section"
-          >
-            <div className="expertise-list">
-              {content.expertise.items.map((item) => (
-                <article className="expertise-row" key={item.index}>
-                  <span className="row-index">{item.index}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <ul className="inline-list" aria-label={item.title}>
-                    {item.evidence.map((entry) => (
-                      <li key={entry}>{entry}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </Section>
 
           <Section
             id={ids.projects}
@@ -253,9 +238,32 @@ export function LandingPage({ content }: LandingPageProps) {
                   key={project.number}
                   project={project}
                   labels={content.projects}
-                  featured={index === 0}
-                  reversed={index === 2}
+                  index={index}
                 />
+              ))}
+            </div>
+          </Section>
+
+          <Section
+            eyebrow={content.expertise.eyebrow}
+            title={content.expertise.title}
+            description={content.expertise.description}
+            className="expertise-section"
+          >
+            <div className="expertise-list">
+              {content.expertise.items.map((item, index) => (
+                <Reveal delay={index * 70} key={item.index}>
+                  <article className="expertise-row">
+                    <span className="row-index">{item.index}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <ul className="inline-list" aria-label={item.title}>
+                      {item.evidence.map((entry) => (
+                        <li key={entry}>{entry}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </Section>
@@ -269,16 +277,18 @@ export function LandingPage({ content }: LandingPageProps) {
           >
             <div className="capabilities-table">
               {content.capabilities.items.map((item, index) => (
-                <article className="capability-row" key={item.title}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <ul className="inline-list">
-                    {item.tools.map((tool) => (
-                      <li key={tool}>{tool}</li>
-                    ))}
-                  </ul>
-                </article>
+                <Reveal delay={(index % 3) * 55} key={item.title}>
+                  <article className="capability-row">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <ul className="inline-list" aria-label={item.title}>
+                      {item.tools.map((tool) => (
+                        <li key={tool}>{tool}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </Section>
@@ -291,12 +301,14 @@ export function LandingPage({ content }: LandingPageProps) {
                 <p>{content.approach.description}</p>
               </Reveal>
               <div className="execution-line">
-                {content.approach.steps.map((step) => (
-                  <article key={step.number}>
-                    <span>{step.number}</span>
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
-                  </article>
+                {content.approach.steps.map((step, index) => (
+                  <Reveal delay={index * 75} key={step.number}>
+                    <article>
+                      <span>{step.number}</span>
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </article>
+                  </Reveal>
                 ))}
               </div>
               <Reveal>
@@ -334,7 +346,7 @@ export function LandingPage({ content }: LandingPageProps) {
         </main>
 
         <footer className="site-footer section-frame">
-          <div>
+          <div className="footer-signature">
             <span className="brand-mark" aria-hidden="true">
               DF
             </span>
@@ -367,32 +379,49 @@ export function LandingPage({ content }: LandingPageProps) {
   );
 }
 
-function SystemDiagram({ content }: { content: LandingContent }) {
+function ArchitectureCorridor({ content }: { content: LandingContent }) {
+  const [entry, rules, state, operation] = content.hero.diagramNodes;
+  const panels = [
+    { code: "01", kicker: entry.phase, title: entry.title, detail: entry.detail },
+    { code: "02", kicker: rules.phase, title: rules.title, detail: rules.detail },
+    {
+      code: "CORE",
+      kicker: content.hero.diagramKicker,
+      title: content.hero.diagramCoreTitle,
+      detail: content.hero.diagramCoreDetail,
+    },
+    { code: "03", kicker: state.phase, title: state.title, detail: state.detail },
+    { code: "04", kicker: operation.phase, title: operation.title, detail: operation.detail },
+  ];
+
   return (
-    <figure className="system-diagram">
+    <figure className="architecture-corridor">
       <figcaption>
         <span>{content.hero.diagramKicker}</span>
         <strong>{content.hero.diagramLabel}</strong>
       </figcaption>
-      <div className="architecture-graph">
-        <div className="graph-link graph-link-horizontal" aria-hidden="true" />
-        <div className="graph-link graph-link-vertical" aria-hidden="true" />
-        <div className="graph-core">
-          <span>Core</span>
-          <strong>{content.hero.diagramCoreTitle}</strong>
-          <p>{content.hero.diagramCoreDetail}</p>
-        </div>
-        <ol className="diagram-flow" aria-label={content.hero.diagramLabel}>
-          {content.hero.diagramNodes.map((node) => (
-            <li className="diagram-step" key={node.phase}>
-              <span>{node.phase}</span>
-              <strong>{node.title}</strong>
-              <p>{node.detail}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-      <p className="diagram-caption">{content.hero.diagramCaption}</p>
+      <ol className="corridor-stage">
+        {panels.map((panel, index) => (
+          <li
+            className={`corridor-panel corridor-panel-${index + 1}`}
+            key={`${panel.code}-${panel.title}`}
+            style={{ "--panel-index": index } as CSSProperties}
+          >
+            <div className="panel-art" aria-hidden="true">
+              <span>{panel.code}</span>
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className="panel-copy">
+              <span>{panel.kicker}</span>
+              <strong>{panel.title}</strong>
+              <p>{panel.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className="corridor-caption">{content.hero.diagramCaption}</p>
     </figure>
   );
 }
@@ -413,13 +442,15 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className={`content-section section-frame ${className}`} id={id}>
-      <Reveal className="section-intro">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </Reveal>
-      {children}
+    <section className={`content-section ${className}`} id={id}>
+      <div className="section-frame">
+        <Reveal className="section-intro">
+          <p className="eyebrow">{eyebrow}</p>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </Reveal>
+        {children}
+      </div>
     </section>
   );
 }
@@ -427,23 +458,17 @@ function Section({
 function ProjectCase({
   project,
   labels,
-  featured,
-  reversed,
+  index,
 }: {
   project: ProjectItem;
   labels: LandingContent["projects"];
-  featured?: boolean;
-  reversed?: boolean;
+  index: number;
 }) {
   const projectHref = project.href === "store" ? siteConfig.storeUrl : project.href;
 
   return (
     <Reveal>
-      <article
-        className={`project-case ${featured ? "project-featured" : ""} ${
-          reversed ? "project-reversed" : ""
-        }`}
-      >
+      <article className={`project-case project-tone-${(index % 4) + 1}`}>
         <header className="project-header">
           <span className="project-number">{project.number}</span>
           <p>{project.category}</p>
@@ -453,8 +478,13 @@ function ProjectCase({
           </span>
         </header>
 
-        <div className="project-summary">
+        <div className="project-heading">
           <h3>{project.title}</h3>
+        </div>
+
+        <ProjectVisual project={project} labels={labels} index={index} />
+
+        <div className="project-overview">
           <p>{project.summary}</p>
           {projectHref && project.hrefLabel ? (
             <a href={projectHref} target="_blank" rel="noreferrer">
@@ -463,20 +493,6 @@ function ProjectCase({
             </a>
           ) : null}
         </div>
-
-        {project.architecture ? (
-          <div className="project-architecture">
-            <p>{labels.architectureLabel}</p>
-            <ol>
-              {project.architecture.map((node, index) => (
-                <li key={node}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <strong>{node}</strong>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ) : null}
 
         <dl className="project-details">
           {project.sections.map((section) => (
@@ -488,7 +504,7 @@ function ProjectCase({
         </dl>
 
         <footer className="project-footer">
-          <ul className="inline-list">
+          <ul className="inline-list" aria-label={project.title}>
             {project.technologies.map((technology) => (
               <li key={technology}>{technology}</li>
             ))}
@@ -497,5 +513,42 @@ function ProjectCase({
         </footer>
       </article>
     </Reveal>
+  );
+}
+
+function ProjectVisual({
+  project,
+  labels,
+  index,
+}: {
+  project: ProjectItem;
+  labels: LandingContent["projects"];
+  index: number;
+}) {
+  const nodes = project.architecture ?? project.technologies.slice(0, 4);
+
+  return (
+    <figure className={`project-visual visual-${(index % 4) + 1}`}>
+      <figcaption>
+        <span>{project.architecture ? labels.architectureLabel : project.category}</span>
+        <strong>{project.title}</strong>
+      </figcaption>
+      <div className="project-canvas">
+        <span className="project-watermark" aria-hidden="true">
+          {project.number}
+        </span>
+        <ol>
+          {nodes.map((node, nodeIndex) => (
+            <li
+              key={node}
+              style={{ "--node-index": nodeIndex } as CSSProperties}
+            >
+              <span>{String(nodeIndex + 1).padStart(2, "0")}</span>
+              <strong>{node}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </figure>
   );
 }
