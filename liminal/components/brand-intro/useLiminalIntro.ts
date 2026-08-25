@@ -200,7 +200,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, control
           // The store intro is centered in the viewport. In the portfolio the
           // same scene lives inside a right-hand frame, so viewport recentering
           // would make the camera drift horizontally during the portal zoom.
-          return embedded ? { ...camera, x: 0 } : camera;
+          return embedded ? { ...camera, scale: 1, x: 0, y: 0 } : camera;
         };
         const geometry = { current: cameraGeometry() };
         const refreshGeometry = () => {
@@ -269,9 +269,9 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, control
           .to(query("[data-door-core]"), { opacity: 0.2, scale: 0.92, duration: 0.68 }, 1.08)
           .to(query("[data-vignette]"), { opacity: 0.42, duration: 0.72 }, 1.1)
           .to(stage, {
-            scale: 1.07,
+            scale: embedded ? 1 : 1.07,
             x: 0,
-            y: () => geometry.current.y * 0.07,
+            y: embedded ? 0 : () => geometry.current.y * 0.07,
             duration: 0.7,
             ease: "sine.inOut",
           }, 1.1)
@@ -289,7 +289,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, control
           .to(query("[data-door-radiance]"), { opacity: 1, scale: 2.55, duration: 1.28, ease: "power3.in" }, 1.76)
           .to(query("[data-door-core]"), { opacity: 1, scale: 1.16, filter: "brightness(2.2) saturate(.28)", duration: 1.12, ease: "power3.in" }, 1.82)
           .to(query("[data-portal-wash]"), { opacity: 0.96, scale: 2.45, duration: 1.25, ease: "power2.in" }, 1.78)
-          .to(query("[data-peripheral-blur]"), { opacity: mobile ? 0.32 : 0.58, backdropFilter: `blur(${mobile ? 2 : 4}px)`, duration: 0.92 }, 1.88)
+          .to(query("[data-peripheral-blur]"), { opacity: embedded ? 0 : mobile ? 0.32 : 0.58, backdropFilter: `blur(${mobile ? 2 : 4}px)`, duration: 0.92 }, 1.88)
           .addLabel("threshold", 2.96)
           .fromTo(flash, { opacity: 0, clipPath: "circle(0% at 50% 50%)" }, { opacity: 0.98, clipPath: "circle(150% at 50% 50%)", duration: 0.34, ease: "power3.in" }, 2.91)
           .to(root, { opacity: 0, duration: 0.34, ease: "power2.out" }, 3.19)
