@@ -1,13 +1,10 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { createOnceFinalizer } from "./introSession";
 import { doorGeometryFor } from "./geometry";
 import type { IntroColorMode, IntroCompletionReason } from "./types";
-
-gsap.registerPlugin(useGSAP);
 
 interface IntroControllerOptions {
   scope: RefObject<HTMLDivElement | null>;
@@ -156,7 +153,7 @@ export function useLiminalIntro({ scope, enabled, embedded, colorMode, debug, fo
     return unlockScroll.current;
   }, [enabled, embedded]);
 
-  useGSAP(() => {
+  useLayoutEffect(() => {
     if (!enabled || !scope.current) return;
     const root = scope.current;
     const query = gsap.utils.selector(root);
@@ -300,7 +297,7 @@ export function useLiminalIntro({ scope, enabled, embedded, colorMode, debug, fo
       unlockScroll.current();
       if (debug && typeof window !== "undefined") delete window.__LIMINAL_INTRO__;
     };
-  }, { scope, dependencies: [enabled, embedded, colorMode, debug, forceReducedMotion, durationScale, finalizeOnce], revertOnUpdate: true });
+  }, [scope, enabled, embedded, colorMode, debug, forceReducedMotion, durationScale, finalizeOnce]);
 
   const skipIntro = useCallback(() => {
     const root = scope.current;
