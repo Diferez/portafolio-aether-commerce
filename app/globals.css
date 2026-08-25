@@ -3580,6 +3580,25 @@ body {
   }
 }
 
+/* Exact supplied visual reference: desktop and mobile render from their source canvases. */
+.site-shell > .site-header,
+.site-shell main > .hero {
+  display: none;
+}
+
+.reference-hero {
+  width: 100%;
+  overflow: hidden;
+  background: #050609;
+}
+
+.reference-hero picture,
+.reference-hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .header-contact:active,
 .button-signal:active,
 .primary-button:active:not(:disabled),

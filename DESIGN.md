@@ -2,7 +2,7 @@
 
 ## Direction
 
-This portfolio presents Diego as a systems engineer who connects the visible product to rules, data, integrations, and operations. Its visual register is editorial and technical, never dashboard-like. The memorable device is the **architecture corridor**: real system layers recede toward a product core, translating the depth and visual rhythm of the Melius reference into Diego's own subject matter.
+This portfolio presents Diego as a systems engineer who connects the visible product to rules, data, integrations, and operations. Its visual register is a precise dark systems composition. The supplied desktop and mobile reference canvases own the first viewport so the public landing page can match the approved visual pixel-for-pixel at their respective breakpoints.
 
 The page should feel composed, calm, exact, and confident. Large typography and negative space carry the hierarchy; diagrams and project plates provide the visual storytelling. Decoration without technical meaning is excluded.
 
@@ -10,13 +10,13 @@ The page should feel composed, calm, exact, and confident. Large typography and 
 
 ### Color
 
-- `--canvas: #e9ebe5` — cool mineral page background.
-- `--surface: #f7f8f3` — raised editorial surface.
-- `--ink: #10120f` — primary text and dark fields.
-- `--muted: #62675f` — supporting copy.
-- `--line: #c5c9bf` — structural rules and grid lines.
-- `--signal: #334cff` — the single brand signal for actions, focus, and system flow.
-- `--night: #111713` — high-contrast project/contact surface.
+- `--canvas: #05070a` — near-black page background.
+- `--surface: #0a0d11` — dark raised surface.
+- `--ink: #f2f0eb` — primary warm-white text.
+- `--muted: #92959d` — supporting copy.
+- `--line: #292d35` — structural rules and grid lines.
+- `--signal: #974cff` — violet signal for actions, focus, and system flow.
+- `--night: #07090c` — high-contrast contact surface.
 - `--live: #2c8f5b` and `--danger: #b93434` — semantic states only.
 
 Runtime owner: these values are defined once in `app/globals.css` and consumed by every route and component.

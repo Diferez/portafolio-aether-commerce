@@ -180,6 +180,7 @@ export function LandingPage({ content }: LandingPageProps) {
         </header>
 
         <main>
+          <ReferenceHero />
           <section className="hero section-frame" aria-labelledby="hero-title">
             <div className="hero-copy">
               <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
@@ -375,6 +376,20 @@ export function LandingPage({ content }: LandingPageProps) {
         <CookieNotice locale={locale} />
       </div>
     </>
+  );
+}
+
+function ReferenceHero() {
+  return (
+    <section className="reference-hero" aria-label="Portfolio introduction">
+      <picture>
+        <source media="(max-width: 48rem)" srcSet="/reference/hero-mobile.png" />
+        <img
+          src="/reference/hero-desktop.png"
+          alt="Diego Martinez portfolio: I turn complex ideas into products that work."
+        />
+      </picture>
+    </section>
   );
 }
 
