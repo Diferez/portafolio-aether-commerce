@@ -68,12 +68,22 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
       entryTimeline
         .to(query("[data-eyebrow]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0)
         .to(query("[data-title]"), { autoAlpha: 1, y: 0, duration: 0.58 }, 0.08)
-        .to(query("[data-description-one]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.24)
-        .to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.34);
+        .to(query("[data-description-one]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.24);
+
+      if (!compact.matches) {
+        entryTimeline.to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.34);
+      }
+
+      timeline.to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.48 }, 0.32);
+
+      if (compact.matches) {
+        timeline
+          .to(query("[data-description-one]"), { autoAlpha: 0, y: -10, duration: 0.24 }, 0.62)
+          .to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.3 }, 0.68);
+      }
 
       timeline
-        .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.48 }, 0.32)
-        .addLabel("title-exit", 0.94)
+        .addLabel("title-exit", compact.matches ? 1.22 : 0.94)
         .to(query("[data-eyebrow]"), { autoAlpha: 0, duration: 0.28 }, "title-exit")
         .to(query("[data-description-one], [data-description-two]"), { autoAlpha: 0, y: -14, duration: 0.4 }, "title-exit")
         .to(query("[data-title]"), { xPercent: compact.matches ? 0 : -20, yPercent: compact.matches ? -16 : 0, duration: 0.42, ease: "power2.inOut" }, "title-exit")

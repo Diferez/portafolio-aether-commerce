@@ -4503,6 +4503,7 @@ body {
 
   .narrative-section {
     --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 46svh, 27rem);
+    --narrative-mobile-media-top: clamp(22rem, 53svh, 29rem);
   }
 
   .narrative-frame {
@@ -4532,13 +4533,24 @@ body {
   }
 
   .narrative-description {
+    position: relative;
+    display: block;
+    min-height: 3.4rem;
     margin-top: 1.7rem;
-    gap: 0.75rem;
+  }
+
+  .narrative-description p {
+    position: absolute;
+    inset: 0;
   }
 
   .liminal-canvas {
+    position: absolute;
+    top: var(--narrative-mobile-media-top);
+    right: var(--page-pad);
+    left: var(--page-pad);
     width: var(--narrative-mobile-media-size);
-    margin: clamp(1.25rem, 4svh, 2rem) auto 0;
+    margin: 0 auto;
   }
 
   .narrative-resolution {
@@ -4562,7 +4574,8 @@ body {
 
   .project-store-view {
     right: var(--page-pad);
-    bottom: 3.4rem;
+    top: var(--narrative-mobile-media-top);
+    bottom: auto;
     left: var(--page-pad);
     width: var(--narrative-mobile-media-size);
     margin-inline: auto;
@@ -4586,6 +4599,7 @@ body {
 
   .narrative-section {
     --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 33svh, 21rem);
+    --narrative-mobile-media-top: clamp(22rem, 53svh, 24rem);
   }
 
   .narrative-copy h2 {
@@ -4596,9 +4610,6 @@ body {
     margin-top: 1.4rem;
   }
 
-  .liminal-canvas {
-    margin-top: 1rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
