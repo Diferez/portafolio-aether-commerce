@@ -44,6 +44,17 @@ export type DiagramNode = {
   detail: string;
 };
 
+export type NarrativeContent = {
+  eyebrow: string;
+  title: string;
+  descriptionOne: string;
+  descriptionTwo: string;
+  firstStatement: string;
+  secondStatement: string;
+  projectTitle: string;
+  projectDescription: string;
+};
+
 export type ContactContent = {
   title: string;
   eyebrow: string;
@@ -116,6 +127,7 @@ export type LandingContent = {
     diagramNodes: readonly DiagramNode[];
     diagramCaption: string;
   };
+  narrative: NarrativeContent;
   expertise: {
     eyebrow: string;
     title: string;

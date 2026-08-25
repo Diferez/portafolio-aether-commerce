@@ -18,6 +18,7 @@ import { localeCookieName, type Locale } from "@/i18n/config";
 import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
+import { NarrativeSection } from "./NarrativeSection";
 import { CookieNotice } from "@/components/legal/CookieNotice";
 import { legalHref } from "@/content/legal-content";
 
@@ -225,6 +226,8 @@ export function LandingPage({ content }: LandingPageProps) {
               </div>
             </div>
           </section>
+
+          <NarrativeSection content={content.narrative} />
 
           <Section
             id={ids.projects}

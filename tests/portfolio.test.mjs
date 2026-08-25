@@ -34,15 +34,17 @@ async function text(pathname) {
   return response.text();
 }
 
-test("renders Spanish and English without mixing hero copy", async () => {
+test("renders Spanish and English without mixing hero or narrative copy", async () => {
   const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
   assert.match(es, /Construyo sistemas para productos reales/);
-  assert.match(es, /De la arquitectura a producción/);
+  assert.match(es, /Construyo alrededor de tu negocio/);
   assert.match(en, /I build systems for real products/);
-  assert.match(en, /From architecture to production/);
+  assert.match(en, /I build around your business/);
   assert.doesNotMatch(es, /I build systems for real products/);
   assert.doesNotMatch(en, /Construyo sistemas para productos reales/);
+  assert.doesNotMatch(es, /I build around your business/);
+  assert.doesNotMatch(en, /Construyo alrededor de tu negocio/);
 });
 
 test("includes localized navigation, hreflang, and production project link", async () => {
@@ -136,18 +138,18 @@ test("renders honest case-study status and the validated AI architecture", async
   assert.doesNotMatch(es, /99%|10x|millones de usuarios/i);
 });
 
-test("hero architecture corridor uses a responsive depth layout", async () => {
+test("hero architecture corridor uses supplied responsive artwork", async () => {
   const [css, source] = await Promise.all([
     readFile(path.join(root, "app", "globals.css"), "utf8"),
     readFile(path.join(root, "components", "sections", "LandingPage.tsx"), "utf8"),
   ]);
 
-  assert.match(css, /\.corridor-stage\s*{[^}]*display:\s*grid[^}]*perspective:/s);
-  assert.match(css, /\.corridor-panel-1\s*{[^}]*rotateY\(18deg\)/s);
-  assert.match(css, /@media \(max-width: 48rem\)[^]*\.corridor-stage\s*{[^}]*display:\s*flex/s);
+  assert.match(css, /\.architecture-graphic\s*{[^}]*width:\s*min\(100%, 56rem\)/s);
+  assert.match(css, /@media \(min-width: 75rem\)[^]*\.architecture-graphic\s*{[^}]*width:\s*calc\(100% \+/s);
+  assert.match(css, /@media \(max-width: 48rem\)[^]*\.architecture-graphic,[^}]*\.architecture-graphic img/s);
   assert.match(source, /function ArchitectureCorridor/);
-  assert.match(source, /content\.hero\.diagramNodes/);
-  assert.doesNotMatch(css, /\.corridor-panel\s*{[^}]*(?:top|right|bottom|left):/s);
+  assert.match(source, /<source media="\(max-width: 48rem\)" srcSet=\{graph\.mobile\}/);
+  assert.match(source, /src=\{graph\.desktop\}/);
 });
 
 test("capability rows keep their layout stable on hover", async () => {

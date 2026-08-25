@@ -89,6 +89,16 @@ export const content = {
       diagramCaption:
         "Diseño la interfaz como la puerta de un sistema que debe responder bien cuando hay usuarios, fallos y cambios.",
     },
+    narrative: {
+      eyebrow: "No parto de una plantilla",
+      title: "Construyo alrededor de tu negocio.",
+      descriptionOne: "Cada empresa tiene procesos, clientes y objetivos distintos.",
+      descriptionTwo: "Diseño soluciones que se adaptan a ellos, no al revés.",
+      firstStatement: "Tu negocio no debería adaptarse al software.",
+      secondStatement: "El software debería adaptarse a tu negocio.",
+      projectTitle: "Aquí está lo que ya he construido.",
+      projectDescription: "Productos reales. Problemas reales. Decisiones reales.",
+    },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
       title: "No separo el código del contexto operativo.",
@@ -462,6 +472,16 @@ export const content = {
       ],
       diagramCaption:
         "I design the interface as the doorway into a system that must hold up under users, failures, and change.",
+    },
+    narrative: {
+      eyebrow: "I don't start from a template",
+      title: "I build around your business.",
+      descriptionOne: "Every company has different processes, customers, and objectives.",
+      descriptionTwo: "I design solutions that adapt to them, not the other way around.",
+      firstStatement: "Your business should not adapt to software.",
+      secondStatement: "Software should adapt to your business.",
+      projectTitle: "Here is what I have already built.",
+      projectDescription: "Real products. Real problems. Real decisions.",
     },
     expertise: {
       eyebrow: "01 / Value",

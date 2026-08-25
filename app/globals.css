@@ -4215,3 +4215,281 @@ body {
 .hero-aside .hero-description {
   color: #a5a6ad;
 }
+
+/* Scroll narrative: the portfolio's systems language turns into a bespoke visual proof. */
+.narrative-section {
+  position: relative;
+  min-height: 100svh;
+  overflow: clip;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 73% 46%, rgba(151, 76, 255, 0.16), transparent 22rem),
+    linear-gradient(122deg, #07090c 0%, #080a0e 56%, #110d18 100%);
+  color: var(--ink);
+}
+
+.narrative-frame {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 0.95fr) minmax(22rem, 1.05fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 7rem);
+}
+
+.narrative-frame::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.12) 16%, rgba(255, 255, 255, 0.12) 84%, transparent);
+  content: "";
+}
+
+.narrative-copy {
+  position: relative;
+  z-index: 3;
+  max-width: 37rem;
+}
+
+.narrative-eyebrow {
+  margin: 0 0 2.1rem;
+  color: #c4c0ca;
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.narrative-eyebrow::before {
+  display: inline-block;
+  width: 1.8rem;
+  height: 1px;
+  margin: 0 0.8rem 0.23rem 0;
+  background: var(--signal-deep);
+  content: "";
+}
+
+.narrative-copy h2,
+.project-bridge h2 {
+  margin: 0;
+  color: #f2f0eb;
+  font-family: var(--font-sans);
+  font-size: clamp(3.4rem, 6.1vw, 7.35rem);
+  font-weight: 430;
+  letter-spacing: -0.09em;
+  line-height: 0.91;
+  text-wrap: balance;
+}
+
+.narrative-description {
+  display: grid;
+  max-width: 27rem;
+  margin-top: clamp(2.1rem, 4vw, 4rem);
+  gap: 1rem;
+}
+
+.narrative-description p {
+  margin: 0;
+  color: #b9bac0;
+  font-size: clamp(0.98rem, 1.13vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.narrative-description p:last-child {
+  color: #ebe8ee;
+}
+
+.liminal-canvas {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 43rem);
+  margin: 0;
+  justify-self: end;
+  aspect-ratio: 1;
+  isolation: isolate;
+}
+
+.liminal-art {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.liminal-art::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 48%, transparent 32%, rgba(5, 7, 10, 0.48) 76%, #07090c 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.liminal-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: saturate(1.16) contrast(1.05);
+  user-select: none;
+}
+
+.liminal-art .liminal-flame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.38;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.liminal-art .liminal-flame-left {
+  clip-path: circle(8.5% at 24.1% 34.3%);
+}
+
+.liminal-art .liminal-flame-right {
+  clip-path: circle(8.5% at 73.3% 34.2%);
+}
+
+.liminal-glow {
+  position: absolute;
+  z-index: 1;
+  inset: 18% 23% 32%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 244, 250, 0.78), rgba(193, 39, 91, 0.5) 29%, rgba(116, 80, 156, 0.3) 55%, transparent 74%);
+  filter: blur(2.5rem);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.narrative-resolution {
+  position: absolute;
+  z-index: 4;
+  right: var(--page-pad);
+  bottom: 16%;
+  width: min(34rem, 42%);
+}
+
+.narrative-resolution p {
+  margin: 0;
+  color: #c5c3c9;
+  font-size: clamp(1.4rem, 2.2vw, 2.55rem);
+  font-weight: 430;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+}
+
+.narrative-resolution p + p {
+  margin-top: 0.85rem;
+  color: #fff;
+}
+
+.project-bridge {
+  position: absolute;
+  z-index: 5;
+  bottom: clamp(3.5rem, 8vw, 7rem);
+  left: var(--page-pad);
+  width: min(46rem, 72%);
+}
+
+.project-bridge > span {
+  display: block;
+  margin-bottom: 1.3rem;
+  color: var(--signal-deep);
+  font-size: 1.45rem;
+}
+
+.project-bridge h2 {
+  max-width: 10ch;
+  font-size: clamp(3rem, 5.4vw, 6.6rem);
+}
+
+.project-bridge p {
+  margin: 1.4rem 0 0;
+  color: #c7c5cc;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 48rem) {
+  .narrative-frame {
+    display: block;
+    min-height: 100svh;
+    padding-top: max(7.4rem, 15svh);
+  }
+
+  .narrative-frame::before {
+    top: 0;
+    right: var(--page-pad);
+    bottom: 0;
+    left: auto;
+  }
+
+  .narrative-copy {
+    max-width: 28rem;
+  }
+
+  .narrative-copy h2 {
+    max-width: 9ch;
+    font-size: clamp(3.25rem, 14vw, 4.85rem);
+  }
+
+  .narrative-description {
+    margin-top: 2rem;
+    gap: 0.75rem;
+  }
+
+  .liminal-canvas {
+    width: min(92vw, 31rem);
+    margin: clamp(1.75rem, 7svh, 4rem) auto 0;
+  }
+
+  .narrative-resolution {
+    right: var(--page-pad);
+    bottom: 21%;
+    left: var(--page-pad);
+    width: auto;
+  }
+
+  .narrative-resolution p {
+    max-width: 13ch;
+    font-size: clamp(1.55rem, 7vw, 2.25rem);
+  }
+
+  .project-bridge {
+    right: var(--page-pad);
+    bottom: 3.4rem;
+    left: var(--page-pad);
+    width: auto;
+  }
+
+  .project-bridge h2 {
+    max-width: 9ch;
+    font-size: clamp(2.65rem, 12vw, 4.25rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .narrative-section {
+    min-height: auto;
+  }
+
+  .narrative-frame {
+    min-height: auto;
+    padding-top: 8rem;
+    padding-bottom: 5rem;
+  }
+
+  .narrative-resolution,
+  .project-bridge {
+    position: static;
+    width: auto;
+    margin-top: 3rem;
+  }
+
+  .project-bridge {
+    margin-bottom: 0;
+  }
+}
