@@ -167,6 +167,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
     let criticalCleanup: (() => void) | null = null;
 
     const finish = (reason: IntroCompletionReason) => {
+      if (scrollBound) return;
       root.style.pointerEvents = "none";
       unlockScroll.current();
       finalizeOnce(reason);
@@ -238,7 +239,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
             trigger: root.closest("section") ?? root,
             start: "top top",
             end: () => `+=${window.innerHeight * (mobile ? 1.9 : 2.55)}`,
-            scrub: 1,
+            scrub: true,
             invalidateOnRefresh: true,
           } : undefined,
         });
@@ -288,8 +289,9 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
           .addLabel("threshold", 2.96)
           .fromTo(flash, { opacity: 0, clipPath: "circle(0% at 50% 50%)" }, { opacity: 0.98, clipPath: "circle(150% at 50% 50%)", duration: 0.34, ease: "power3.in" }, 2.91)
           .to(root, { opacity: 0, duration: 0.34, ease: "power2.out" }, 3.19)
-          .addLabel("reveal", 3.48)
-          .call(() => finish("complete"));
+          .addLabel("reveal", 3.48);
+
+        if (!scrollBound) timeline.call(() => finish("complete"));
 
         if (!scrollBound) timeline.timeScale(1 / Math.max(0.25, durationScale));
         if (debug) {
