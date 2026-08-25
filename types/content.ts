@@ -101,7 +101,6 @@ export type LandingContent = {
   hero: {
     eyebrow: string;
     titleLead: string;
-    titleEmphasis: string;
     description: string;
     secondaryDescription: string;
     projectsCta: string;

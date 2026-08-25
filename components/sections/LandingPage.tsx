@@ -188,8 +188,7 @@ export function LandingPage({ content }: LandingPageProps) {
             <div className="hero-copy">
               <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
               <h1 id="hero-title">
-                <span>{content.hero.titleLead}</span>
-                <span>{content.hero.titleEmphasis.replace(/\.$/, "")}<span className="headline-dot">.</span></span>
+                <span>{content.hero.titleLead.replace(/\.$/, "")}<span className="headline-dot">.</span></span>
               </h1>
             </div>
 

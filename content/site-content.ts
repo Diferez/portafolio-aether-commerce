@@ -50,7 +50,6 @@ export const content = {
     hero: {
       eyebrow: "Full-Stack Software Engineer · backend first",
       titleLead: "Construyo sistemas para productos reales.",
-      titleEmphasis: "De la arquitectura a producción.",
       description:
         "Ingeniero de Sistemas especializado en backend, APIs y arquitectura cloud. Construyo productos completos con Node.js, TypeScript, Python, React y Next.js; especialmente en fintech, comercio electrónico, pagos e IA aplicada.",
       secondaryDescription:
@@ -425,7 +424,6 @@ export const content = {
     hero: {
       eyebrow: "Full-Stack Software Engineer · backend first",
       titleLead: "I build systems for real products.",
-      titleEmphasis: "From architecture to production.",
       description:
         "Systems Engineer specializing in backend, APIs, and cloud architecture. I build complete products with Node.js, TypeScript, Python, React, and Next.js—particularly in fintech, commerce, payments, and applied AI.",
       secondaryDescription:
