@@ -4206,3 +4206,12 @@ body {
     max-width: 100%;
   }
 }
+
+/* Keep the supporting copy in the same readable contrast range as the rest of the portfolio. */
+.hero-aside .hero-lead {
+  color: #e3e1df;
+}
+
+.hero-aside .hero-description {
+  color: #a5a6ad;
+}
