@@ -60,7 +60,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         defaults: { ease: "power2.out" },
         scrollTrigger: {
           trigger: section,
-          start: "top 115%",
+          start: "top 96%",
           toggleActions: "play none none reverse",
         },
       });
@@ -69,10 +69,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .to(query("[data-eyebrow]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0)
         .to(query("[data-title]"), { autoAlpha: 1, y: 0, duration: 0.58 }, 0.08)
         .to(query("[data-description-one]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.24)
-        .to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.34)
-        .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.46 }, 0.3);
+        .to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.34 }, 0.34);
 
       timeline
+        .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.48 }, 0.32)
         .addLabel("title-exit", 0.94)
         .to(query("[data-eyebrow]"), { autoAlpha: 0, duration: 0.28 }, "title-exit")
         .to(query("[data-description-one], [data-description-two]"), { autoAlpha: 0, y: -14, duration: 0.4 }, "title-exit")
