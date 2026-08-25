@@ -4154,3 +4154,55 @@ body {
 .footer-links button {
   min-height: 2.75rem;
 }
+
+/* Final responsive treatment for the supplied architecture artwork. */
+.architecture-corridor {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.architecture-graphic {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+}
+
+.architecture-graphic img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+@media (min-width: 75rem) {
+  .architecture-graphic {
+    width: calc(100% + clamp(7rem, 10vw, 10rem));
+    margin-left: clamp(-5rem, -5vw, -2rem);
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 74rem) {
+  .architecture-corridor {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .architecture-graphic {
+    width: 100%;
+  }
+}
+
+@media (max-width: 48rem) {
+  .architecture-corridor {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .architecture-graphic,
+  .architecture-graphic img {
+    width: 100%;
+    max-width: 100%;
+  }
+}
