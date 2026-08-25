@@ -4501,6 +4501,10 @@ body {
     min-height: 100dvh;
   }
 
+  .narrative-section {
+    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 46svh, 27rem);
+  }
+
   .narrative-frame {
     display: block;
     /* Keep the opening scene within a short mobile viewport instead of starting below a large empty band. */
@@ -4533,7 +4537,7 @@ body {
   }
 
   .liminal-canvas {
-    width: min(90vw, 46svh, 27rem);
+    width: var(--narrative-mobile-media-size);
     margin: clamp(1.25rem, 4svh, 2rem) auto 0;
   }
 
@@ -4557,10 +4561,10 @@ body {
   }
 
   .project-store-view {
-    right: 0;
+    right: var(--page-pad);
     bottom: 3.4rem;
-    left: 0;
-    width: min(68vw, 25rem);
+    left: var(--page-pad);
+    width: var(--narrative-mobile-media-size);
     margin-inline: auto;
   }
 
@@ -4580,6 +4584,10 @@ body {
     padding-top: max(3.75rem, 8svh);
   }
 
+  .narrative-section {
+    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 33svh, 21rem);
+  }
+
   .narrative-copy h2 {
     font-size: clamp(2.9rem, 12.8vw, 3.7rem);
   }
@@ -4589,7 +4597,6 @@ body {
   }
 
   .liminal-canvas {
-    width: min(82vw, 33svh, 21rem);
     margin-top: 1rem;
   }
 }
