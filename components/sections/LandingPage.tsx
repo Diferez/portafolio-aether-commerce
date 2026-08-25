@@ -115,11 +115,8 @@ export function LandingPage({ content }: LandingPageProps) {
         <header className="site-header">
           <div className="header-inner section-frame">
             <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
-              <span className="brand-mark" aria-hidden="true">
-                DF
-              </span>
               <span className="brand-copy">
-                <strong>{siteConfig.brandName}</strong>
+                <strong>Diego Martinez</strong>
                 <span>{content.nav.role}</span>
               </span>
             </a>
@@ -185,15 +182,17 @@ export function LandingPage({ content }: LandingPageProps) {
         <main>
           <section className="hero section-frame" aria-labelledby="hero-title">
             <div className="hero-copy">
-              <p className="eyebrow">{content.hero.eyebrow}</p>
+              <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
               <h1 id="hero-title">
-                <span>{content.hero.titleLead}</span>
-                <em>{content.hero.titleEmphasis}</em>
+                <span>I turn complex</span>
+                <span>ideas into</span>
+                <span>products that work<span className="headline-dot">.</span></span>
               </h1>
             </div>
 
             <aside className="hero-aside">
-              <p>{content.hero.description}</p>
+              <p className="hero-lead">Digital products, commerce experiences and business systems designed to sell, automate and scale.</p>
+              <p className="hero-description">I design and build digital systems that connect products, payments, operations and people.</p>
               <div className="hero-actions">
                 <a className="button button-signal" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
@@ -212,7 +211,7 @@ export function LandingPage({ content }: LandingPageProps) {
               <div className="availability" aria-label={content.hero.availability}>
                 <span className="status-indicator" aria-hidden="true" />
                 <span>{content.hero.availability}</span>
-                <span>{content.hero.location}</span>
+                <span>Software Engineer / Product Builder — Colombia</span>
               </div>
               <div className="focus-list" aria-label={content.hero.focusLabel}>
                 <span>{content.hero.focusLabel}</span>
