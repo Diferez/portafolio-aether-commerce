@@ -391,50 +391,63 @@ export function LandingPage({ content }: LandingPageProps) {
 }
 
 function ArchitectureCorridor({ content }: { content: LandingContent }) {
+  const copy = content.locale === "es"
+    ? {
+        phases: [["Problema", "Ambigüedad", "y complejidad"], ["Sistema", "Estructurado", "y conectado"], ["Producto", "Funcional", "y valioso"], ["Crecimiento", "Impacto", "y escala"]],
+        product: "Taza cerámica", add: "Añadir al carrito", payment: "Pago", success: "Pago exitoso", received: "Pedido\nrecibido", validate: "Validar\ninventario", charge: "Cobrar\npago", fulfill: "Preparar\npedido", overview: "Resumen operativo", orders: "Pedidos", revenue: "Ingresos", conversion: "Conversión", top: "Productos destacados", outcomes: [["Comercio", "Vende productos y\ngestiona operaciones."], ["Pagos", "Flujos de pago\nfiables e integrados."], ["Automatización", "Reduce trabajo\noperativo repetitivo."], ["Plataformas", "Convierte flujos complejos\nen software útil."]],
+      }
+    : {
+        phases: [["Problem", "Ambiguity", "& complexity"], ["System", "Structured", "& connected"], ["Product", "Functional", "& valuable"], ["Growth", "Impact", "& scale"]],
+        product: "Ceramic Mug", add: "Add to cart", payment: "Payment", success: "Payment successful", received: "Order\nreceived", validate: "Validate\ninventory", charge: "Charge\npayment", fulfill: "Fulfill\norder", overview: "Operations overview", orders: "Orders", revenue: "Revenue", conversion: "Conversion", top: "Top products", outcomes: [["Commerce", "Sell products and\nmanage operations."], ["Payments", "Reliable payment\nflows and integrations."], ["Automation", "Reduce repetitive\noperational work."], ["Platforms", "Turn complex workflows into\nusable software."]],
+      };
+
+  const [problem, system, product, growth] = copy.phases;
+  const [commerce, payments, automation, platforms] = copy.outcomes;
+
   return (
     <figure className="architecture-corridor" aria-label={content.hero.diagramLabel}>
       <div className="system-phases" aria-hidden="true">
-        <span>Problem<small>Ambiguity<br />&amp; complexity</small></span>
-        <span>System<small>Structured<br />&amp; connected</small></span>
-        <span>Product<small>Functional<br />&amp; valuable</small></span>
-        <span>Growth<small>Impact<br />&amp; scale</small></span>
+        <span>{problem[0]}<small>{problem[1]}<br />{problem[2]}</small></span>
+        <span>{system[0]}<small>{system[1]}<br />{system[2]}</small></span>
+        <span>{product[0]}<small>{product[1]}<br />{product[2]}</small></span>
+        <span>{growth[0]}<small>{growth[1]}<br />{growth[2]}</small></span>
       </div>
 
       <div className="system-board" aria-hidden="true">
         <div className="system-rail" />
         <div className="system-card commerce-card">
-          <div className="mug-art"><i /><b /></div>
+          <div className="mug-art"><img src="/images/ceramic-mug-system.png" alt="" /></div>
           <div className="commerce-copy">
-            <div className="card-label">Ceramic Mug <ShoppingCart size={15} /></div>
+            <div className="card-label">{copy.product} <ShoppingCart size={15} /></div>
             <strong>$48.00</strong>
             <div className="quantity"><Minus size={12} /> <span>1</span> <Plus size={12} /></div>
-            <span className="add-cart">Add to cart</span>
+            <span className="add-cart">{copy.add}</span>
           </div>
         </div>
 
         <div className="system-card payment-card">
-          <div className="payment-number"><small>Payment</small><strong>•••• 4242</strong><em>VISA</em></div>
-          <div className="payment-success"><CheckCircle2 size={22} /><span><strong>Payment successful</strong><small>Order #9821 &nbsp;&nbsp; $96.00</small></span></div>
+          <div className="payment-number"><small>{copy.payment}</small><strong>•••• 4242</strong><em>VISA</em></div>
+          <div className="payment-success"><CheckCircle2 size={22} /><span><strong>{copy.success}</strong><small>Order #9821 &nbsp;&nbsp; $96.00</small></span></div>
         </div>
 
         <div className="fulfillment-flow">
-          <span><ShoppingCart size={17} />Order<br />received</span><b>→</b>
-          <span className="active"><CheckCircle2 size={17} />Validate<br />inventory</span><b>→</b>
-          <span><CreditCard size={17} />Charge<br />payment</span><b>→</b>
-          <span><Box size={17} />Fulfill<br />order</span>
+          <span><ShoppingCart size={17} />{copy.received.split("\n").map((line) => <span key={line}>{line}</span>)}</span><b>→</b>
+          <span className="active"><CheckCircle2 size={17} />{copy.validate.split("\n").map((line) => <span key={line}>{line}</span>)}</span><b>→</b>
+          <span><CreditCard size={17} />{copy.charge.split("\n").map((line) => <span key={line}>{line}</span>)}</span><b>→</b>
+          <span><Box size={17} />{copy.fulfill.split("\n").map((line) => <span key={line}>{line}</span>)}</span>
         </div>
 
         <div className="operations-card">
-          <small>Operations overview</small>
-          <div className="operations-grid"><div><span>Orders</span><strong>1,240</strong><em>+18%</em><span>Revenue</span><strong>$96,420</strong><em>+24%</em><span>Conversion</span><strong>2.8%</strong><em>+0.6%</em></div><div className="chart"><i /><i /><i /><i /><i /><i /></div><div><span>Top products</span><strong>Ceramic Mug &nbsp; 1,240</strong><strong>Pour Over Kit &nbsp; 842</strong><strong>Coffee Beans &nbsp; 612</strong></div></div>
+          <small>{copy.overview}</small>
+          <div className="operations-grid"><div><span>{copy.orders}</span><strong>1,240</strong><em>+18%</em><span>{copy.revenue}</span><strong>$96,420</strong><em>+24%</em><span>{copy.conversion}</span><strong>2.8%</strong><em>+0.6%</em></div><div className="chart"><i /><i /><i /><i /><i /><i /></div><div><span>{copy.top}</span><strong>{copy.product} &nbsp; 1,240</strong><strong>Pour Over Kit &nbsp; 842</strong><strong>Coffee Beans &nbsp; 612</strong></div></div>
         </div>
       </div>
 
       <div className="system-outcomes" aria-hidden="true">
-        <div><ShoppingBag /><span><strong>Commerce</strong><small>Sell products and<br />manage operations.</small></span></div>
-        <div><CreditCard /><span><strong>Payments</strong><small>Reliable payment<br />flows and integrations.</small></span></div>
-        <div><Zap /><span><strong>Automation</strong><small>Reduce repetitive<br />operational work.</small></span></div>
-        <div><Box /><span><strong>Platforms</strong><small>Turn complex workflows into<br />usable software.</small></span></div>
+        <div><ShoppingBag /><span><strong>{commerce[0]}</strong><small>{commerce[1].split("\n").map((line) => <span key={line}>{line}</span>)}</small></span></div>
+        <div><CreditCard /><span><strong>{payments[0]}</strong><small>{payments[1].split("\n").map((line) => <span key={line}>{line}</span>)}</small></span></div>
+        <div><Zap /><span><strong>{automation[0]}</strong><small>{automation[1].split("\n").map((line) => <span key={line}>{line}</span>)}</small></span></div>
+        <div><Box /><span><strong>{platforms[0]}</strong><small>{platforms[1].split("\n").map((line) => <span key={line}>{line}</span>)}</small></span></div>
       </div>
       <figcaption>{content.hero.diagramCaption}</figcaption>
     </figure>
