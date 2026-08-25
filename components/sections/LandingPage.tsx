@@ -188,15 +188,14 @@ export function LandingPage({ content }: LandingPageProps) {
             <div className="hero-copy">
               <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
               <h1 id="hero-title">
-                <span>I turn complex</span>
-                <span>ideas into</span>
-                <span>products that work<span className="headline-dot">.</span></span>
+                <span>{content.hero.titleLead}</span>
+                <span>{content.hero.titleEmphasis.replace(/\.$/, "")}<span className="headline-dot">.</span></span>
               </h1>
             </div>
 
             <aside className="hero-aside">
-              <p className="hero-lead">Digital products, commerce experiences and business systems designed to sell, automate and scale.</p>
-              <p className="hero-description">I design and build digital systems that connect products, payments, operations and people.</p>
+              <p className="hero-lead">{content.hero.description}</p>
+              <p className="hero-description">{content.hero.secondaryDescription}</p>
               <div className="hero-actions">
                 <a className="button button-signal" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
@@ -215,7 +214,7 @@ export function LandingPage({ content }: LandingPageProps) {
               <div className="availability" aria-label={content.hero.availability}>
                 <span className="status-indicator" aria-hidden="true" />
                 <span>{content.hero.availability}</span>
-                <span>Software Engineer / Product Builder — Colombia</span>
+                <span>{content.locale === "es" ? "Ingeniero de software / Creador de productos" : "Software Engineer / Product Builder"} — {content.hero.location}</span>
               </div>
               <div className="focus-list" aria-label={content.hero.focusLabel}>
                 <span>{content.hero.focusLabel}</span>

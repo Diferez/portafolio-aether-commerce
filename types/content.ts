@@ -103,6 +103,7 @@ export type LandingContent = {
     titleLead: string;
     titleEmphasis: string;
     description: string;
+    secondaryDescription: string;
     projectsCta: string;
     contactCta: string;
     availability: string;

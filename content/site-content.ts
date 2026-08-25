@@ -53,6 +53,8 @@ export const content = {
       titleEmphasis: "De la arquitectura a producción.",
       description:
         "Ingeniero de Sistemas especializado en backend, APIs y arquitectura cloud. Construyo productos completos con Node.js, TypeScript, Python, React y Next.js; especialmente en fintech, comercio electrónico, pagos e IA aplicada.",
+      secondaryDescription:
+        "Conecto productos, pagos, operaciones y personas para que el sistema funcione más allá de la interfaz.",
       projectsCta: "Ver casos de estudio",
       contactCta: "Hablar conmigo",
       availability: "Disponible para proyectos seleccionados",
@@ -426,6 +428,8 @@ export const content = {
       titleEmphasis: "From architecture to production.",
       description:
         "Systems Engineer specializing in backend, APIs, and cloud architecture. I build complete products with Node.js, TypeScript, Python, React, and Next.js—particularly in fintech, commerce, payments, and applied AI.",
+      secondaryDescription:
+        "I connect products, payments, operations, and people so the system works beyond the interface.",
       projectsCta: "View case studies",
       contactCta: "Talk to me",
       availability: "Available for selected projects",
