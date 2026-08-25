@@ -98,6 +98,7 @@ export const content = {
       secondStatement: "El software debería adaptarse a tu negocio.",
       projectTitle: "Aquí está lo que ya he construido.",
       projectDescription: "Productos reales. Problemas reales. Decisiones reales.",
+      projectPreviewAlt: "Vista principal de la tienda Liminal Accesorios",
     },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
@@ -482,6 +483,7 @@ export const content = {
       secondStatement: "Software should adapt to your business.",
       projectTitle: "Here is what I have already built.",
       projectDescription: "Real products. Real problems. Real decisions.",
+      projectPreviewAlt: "Liminal Accesorios storefront main view",
     },
     expertise: {
       eyebrow: "01 / Value",

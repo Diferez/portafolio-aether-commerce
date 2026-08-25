@@ -4476,6 +4476,25 @@ body {
   font-size: 0.95rem;
 }
 
+.project-store-view {
+  position: absolute;
+  z-index: 4;
+  right: var(--page-pad);
+  bottom: clamp(3.5rem, 8vw, 7rem);
+  width: min(43vw, 42rem);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #050306;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.36);
+}
+
+.project-store-view img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 @media (max-width: 48rem) {
   .narrative-frame {
     display: block;
@@ -4526,6 +4545,16 @@ body {
     bottom: 3.4rem;
     left: var(--page-pad);
     width: auto;
+  }
+
+  .project-store-view {
+    right: var(--page-pad);
+    bottom: 3.4rem;
+    width: min(68vw, 25rem);
+  }
+
+  .project-bridge {
+    bottom: min(60svh, 31rem);
   }
 
   .project-bridge h2 {

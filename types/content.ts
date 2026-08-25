@@ -53,6 +53,7 @@ export type NarrativeContent = {
   secondStatement: string;
   projectTitle: string;
   projectDescription: string;
+  projectPreviewAlt: string;
 };
 
 export type ContactContent = {

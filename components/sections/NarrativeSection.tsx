@@ -54,6 +54,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
       gsap.set(query("[data-liminal]"), { autoAlpha: 0, xPercent: 0, scale: 0.84 });
       gsap.set(query("[data-resolution]"), { autoAlpha: 0, y: 22 });
       gsap.set(query("[data-project-bridge]"), { autoAlpha: 0, y: 28 });
+      gsap.set(query("[data-project-store]"), { autoAlpha: 0, y: 22, scale: 0.98 });
 
       timeline
         .addLabel("entry", 0)
@@ -72,7 +73,8 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .to(query("[data-resolution-two]"), { autoAlpha: 1, y: 0, duration: 0.58 }, "resolution+=0.23")
         .addLabel("projects", 2.66)
         .to(query("[data-resolution]"), { autoAlpha: 0, y: -16, duration: 0.38 }, "projects")
-        .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.17");
+        .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.17")
+        .to(query("[data-project-store]"), { autoAlpha: 1, y: 0, scale: 1, duration: 0.62 }, "projects+=0.11");
 
       timeline.eventCallback("onUpdate", synchronizeLiminal);
       synchronizeLiminal();
@@ -105,6 +107,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           <h2>{content.projectTitle}</h2>
           <p>{content.projectDescription}</p>
         </div>
+
+        <figure className="project-store-view" data-project-store>
+          <img src="/images/liminal-store-main-view.png" alt={content.projectPreviewAlt} />
+        </figure>
       </div>
     </section>
   );
