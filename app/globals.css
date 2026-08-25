@@ -4496,9 +4496,13 @@ body {
 }
 
 @media (max-width: 48rem) {
+  .narrative-section,
+  .narrative-frame {
+    min-height: 100dvh;
+  }
+
   .narrative-frame {
     display: block;
-    min-height: 100svh;
     /* Keep the opening scene within a short mobile viewport instead of starting below a large empty band. */
     padding-top: max(4.75rem, 9svh);
   }
@@ -4553,9 +4557,11 @@ body {
   }
 
   .project-store-view {
-    right: var(--page-pad);
+    right: 0;
     bottom: 3.4rem;
+    left: 0;
     width: min(68vw, 25rem);
+    margin-inline: auto;
   }
 
   .project-bridge {

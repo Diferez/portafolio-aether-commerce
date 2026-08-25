@@ -75,8 +75,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .to(query("[data-resolution-two]"), { autoAlpha: 1, y: 0, duration: 0.58 }, "resolution+=0.23")
         .addLabel("projects", 2.66)
         .to(query("[data-resolution]"), { autoAlpha: 0, y: -16, duration: 0.38 }, "projects")
-        .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.17")
-        .to(query("[data-project-store]"), { autoAlpha: 1, y: 0, scale: 1, duration: 0.62 }, "projects+=0.11");
+        .to(query("[data-liminal]"), { autoAlpha: 0, scale: 0.96, duration: 0.24 }, "projects")
+        .set(query("[data-project-store]"), { autoAlpha: 1, y: 0, scale: 1 }, "projects")
+        .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.12")
+        .to({}, { duration: 0.55 });
 
       timeline.eventCallback("onUpdate", synchronizeLiminal);
       synchronizeLiminal();
