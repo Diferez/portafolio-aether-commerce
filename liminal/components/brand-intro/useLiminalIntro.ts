@@ -209,7 +209,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
         resizeHandler = refreshGeometry;
         window.addEventListener("resize", refreshGeometry, { passive: true });
 
-        gsap.set(stage, { transformOrigin: () => `${geometry.current.originX}px ${geometry.current.originY}px` });
+        gsap.set(stage, { transformOrigin: () => `${geometry.current.originX}px ${geometry.current.originY}px`, x: 0 });
         gsap.set(skip, { autoAlpha: 0 });
         gsap.set(query("[data-door-bloom]"), { opacity: 0.08, scale: 0.82 });
         gsap.set(query("[data-door-radiance], [data-door-core], [data-color-atmosphere]"), { opacity: 0 });
@@ -245,7 +245,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
         mainTimeline.current = timeline;
         timeline
           .addLabel("appear", 0)
-          .set(stage, { opacity: 0, scale: 0.975 })
+          .set(stage, { opacity: 0, scale: 0.975, x: 0 })
           .set(query("[data-role='wordmark'], [data-role='subtitle'], [data-role='ornament']"), { opacity: 0, y: 7 })
           .fromTo(query("[data-role='portal']"), { opacity: 0.18 }, { opacity: 1, duration: 0.34 }, 0)
           .to(stage, { opacity: 1, scale: 1, duration: 0.36 }, 0)
@@ -265,7 +265,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
           .to(query("[data-vignette]"), { opacity: 0.42, duration: 0.72 }, 1.1)
           .to(stage, {
             scale: 1.07,
-            x: () => geometry.current.x * 0.07,
+            x: 0,
             y: () => geometry.current.y * 0.07,
             duration: 0.7,
             ease: "sine.inOut",
@@ -274,7 +274,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
           .to(stage, {
             transformOrigin: () => `${geometry.current.originX}px ${geometry.current.originY}px`,
             scale: () => geometry.current.scale,
-            x: () => geometry.current.x,
+            x: 0,
             y: () => geometry.current.y,
             duration: 1.42,
             ease: "power4.in",
