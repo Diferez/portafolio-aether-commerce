@@ -4,10 +4,18 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  Box,
+  CheckCircle2,
+  CreditCard,
   ExternalLink,
   Globe2,
   Menu,
   MessageSquareText,
+  Minus,
+  Plus,
+  ShoppingBag,
+  ShoppingCart,
+  Zap,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -120,6 +128,10 @@ export function LandingPage({ content }: LandingPageProps) {
                 <span>{content.nav.role}</span>
               </span>
             </a>
+            <p className="header-availability">
+              <span className="status-indicator" aria-hidden="true" />
+              {content.hero.availability}
+            </p>
 
             <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
               {content.nav.items.map((item) => (
@@ -180,7 +192,6 @@ export function LandingPage({ content }: LandingPageProps) {
         </header>
 
         <main>
-          <ReferenceHero />
           <section className="hero section-frame" aria-labelledby="hero-title">
             <div className="hero-copy">
               <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
@@ -379,63 +390,53 @@ export function LandingPage({ content }: LandingPageProps) {
   );
 }
 
-function ReferenceHero() {
-  return (
-    <section className="reference-hero" aria-label="Portfolio introduction">
-      <picture>
-        <source media="(max-width: 48rem)" srcSet="/reference/hero-mobile.png" />
-        <img
-          src="/reference/hero-desktop.png"
-          alt="Diego Martinez portfolio: I turn complex ideas into products that work."
-        />
-      </picture>
-    </section>
-  );
-}
-
 function ArchitectureCorridor({ content }: { content: LandingContent }) {
-  const [entry, rules, state, operation] = content.hero.diagramNodes;
-  const panels = [
-    { code: "01", kicker: entry.phase, title: entry.title, detail: entry.detail },
-    { code: "02", kicker: rules.phase, title: rules.title, detail: rules.detail },
-    {
-      code: "CORE",
-      kicker: content.hero.diagramKicker,
-      title: content.hero.diagramCoreTitle,
-      detail: content.hero.diagramCoreDetail,
-    },
-    { code: "03", kicker: state.phase, title: state.title, detail: state.detail },
-    { code: "04", kicker: operation.phase, title: operation.title, detail: operation.detail },
-  ];
-
   return (
-    <figure className="architecture-corridor">
-      <figcaption>
-        <span>{content.hero.diagramKicker}</span>
-        <strong>{content.hero.diagramLabel}</strong>
-      </figcaption>
-      <ol className="corridor-stage">
-        {panels.map((panel, index) => (
-          <li
-            className={`corridor-panel corridor-panel-${index + 1}`}
-            key={`${panel.code}-${panel.title}`}
-            style={{ "--panel-index": index } as CSSProperties}
-          >
-            <div className="panel-art" aria-hidden="true">
-              <span>{panel.code}</span>
-              <i />
-              <i />
-              <i />
-            </div>
-            <div className="panel-copy">
-              <span>{panel.kicker}</span>
-              <strong>{panel.title}</strong>
-              <p>{panel.detail}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-      <p className="corridor-caption">{content.hero.diagramCaption}</p>
+    <figure className="architecture-corridor" aria-label={content.hero.diagramLabel}>
+      <div className="system-phases" aria-hidden="true">
+        <span>Problem<small>Ambiguity<br />&amp; complexity</small></span>
+        <span>System<small>Structured<br />&amp; connected</small></span>
+        <span>Product<small>Functional<br />&amp; valuable</small></span>
+        <span>Growth<small>Impact<br />&amp; scale</small></span>
+      </div>
+
+      <div className="system-board" aria-hidden="true">
+        <div className="system-rail" />
+        <div className="system-card commerce-card">
+          <div className="mug-art"><i /><b /></div>
+          <div className="commerce-copy">
+            <div className="card-label">Ceramic Mug <ShoppingCart size={15} /></div>
+            <strong>$48.00</strong>
+            <div className="quantity"><Minus size={12} /> <span>1</span> <Plus size={12} /></div>
+            <span className="add-cart">Add to cart</span>
+          </div>
+        </div>
+
+        <div className="system-card payment-card">
+          <div className="payment-number"><small>Payment</small><strong>•••• 4242</strong><em>VISA</em></div>
+          <div className="payment-success"><CheckCircle2 size={22} /><span><strong>Payment successful</strong><small>Order #9821 &nbsp;&nbsp; $96.00</small></span></div>
+        </div>
+
+        <div className="fulfillment-flow">
+          <span><ShoppingCart size={17} />Order<br />received</span><b>→</b>
+          <span className="active"><CheckCircle2 size={17} />Validate<br />inventory</span><b>→</b>
+          <span><CreditCard size={17} />Charge<br />payment</span><b>→</b>
+          <span><Box size={17} />Fulfill<br />order</span>
+        </div>
+
+        <div className="operations-card">
+          <small>Operations overview</small>
+          <div className="operations-grid"><div><span>Orders</span><strong>1,240</strong><em>+18%</em><span>Revenue</span><strong>$96,420</strong><em>+24%</em><span>Conversion</span><strong>2.8%</strong><em>+0.6%</em></div><div className="chart"><i /><i /><i /><i /><i /><i /></div><div><span>Top products</span><strong>Ceramic Mug &nbsp; 1,240</strong><strong>Pour Over Kit &nbsp; 842</strong><strong>Coffee Beans &nbsp; 612</strong></div></div>
+        </div>
+      </div>
+
+      <div className="system-outcomes" aria-hidden="true">
+        <div><ShoppingBag /><span><strong>Commerce</strong><small>Sell products and<br />manage operations.</small></span></div>
+        <div><CreditCard /><span><strong>Payments</strong><small>Reliable payment<br />flows and integrations.</small></span></div>
+        <div><Zap /><span><strong>Automation</strong><small>Reduce repetitive<br />operational work.</small></span></div>
+        <div><Box /><span><strong>Platforms</strong><small>Turn complex workflows into<br />usable software.</small></span></div>
+      </div>
+      <figcaption>{content.hero.diagramCaption}</figcaption>
     </figure>
   );
 }
