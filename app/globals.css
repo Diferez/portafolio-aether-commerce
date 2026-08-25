@@ -6,6 +6,33 @@
   font-display: swap;
 }
 
+/* Supplied graph artwork: its language and aspect ratio follow the active view. */
+.architecture-corridor {
+  display: block;
+  min-height: 0;
+  align-self: center;
+}
+
+.architecture-graphic,
+.architecture-graphic img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.architecture-graphic img {
+  border-radius: 0.8rem;
+}
+
+.architecture-corridor > figcaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 @font-face {
   font-family: "Manrope";
   src: url("/fonts/manrope-latin.woff2") format("woff2");
