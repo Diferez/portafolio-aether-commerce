@@ -1,10 +1,13 @@
 "use client";
 
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { createOnceFinalizer } from "./introSession";
 import { doorGeometryFor } from "./geometry";
 import type { IntroColorMode, IntroCompletionReason } from "./types";
+
+if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 interface IntroControllerOptions {
   scope: RefObject<HTMLDivElement | null>;
@@ -221,7 +224,16 @@ export function useLiminalIntro({ scope, enabled, embedded, colorMode, debug, fo
         starLoops(query);
         if (colorMode === "realistic") fantasyFlameLoops(query, mobile);
 
-        const timeline = gsap.timeline({ defaults: { ease: "power2.out" } });
+        const timeline = gsap.timeline({
+          defaults: { ease: "power2.out" },
+          scrollTrigger: embedded ? {
+            trigger: root.closest("section") ?? root,
+            start: "top top",
+            end: () => `+=${window.innerHeight * (mobile ? 1.9 : 2.55)}`,
+            scrub: 1,
+            invalidateOnRefresh: true,
+          } : undefined,
+        });
         mainTimeline.current = timeline;
         timeline
           .addLabel("appear", 0)
@@ -271,7 +283,7 @@ export function useLiminalIntro({ scope, enabled, embedded, colorMode, debug, fo
           .addLabel("reveal", 3.48)
           .call(() => finish("complete"));
 
-        timeline.timeScale(1 / Math.max(0.25, durationScale));
+        if (!embedded) timeline.timeScale(1 / Math.max(0.25, durationScale));
         if (debug) {
           root.dataset.debug = "true";
           window.__LIMINAL_INTRO__ = {

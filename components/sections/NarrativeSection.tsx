@@ -52,7 +52,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.7 }, "message+=0.08")
         .addLabel("transform", 0.5)
         .to(query("[data-description-one], [data-description-two]"), { autoAlpha: 0, y: -14, duration: 0.4 }, "transform")
-        .to(query("[data-title]"), { xPercent: compact.matches ? 0 : -12, yPercent: compact.matches ? -16 : 0, autoAlpha: 0.35, duration: 0.7 }, "transform")
+        .to(query("[data-title]"), { xPercent: compact.matches ? 0 : -12, yPercent: compact.matches ? -16 : 0, autoAlpha: 0.2, duration: 0.58 }, "message+=0.08")
         .to(query("[data-liminal]"), { xPercent: compact.matches ? 0 : -19, yPercent: compact.matches ? 9 : 0, scale: compact.matches ? 1.36 : 1.72, duration: 1.15, ease: "power2.inOut" }, "transform")
         .addLabel("resolution", 1.78)
         .to(query("[data-title], [data-eyebrow]"), { autoAlpha: 0, duration: 0.34 }, "resolution")
