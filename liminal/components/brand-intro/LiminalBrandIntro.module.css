@@ -29,6 +29,23 @@
 .embedded .stage {
   width: min(100%, 78dvh, 680px);
 }
+.overlay[data-static-scene='true'] .stage {
+  opacity: 1;
+  transform: none;
+}
+.overlay[data-static-scene='true'] .colorAtmosphere {
+  opacity: .72;
+}
+.overlay[data-static-scene='true'] .fantasyDoorBloom {
+  opacity: .32;
+  transform: scale(.98);
+}
+.overlay[data-static-scene='true'] .fantasyDoorRadiance {
+  opacity: .2;
+}
+.overlay[data-static-scene='true'] .fantasyDoorCore {
+  opacity: .16;
+}
 .stage {
   position: relative;
   z-index: 2;

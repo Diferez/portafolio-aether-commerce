@@ -16,6 +16,7 @@ const criticalLayers = new Set(["01_key", "02_door_light", "07_portal_architectu
 interface LiminalBrandIntroProps {
   enabled: boolean;
   embedded?: boolean;
+  staticScene?: boolean;
   colorMode?: IntroColorMode;
   debug?: boolean;
   forceReducedMotion?: boolean;
@@ -98,9 +99,9 @@ const stars: ReadonlyArray<{ x: number; y: number; major?: boolean }> = [
   { x: 62.8, y: 35.8 },
 ] as const;
 
-export function LiminalBrandIntro({ enabled, embedded = false, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
+export function LiminalBrandIntro({ enabled, embedded = false, staticScene = false, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled, embedded, colorMode, debug, forceReducedMotion, durationScale, onComplete });
+  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled: enabled && !staticScene, embedded, colorMode, debug, forceReducedMotion, durationScale, onComplete });
   const door = doorGeometryFor(colorMode);
   const doorDebugStyle = {
     "--layer-x": `${(door.x / 1536) * 100}%`,
@@ -115,6 +116,7 @@ export function LiminalBrandIntro({ enabled, embedded = false, colorMode = "mono
       className={`${styles.overlay} ${embedded ? styles.embedded : ""}`}
       data-liminal-intro
       data-ready={enabled}
+      data-static-scene={staticScene || undefined}
       data-color-mode={colorMode}
       data-debug-prop={debug}
       role={embedded ? undefined : "dialog"}

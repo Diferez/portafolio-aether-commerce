@@ -49,17 +49,15 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .addLabel("message", 0.24)
         .to(query("[data-description-one]"), { autoAlpha: 1, y: 0, duration: 0.45 }, "message")
         .to(query("[data-description-two]"), { autoAlpha: 1, y: 0, duration: 0.45 }, "message+=0.11")
-        .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.7 }, "message+=0.08")
+        .to(query("[data-liminal]"), { autoAlpha: 1, xPercent: 0, scale: 1, duration: 0.48 }, "message+=0.08")
         .addLabel("transform", 0.5)
         .to(query("[data-description-one], [data-description-two]"), { autoAlpha: 0, y: -14, duration: 0.4 }, "transform")
         .to(query("[data-title]"), { xPercent: compact.matches ? 0 : -12, yPercent: compact.matches ? -16 : 0, autoAlpha: 0.2, duration: 0.58 }, "message+=0.08")
-        .to(query("[data-liminal]"), { xPercent: compact.matches ? 0 : -19, yPercent: compact.matches ? 9 : 0, scale: compact.matches ? 1.36 : 1.72, duration: 1.15, ease: "power2.inOut" }, "transform")
         .addLabel("resolution", 1.78)
         .to(query("[data-title], [data-eyebrow]"), { autoAlpha: 0, duration: 0.34 }, "resolution")
         .to(query("[data-resolution-one]"), { autoAlpha: 1, y: 0, duration: 0.5 }, "resolution+=0.08")
         .to(query("[data-resolution-two]"), { autoAlpha: 1, y: 0, duration: 0.58 }, "resolution+=0.23")
         .addLabel("projects", 2.66)
-        .to(query("[data-liminal]"), { autoAlpha: 0.26, xPercent: compact.matches ? 0 : -30, yPercent: compact.matches ? 19 : 0, scale: compact.matches ? 1.5 : 1.9, duration: 0.56 }, "projects")
         .to(query("[data-resolution]"), { autoAlpha: 0, y: -16, duration: 0.38 }, "projects")
         .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.17");
     }, section);
@@ -99,7 +97,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
 function LiminalCanvas() {
   return (
     <figure className="liminal-canvas" data-liminal aria-label="Liminal, animación a color controlada por el desplazamiento">
-      <LiminalBrandIntro enabled embedded colorMode="realistic" onComplete={() => undefined} />
+      <LiminalBrandIntro enabled embedded staticScene colorMode="realistic" onComplete={() => undefined} />
     </figure>
   );
 }
