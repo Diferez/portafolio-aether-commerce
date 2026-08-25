@@ -192,10 +192,17 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
         const stage = query("[data-stage]")[0] as HTMLElement;
         const skip = query("[data-skip]");
         const flash = query("[data-flash]");
-        const geometry = { current: getCameraGeometry(stage, colorMode) };
+        const cameraGeometry = () => {
+          const camera = getCameraGeometry(stage, colorMode);
+          // The store intro is centered in the viewport. In the portfolio the
+          // same scene lives inside a right-hand frame, so viewport recentering
+          // would make the camera drift horizontally during the portal zoom.
+          return embedded ? { ...camera, x: 0 } : camera;
+        };
+        const geometry = { current: cameraGeometry() };
         const refreshGeometry = () => {
           if ((mainTimeline.current?.time() ?? 0) < 1.55) {
-            geometry.current = getCameraGeometry(stage, colorMode);
+            geometry.current = cameraGeometry();
             mainTimeline.current?.invalidate();
           }
         };
