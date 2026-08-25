@@ -4,7 +4,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { LiminalBrandIntro } from "@/liminal/components/brand-intro/LiminalBrandIntro";
 import type { NarrativeContent } from "@/types/content";
 
@@ -16,21 +16,6 @@ type NarrativeSectionProps = {
 
 export function NarrativeSection({ content }: NarrativeSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const [liminalEnabled, setLiminalEnabled] = useState(false);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) return;
-      setLiminalEnabled(true);
-      observer.disconnect();
-    }, { threshold: 0.15 });
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -53,7 +38,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
       });
 
       gsap.set(query("[data-narrative-enter]"), { autoAlpha: 0, y: 20 });
-      gsap.set(query("[data-liminal]"), { autoAlpha: 0, xPercent: compact.matches ? 0 : 8, scale: 0.84 });
+      gsap.set(query("[data-liminal]"), { autoAlpha: 0, xPercent: 0, scale: 0.84 });
       gsap.set(query("[data-resolution]"), { autoAlpha: 0, y: 22 });
       gsap.set(query("[data-project-bridge]"), { autoAlpha: 0, y: 28 });
 
@@ -92,7 +77,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           </div>
         </div>
 
-        <LiminalCanvas enabled={liminalEnabled} />
+        <LiminalCanvas />
 
         <div className="narrative-resolution" data-resolution aria-live="polite">
           <p data-resolution-one>{content.firstStatement}</p>
@@ -109,10 +94,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
   );
 }
 
-function LiminalCanvas({ enabled }: { enabled: boolean }) {
+function LiminalCanvas() {
   return (
     <figure className="liminal-canvas" data-liminal aria-label="Liminal, animación a color controlada por el desplazamiento">
-      <LiminalBrandIntro enabled={enabled} embedded colorMode="realistic" onComplete={() => undefined} />
+      <LiminalBrandIntro enabled embedded scrollBound colorMode="realistic" onComplete={() => undefined} />
     </figure>
   );
 }
