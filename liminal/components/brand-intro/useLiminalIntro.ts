@@ -14,6 +14,8 @@ interface IntroControllerOptions {
   enabled: boolean;
   embedded: boolean;
   scrollBound: boolean;
+  controlled: boolean;
+  onTimelineReady?: (timeline: gsap.core.Timeline) => void;
   colorMode: IntroColorMode;
   debug: boolean;
   forceReducedMotion: boolean;
@@ -132,7 +134,7 @@ function fantasyFlameLoops(query: gsap.utils.SelectorFunc, mobile: boolean) {
     .to(query("[data-fantasy-flame='right']"), { scaleX: 0.993, scaleY: 0.996, rotation: -0.16 * amplitude, filter: "brightness(1.16) saturate(1.06)", opacity: 0.44, duration: 0.69, ease: "sine.inOut" });
 }
 
-export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMode, debug, forceReducedMotion, durationScale, onComplete }: IntroControllerOptions) {
+export function useLiminalIntro({ scope, enabled, embedded, scrollBound, controlled, onTimelineReady, colorMode, debug, forceReducedMotion, durationScale, onComplete }: IntroControllerOptions) {
   const mainTimeline = useRef<gsap.core.Timeline | null>(null);
   const skipTimeline = useRef<gsap.core.Timeline | null>(null);
   const finalizeOnce = useMemo(() => createOnceFinalizer<[IntroCompletionReason]>(onComplete), [onComplete]);
@@ -235,7 +237,8 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
 
         const timeline = gsap.timeline({
           defaults: { ease: "power2.out" },
-          scrollTrigger: embedded && scrollBound ? {
+          paused: controlled,
+          scrollTrigger: embedded && scrollBound && !controlled ? {
             trigger: root.closest("section") ?? root,
             start: "top top",
             end: () => `+=${window.innerHeight * (mobile ? 1.9 : 2.55)}`,
@@ -244,6 +247,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
           } : undefined,
         });
         mainTimeline.current = timeline;
+        onTimelineReady?.(timeline);
         timeline
           .addLabel("appear", 0)
           .set(stage, { opacity: 0, scale: 0.975, x: 0 })
@@ -291,9 +295,9 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
           .to(root, { opacity: 0, duration: 0.34, ease: "power2.out" }, 3.19)
           .addLabel("reveal", 3.48);
 
-        if (!scrollBound) timeline.call(() => finish("complete"));
+        if (!scrollBound && !controlled) timeline.call(() => finish("complete"));
 
-        if (!scrollBound) timeline.timeScale(1 / Math.max(0.25, durationScale));
+        if (!scrollBound && !controlled) timeline.timeScale(1 / Math.max(0.25, durationScale));
         if (debug) {
           root.dataset.debug = "true";
           window.__LIMINAL_INTRO__ = {
@@ -319,7 +323,7 @@ export function useLiminalIntro({ scope, enabled, embedded, scrollBound, colorMo
       unlockScroll.current();
       if (debug && typeof window !== "undefined") delete window.__LIMINAL_INTRO__;
     };
-  }, [scope, enabled, embedded, scrollBound, colorMode, debug, forceReducedMotion, durationScale, finalizeOnce]);
+  }, [scope, enabled, embedded, scrollBound, controlled, onTimelineReady, colorMode, debug, forceReducedMotion, durationScale, finalizeOnce]);
 
   const skipIntro = useCallback(() => {
     const root = scope.current;

@@ -4,7 +4,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { LiminalBrandIntro } from "@/liminal/components/brand-intro/LiminalBrandIntro";
 import type { NarrativeContent } from "@/types/content";
 
@@ -16,6 +16,12 @@ type NarrativeSectionProps = {
 
 export function NarrativeSection({ content }: NarrativeSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const liminalTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const liminalProgressRef = useRef(0);
+  const setLiminalTimeline = useCallback((timeline: gsap.core.Timeline) => {
+    liminalTimelineRef.current = timeline;
+    timeline.progress(liminalProgressRef.current).pause();
+  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -36,6 +42,13 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           invalidateOnRefresh: true,
         },
       });
+      const synchronizeLiminal = () => {
+        const start = 0.32;
+        const end = 2.62;
+        const progress = gsap.utils.clamp(0, 1, (timeline.time() - start) / (end - start));
+        liminalProgressRef.current = progress;
+        liminalTimelineRef.current?.progress(progress).pause();
+      };
 
       gsap.set(query("[data-narrative-enter]"), { autoAlpha: 0, y: 20 });
       gsap.set(query("[data-liminal]"), { autoAlpha: 0, xPercent: 0, scale: 0.84 });
@@ -60,6 +73,9 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
         .addLabel("projects", 2.66)
         .to(query("[data-resolution]"), { autoAlpha: 0, y: -16, duration: 0.38 }, "projects")
         .to(query("[data-project-bridge]"), { autoAlpha: 1, y: 0, duration: 0.56 }, "projects+=0.17");
+
+      timeline.eventCallback("onUpdate", synchronizeLiminal);
+      synchronizeLiminal();
     }, section);
 
     return () => context.revert();
@@ -77,7 +93,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           </div>
         </div>
 
-        <LiminalCanvas />
+        <LiminalCanvas onTimelineReady={setLiminalTimeline} />
 
         <div className="narrative-resolution" data-resolution aria-live="polite">
           <p data-resolution-one>{content.firstStatement}</p>
@@ -94,10 +110,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
   );
 }
 
-function LiminalCanvas() {
+function LiminalCanvas({ onTimelineReady }: { onTimelineReady: (timeline: gsap.core.Timeline) => void }) {
   return (
     <figure className="liminal-canvas" data-liminal aria-label="Liminal, animación a color controlada por el desplazamiento">
-      <LiminalBrandIntro enabled embedded scrollBound colorMode="realistic" onComplete={() => undefined} />
+      <LiminalBrandIntro enabled embedded controlled colorMode="realistic" onTimelineReady={onTimelineReady} onComplete={() => undefined} />
     </figure>
   );
 }

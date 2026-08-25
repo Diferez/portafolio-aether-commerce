@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- transparent layer composition must preserve exact raster dimensions */
 
 import { useRef, type CSSProperties } from "react";
+import type gsap from "gsap";
 import manifestJson from "../../manifest.json";
 import { FlameFilters } from "./filters/FlameFilters";
 import { doorGeometryFor } from "./geometry";
@@ -18,6 +19,8 @@ interface LiminalBrandIntroProps {
   embedded?: boolean;
   staticScene?: boolean;
   scrollBound?: boolean;
+  controlled?: boolean;
+  onTimelineReady?: (timeline: gsap.core.Timeline) => void;
   colorMode?: IntroColorMode;
   debug?: boolean;
   forceReducedMotion?: boolean;
@@ -100,9 +103,9 @@ const stars: ReadonlyArray<{ x: number; y: number; major?: boolean }> = [
   { x: 62.8, y: 35.8 },
 ] as const;
 
-export function LiminalBrandIntro({ enabled, embedded = false, staticScene = false, scrollBound = false, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
+export function LiminalBrandIntro({ enabled, embedded = false, staticScene = false, scrollBound = false, controlled = false, onTimelineReady, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled: enabled && !staticScene, embedded, scrollBound, colorMode, debug, forceReducedMotion, durationScale, onComplete });
+  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled: enabled && !staticScene, embedded, scrollBound, controlled, onTimelineReady, colorMode, debug, forceReducedMotion, durationScale, onComplete });
   const door = doorGeometryFor(colorMode);
   const doorDebugStyle = {
     "--layer-x": `${(door.x / 1536) * 100}%`,
