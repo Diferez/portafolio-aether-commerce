@@ -1,0 +1,332 @@
+.overlay {
+  --liminal-wine: #720421;
+  --liminal-violet: #1c0031;
+  --liminal-wine-light: #c1275b;
+  --liminal-violet-light: #74509c;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #000;
+  color: #efefed;
+  touch-action: none;
+}
+.embedded {
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  min-height: 0;
+  background: transparent;
+  pointer-events: none;
+  touch-action: auto;
+}
+.embedded .stage {
+  width: min(100%, 78dvh, 680px);
+}
+.stage {
+  position: relative;
+  z-index: 2;
+  width: min(94vw, 94dvh, 920px);
+  aspect-ratio: 1;
+  flex: none;
+  overflow: visible;
+  background: #000;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+.fantasyMaster,
+.fantasyFlame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+.fantasyMaster { z-index: 0; }
+.fantasyFlame { z-index: 2; opacity: .48; mix-blend-mode: screen; will-change: transform, opacity, filter; }
+.fantasyFlameLeft { clip-path: circle(8.5% at 24.1% 34.3%); transform-origin: 24.1% 39.5%; }
+.fantasyFlameRight { clip-path: circle(8.5% at 73.3% 34.2%); transform-origin: 73.3% 39.5%; }
+.fantasyDoorBloom,
+.fantasyDoorRadiance,
+.fantasyDoorCore {
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  will-change: transform, opacity, filter;
+}
+.fantasyDoorBloom {
+  z-index: 1;
+  left: 27.5%;
+  top: 13.5%;
+  width: 45%;
+  height: 47%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 72%, rgba(255,255,255,.34), rgba(193,39,91,.2) 28%, rgba(116,80,156,.15) 48%, transparent 72%);
+  filter: blur(24px);
+  transform-origin: 50% 76%;
+}
+.fantasyDoorRadiance {
+  z-index: 3;
+  left: 32.1%;
+  top: 18.2%;
+  width: 35.8%;
+  height: 48%;
+  clip-path: polygon(50% 0, 96% 24%, 96% 100%, 4% 100%, 4% 24%);
+  background: radial-gradient(ellipse at 50% 67%, #fff 0 5%, rgba(193,39,91,.62) 20%, rgba(116,80,156,.36) 42%, rgba(28,0,49,.1) 62%, transparent 79%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,.62) 80%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,.62) 80%, transparent 98%);
+  filter: blur(11px);
+  transform-origin: 50% 67%;
+}
+.fantasyDoorCore {
+  z-index: 4;
+  left: 36.1%;
+  top: 20.7%;
+  width: 27.8%;
+  height: 45%;
+  clip-path: polygon(50% 0, 96% 25%, 96% 100%, 4% 100%, 4% 25%);
+  background:
+    radial-gradient(ellipse at 50% 64%, #fff 0 4%, rgba(255,244,249,.92) 9%, rgba(193,39,91,.48) 24%, rgba(116,80,156,.22) 45%, rgba(28,0,49,.07) 63%, transparent 81%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 66%, rgba(0,0,0,.7) 78%, rgba(0,0,0,.18) 91%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0 66%, rgba(0,0,0,.7) 78%, rgba(0,0,0,.18) 91%, transparent 100%);
+  filter: brightness(1.04);
+  transform-origin: 50% 64%;
+}
+.layer {
+  position: absolute;
+  left: var(--layer-x);
+  top: var(--layer-y);
+  width: var(--layer-w);
+  height: var(--layer-h);
+  transform-origin: var(--origin-x) var(--origin-y);
+  pointer-events: none;
+}
+.layerImage { display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; }
+.doorGroup { overflow: visible; }
+.doorGroup .layerImage { position: relative; z-index: 1; }
+.doorBloom {
+  position: absolute;
+  z-index: -1;
+  inset: -24% -58%;
+  border-radius: 50% 50% 22% 22%;
+  background: radial-gradient(ellipse at 50% 54%, rgba(255,255,255,.92), rgba(218,220,222,.28) 38%, transparent 72%);
+  filter: blur(17px);
+  mix-blend-mode: screen;
+  transform-origin: 50% 55%;
+  will-change: transform, opacity;
+}
+.doorRadiance {
+  position: absolute;
+  z-index: 2;
+  inset: -10% -28%;
+  border-radius: 52% 52% 16% 16% / 34% 34% 10% 10%;
+  background: radial-gradient(ellipse at 50% 51%, rgba(255,255,255,1) 0 25%, rgba(239,239,244,.8) 42%, transparent 72%);
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  transform-origin: 50% 55%;
+  will-change: transform, opacity;
+}
+.doorCore {
+  position: absolute;
+  z-index: 3;
+  inset: 5% 15% 3%;
+  border-radius: 50% 50% 3% 3% / 24% 24% 2% 2%;
+  background: radial-gradient(ellipse at 50% 48%, #fff 0 34%, #f1f0f4 68%, rgba(211,213,218,.9) 100%);
+  box-shadow: 0 0 11px rgba(255,255,255,.96), 0 0 28px rgba(235,237,241,.72);
+  mix-blend-mode: screen;
+  transform-origin: 50% 55%;
+  will-change: transform, opacity, filter;
+}
+.colorAtmosphere {
+  position: absolute;
+  z-index: 1;
+  inset: 8% 17% 31%;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 24% 48%, rgba(114,4,33,.58), transparent 31%),
+    radial-gradient(circle at 76% 48%, rgba(28,0,49,.9), transparent 34%),
+    radial-gradient(ellipse at 50% 55%, rgba(255,255,255,.12), transparent 55%);
+  filter: blur(26px);
+  mix-blend-mode: screen;
+}
+.portalWash {
+  position: absolute;
+  z-index: 0;
+  left: 38.2%;
+  top: 17.6%;
+  width: 23.7%;
+  height: 46%;
+  opacity: .05;
+  background: radial-gradient(ellipse, rgba(255,255,255,.5), transparent 70%);
+  filter: blur(28px);
+  mix-blend-mode: screen;
+  transform-origin: 50% 54%;
+}
+.flameGroup { overflow: visible; will-change: transform, opacity; }
+.flameBase, .flameInner, .flameColor { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; transform-origin: 50% 88%; }
+[data-flame='left'] .flameBase { filter: url(#liminal-flame-left) brightness(1.06); }
+[data-flame='right'] .flameBase { filter: url(#liminal-flame-right) brightness(1.04); }
+.flameInner { opacity: .33; filter: brightness(1.8) contrast(.8) blur(.35px); transform: scale(.72,.86); transform-origin: 50% 88%; mix-blend-mode: screen; }
+.flameColor { display: none; opacity: .78; mix-blend-mode: color; }
+[data-flame='left'] .flameColor {
+  background: radial-gradient(ellipse at 50% 76%, #fff 0 8%, var(--liminal-wine-light) 32%, var(--liminal-wine) 74%, transparent 100%);
+  -webkit-mask: url('/brands/liminal/intro/layers/03_torch_left_flame.png') center / 100% 100% no-repeat;
+  mask: url('/brands/liminal/intro/layers/03_torch_left_flame.png') center / 100% 100% no-repeat;
+}
+[data-flame='right'] .flameColor {
+  background: radial-gradient(ellipse at 50% 76%, #fff 0 8%, var(--liminal-violet-light) 32%, var(--liminal-violet) 74%, transparent 100%);
+  -webkit-mask: url('/brands/liminal/intro/layers/04_torch_right_flame.png') center / 100% 100% no-repeat;
+  mask: url('/brands/liminal/intro/layers/04_torch_right_flame.png') center / 100% 100% no-repeat;
+}
+.outerHalo {
+  position: absolute;
+  z-index: -1;
+  left: 7%; top: 6%; width: 86%; height: 88%;
+  opacity: .46;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,.64), rgba(205,208,211,.15) 44%, transparent 72%);
+  filter: blur(9px);
+  mix-blend-mode: screen;
+  transform-origin: 50% 75%;
+}
+.ambientLight {
+  position: absolute;
+  z-index: -2;
+  left: -115%; top: -75%; width: 330%; height: 270%;
+  opacity: .17;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244,242,232,.42), rgba(195,198,202,.09) 36%, transparent 68%);
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  transform-origin: 50% 58%;
+}
+.flameParticle { position: absolute; left: 50%; top: 14%; width: 3px; height: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 7px rgba(255,255,255,.9); opacity: 0; }
+.flameParticle:nth-of-type(4) { left: 43%; top: 18%; }
+.flameParticle:nth-of-type(5) { left: 57%; top: 24%; width: 2px; height: 2px; }
+.keyGroup { overflow: hidden; }
+.keyShine {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 36%, rgba(255,255,255,.95) 48%, rgba(255,255,255,.16) 53%, transparent 64%);
+  -webkit-mask: url('/brands/liminal/intro/layers/01_key.png') center / 100% 100% no-repeat;
+  mask: url('/brands/liminal/intro/layers/01_key.png') center / 100% 100% no-repeat;
+  mix-blend-mode: screen;
+}
+.starField { position: absolute; inset: 0; z-index: 12; pointer-events: none; }
+.star { position: absolute; left: var(--star-x); top: var(--star-y); width: 7px; height: 7px; opacity: .18; transform: translate(-50%,-50%) scale(.72); transform-origin: 50% 50%; filter: drop-shadow(0 0 5px rgba(255,255,255,.75)); }
+.star::before, .star::after { content: ''; position: absolute; inset: 0; margin: auto; border-radius: 100%; background: #fff; }
+.star::before { width: 100%; height: 2px; }
+.star::after { width: 2px; height: 100%; }
+.star[data-star-major='true'] { width: 14px; height: 14px; opacity: .3; }
+.fallbackLogo { position: absolute; z-index: 3; width: min(94vw, 94dvh, 820px); height: auto; opacity: 0; visibility: hidden; object-fit: contain; }
+.vignette { position: absolute; inset: -2px; z-index: 20; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 26%, rgba(0,0,0,.32) 58%, rgba(0,0,0,.88) 100%); will-change: opacity; }
+.peripheralBlur { position: absolute; inset: -8px; z-index: 19; pointer-events: none; -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 23%, #000 60%); mask-image: radial-gradient(circle at 50% 50%, transparent 0 23%, #000 60%); will-change: opacity, backdrop-filter; }
+.flash { position: absolute; inset: -2px; z-index: 30; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 48%, #fff 0 18%, #e5e5e2 48%, #bfc1c4 100%); will-change: clip-path, opacity; }
+
+.overlay[data-color-mode='duotone'] .flameColor,
+.overlay[data-color-mode='realistic'] .flameColor { display: block; }
+.overlay[data-color-mode='duotone'] [data-flame='left'] .outerHalo,
+.overlay[data-color-mode='realistic'] [data-flame='left'] .outerHalo { background: radial-gradient(ellipse, rgba(255,255,255,.82), rgba(193,39,91,.42) 32%, rgba(114,4,33,.2) 52%, transparent 74%); }
+.overlay[data-color-mode='duotone'] [data-flame='right'] .outerHalo,
+.overlay[data-color-mode='realistic'] [data-flame='right'] .outerHalo { background: radial-gradient(ellipse, rgba(255,255,255,.8), rgba(116,80,156,.42) 32%, rgba(28,0,49,.28) 54%, transparent 74%); }
+.overlay[data-color-mode='duotone'] [data-flame='left'] .ambientLight,
+.overlay[data-color-mode='realistic'] [data-flame='left'] .ambientLight { background: radial-gradient(circle, rgba(193,39,91,.38), rgba(114,4,33,.14) 38%, transparent 69%); }
+.overlay[data-color-mode='duotone'] [data-flame='right'] .ambientLight,
+.overlay[data-color-mode='realistic'] [data-flame='right'] .ambientLight { background: radial-gradient(circle, rgba(116,80,156,.38), rgba(28,0,49,.2) 38%, transparent 69%); }
+.overlay[data-color-mode='duotone'] .doorCore {
+  background: radial-gradient(ellipse at 50% 46%, #fff 0 32%, #efe7f1 57%, rgba(193,39,91,.82) 82%, rgba(28,0,49,.85) 100%);
+}
+.overlay[data-color-mode='duotone'] .doorRadiance {
+  background: radial-gradient(ellipse at 50% 51%, #fff 0 24%, rgba(193,39,91,.68) 42%, rgba(28,0,49,.5) 59%, transparent 74%);
+}
+.overlay[data-color-mode='duotone'] .keyShine,
+.overlay[data-color-mode='realistic'] .keyShine { background: linear-gradient(105deg, transparent 34%, rgba(193,39,91,.55) 44%, #fff 49%, rgba(116,80,156,.62) 54%, transparent 65%); }
+.overlay[data-color-mode='realistic'] .stage {
+  background:
+    radial-gradient(circle at 35% 43%, rgba(114,4,33,.17), transparent 30%),
+    radial-gradient(circle at 65% 43%, rgba(28,0,49,.34), transparent 33%),
+    #000;
+}
+.overlay[data-color-mode='realistic'] [data-layer-id='01_key'],
+.overlay[data-color-mode='realistic'] [data-layer-id='02_door_light'],
+.overlay[data-color-mode='realistic'] [data-layer-id='03_torch_left_flame'],
+.overlay[data-color-mode='realistic'] [data-layer-id='04_torch_right_flame'],
+.overlay[data-color-mode='realistic'] [data-layer-id='05_torch_left_body'],
+.overlay[data-color-mode='realistic'] [data-layer-id='06_torch_right_body'],
+.overlay[data-color-mode='realistic'] [data-layer-id='07_portal_architecture'],
+.overlay[data-color-mode='realistic'] [data-layer-id='08_stars_particles'],
+.overlay[data-color-mode='realistic'] [data-layer-id='12_unassigned_detail'] { display: none; }
+.overlay[data-color-mode='realistic'] [data-role='wordmark'],
+.overlay[data-color-mode='realistic'] [data-role='subtitle'],
+.overlay[data-color-mode='realistic'] [data-role='ornament'] { z-index: 14; filter: drop-shadow(0 2px 7px #000); }
+.overlay[data-color-mode='realistic'] .colorAtmosphere { filter: blur(20px) saturate(1.18); mix-blend-mode: screen; }
+.overlay[data-color-mode='realistic'] [data-role='portal'] { filter: drop-shadow(-7px 2px 10px rgba(114,4,33,.2)) drop-shadow(8px 2px 11px rgba(116,80,156,.18)); }
+.overlay[data-color-mode='realistic'] .flameColor { opacity: .94; mix-blend-mode: screen; filter: saturate(1.2) contrast(1.08); }
+.overlay[data-color-mode='realistic'] .flameInner { opacity: .64; filter: brightness(2.35) contrast(.72) blur(.25px); }
+.overlay[data-color-mode='realistic'] .doorCore {
+  background:
+    radial-gradient(ellipse at 50% 43%, #fff 0 29%, rgba(255,246,250,.98) 48%, rgba(193,39,91,.82) 72%, rgba(28,0,49,.94) 100%);
+  box-shadow: 0 0 14px #fff, -13px 2px 34px rgba(193,39,91,.72), 14px 2px 38px rgba(116,80,156,.62);
+}
+.overlay[data-color-mode='realistic'] .doorRadiance {
+  background: radial-gradient(ellipse at 50% 51%, #fff 0 23%, rgba(193,39,91,.7) 40%, rgba(116,80,156,.5) 57%, rgba(28,0,49,.16) 67%, transparent 76%);
+}
+.overlay[data-color-mode='realistic'] .portalWash { background: radial-gradient(ellipse, rgba(255,255,255,.54), rgba(193,39,91,.2) 36%, rgba(28,0,49,.15) 58%, transparent 73%); }
+.overlay[data-color-mode='realistic'] .flash { background: radial-gradient(circle at 50% 48%, #fff 0 22%, #f7edf2 48%, #cec2d8 100%); }
+.skipButton {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 40;
+  min-width: 154px;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.26);
+  border-radius: 999px;
+  background: rgba(0,0,0,.38);
+  color: rgba(255,255,255,.72);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: color .2s, border-color .2s;
+}
+.skipButton:hover, .skipButton:focus-visible { color: #fff; border-color: rgba(255,255,255,.7); }
+.skipButton:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.doorDebugBox, .doorDebugCenter { display: none; position: absolute; z-index: 50; pointer-events: none; }
+[data-debug='true'] .doorDebugBox { display: block; left: var(--layer-x); top: var(--layer-y); width: var(--layer-w); height: var(--layer-h); border: 1px solid #00e5ff; background: rgba(0,229,255,.06); }
+[data-debug='true'] .doorDebugCenter { display: block; left: var(--center-x); top: var(--center-y); width: 14px; height: 14px; transform: translate(-50%,-50%); border: 1px solid #ff2e98; border-radius: 50%; box-shadow: 0 0 0 1px #000; }
+[data-debug='true'] .doorDebugCenter::before, [data-debug='true'] .doorDebugCenter::after { content: ''; position: absolute; left: 50%; top: 50%; background: #ff2e98; transform: translate(-50%,-50%); }
+[data-debug='true'] .doorDebugCenter::before { width: 22px; height: 1px; }
+[data-debug='true'] .doorDebugCenter::after { width: 1px; height: 22px; }
+@media (max-width: 767px) {
+  .stage { width: min(96vw, 72dvh); }
+  .doorBloom { filter: blur(10px); }
+  .doorRadiance { filter: blur(5px); }
+  .fantasyDoorBloom { filter: blur(14px); }
+  .fantasyDoorRadiance { filter: blur(7px); }
+  .colorAtmosphere { filter: blur(16px); }
+  .ambientLight { filter: blur(11px); opacity: .14; }
+  .outerHalo { filter: blur(6px); }
+  .portalWash { filter: blur(16px); }
+  .flameParticle:nth-of-type(n+5) { display: none; }
+  .skipButton { right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); min-height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage, .flash, .vignette, .peripheralBlur { will-change: auto; }
+  .flameBase, .flameInner { filter: brightness(1.02); }
+  .flameParticle { display: none; }
+  .skipButton { transition: none; }
+}
