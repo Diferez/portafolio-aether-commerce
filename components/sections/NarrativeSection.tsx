@@ -4,7 +4,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { LiminalBrandIntro } from "@/liminal/components/brand-intro/LiminalBrandIntro";
 import type { NarrativeContent } from "@/types/content";
 
@@ -16,6 +16,21 @@ type NarrativeSectionProps = {
 
 export function NarrativeSection({ content }: NarrativeSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const [liminalEnabled, setLiminalEnabled] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setLiminalEnabled(true);
+      observer.disconnect();
+    }, { threshold: 0.15 });
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -77,7 +92,7 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           </div>
         </div>
 
-        <LiminalCanvas />
+        <LiminalCanvas enabled={liminalEnabled} />
 
         <div className="narrative-resolution" data-resolution aria-live="polite">
           <p data-resolution-one>{content.firstStatement}</p>
@@ -94,10 +109,10 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
   );
 }
 
-function LiminalCanvas() {
+function LiminalCanvas({ enabled }: { enabled: boolean }) {
   return (
     <figure className="liminal-canvas" data-liminal aria-label="Liminal, animación a color controlada por el desplazamiento">
-      <LiminalBrandIntro enabled embedded staticScene colorMode="realistic" onComplete={() => undefined} />
+      <LiminalBrandIntro enabled={enabled} embedded colorMode="realistic" onComplete={() => undefined} />
     </figure>
   );
 }

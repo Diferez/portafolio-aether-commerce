@@ -17,6 +17,7 @@ interface LiminalBrandIntroProps {
   enabled: boolean;
   embedded?: boolean;
   staticScene?: boolean;
+  scrollBound?: boolean;
   colorMode?: IntroColorMode;
   debug?: boolean;
   forceReducedMotion?: boolean;
@@ -99,9 +100,9 @@ const stars: ReadonlyArray<{ x: number; y: number; major?: boolean }> = [
   { x: 62.8, y: 35.8 },
 ] as const;
 
-export function LiminalBrandIntro({ enabled, embedded = false, staticScene = false, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
+export function LiminalBrandIntro({ enabled, embedded = false, staticScene = false, scrollBound = false, colorMode = "monochrome", debug = false, forceReducedMotion = false, durationScale = 1, onComplete }: LiminalBrandIntroProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled: enabled && !staticScene, embedded, colorMode, debug, forceReducedMotion, durationScale, onComplete });
+  const { skipIntro } = useLiminalIntro({ scope: overlayRef, enabled: enabled && !staticScene, embedded, scrollBound, colorMode, debug, forceReducedMotion, durationScale, onComplete });
   const door = doorGeometryFor(colorMode);
   const doorDebugStyle = {
     "--layer-x": `${(door.x / 1536) * 100}%`,
