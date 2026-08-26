@@ -51,9 +51,9 @@ export const content = {
       eyebrow: "Full-Stack Software Engineer · backend first",
       titleLead: "Construyo sistemas para productos reales.",
       description:
-        "Ingeniero de Sistemas especializado en backend, APIs y arquitectura cloud. Construyo productos completos con Node.js, TypeScript, Python, React y Next.js; especialmente en fintech, comercio electrónico, pagos e IA aplicada.",
+        "Convierto procesos complejos en productos digitales simples, confiables y listos para crecer. Diseño soluciones que automatizan operaciones, conectan servicios y eliminan fricción entre tu negocio y la tecnología.",
       secondaryDescription:
-        "Conecto productos, pagos, operaciones y personas para que el sistema funcione más allá de la interfaz.",
+        "Conecto tecnología y operación para crear soluciones que simplifican procesos y hacen crecer tu negocio.",
       projectsCta: "Ver casos de estudio",
       contactCta: "Hablar conmigo",
       availability: "Disponible para proyectos seleccionados",
