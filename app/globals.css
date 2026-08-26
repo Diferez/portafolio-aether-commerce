@@ -2859,7 +2859,7 @@ ol {
   gap: 0.65rem;
   border: 1px solid var(--ink);
   background: var(--ink);
-  color: white;
+  color: #090b0e;
   font-size: 0.78rem;
   font-weight: 800;
   transition: background-color 180ms ease, border-color 180ms ease, transform 180ms var(--ease-out);
@@ -2868,7 +2868,13 @@ ol {
 .primary-button:hover:not(:disabled) {
   border-color: var(--signal);
   background: var(--signal);
+  color: white;
   transform: translateY(-0.12rem);
+}
+
+.primary-button:focus-visible {
+  outline: 2px solid var(--signal-deep);
+  outline-offset: 3px;
 }
 
 .primary-button:disabled {
@@ -2891,12 +2897,13 @@ ol {
   display: grid;
   width: 100%;
   max-width: none;
-  grid-template-columns: 5fr 3fr 4fr;
+  grid-template-columns: minmax(0, 5fr) minmax(10rem, 3fr) minmax(11rem, 3fr);
   margin: 0;
   padding: clamp(4rem, 7vw, 7rem) var(--page-pad) 1.5rem;
+  border-top: 1px solid var(--line);
   background: var(--night);
-  color: var(--surface);
-  gap: 2rem;
+  color: var(--ink);
+  gap: clamp(1.5rem, 3vw, 4rem);
 }
 
 .footer-signature {
@@ -2908,8 +2915,10 @@ ol {
 }
 
 .footer-signature p {
+  max-width: 14ch;
+  color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 3.4rem);
+  font-size: clamp(1.7rem, 2.7vw, 3.15rem);
   font-weight: 380;
   letter-spacing: -0.04em;
   line-height: 1.02;
@@ -2931,21 +2940,27 @@ ol {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #a7afa4;
+  color: #adb0ba;
   font-size: 0.76rem;
 }
 
 .footer-links a:hover,
 .footer-links button:hover {
-  color: white;
+  color: var(--signal-deep);
+}
+
+.footer-links a:focus-visible,
+.footer-links button:focus-visible {
+  outline: 2px solid var(--signal-deep);
+  outline-offset: 0.25rem;
 }
 
 .copyright {
   grid-column: 1 / -1;
   margin-top: 3rem;
   padding-top: 1.2rem;
-  border-top: 1px solid #414840;
-  color: #8e968b;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
   font-family: var(--font-mono);
   font-size: 0.62rem;
 }
