@@ -119,7 +119,7 @@ export const content = {
       },
       customerAssistant: {
         eyebrow: "El catálogo también puede conversar",
-        title: "Buscar deja de ser adivinar qué escribir.",
+        title: "Encuentra lo que buscas conversando.",
         paragraphs: ["El asistente entiende lo que el cliente necesita, encuentra opciones reales dentro del catálogo y lo ayuda a avanzar hacia la compra."],
         emphasis: "No responde sobre una tienda. Forma parte de ella.",
       },
