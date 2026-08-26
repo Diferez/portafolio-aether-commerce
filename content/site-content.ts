@@ -133,7 +133,7 @@ export const content = {
       eyebrow: "02 / Trabajo seleccionado",
       title: "Proyectos reales, explicados desde sus decisiones.",
       description:
-        "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto. Sin métricas inventadas ni nombres confidenciales.",
+        "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto.",
       problemLabel: "Problema",
       responsibilityLabel: "Responsabilidad",
       decisionLabel: "Decisiones",
