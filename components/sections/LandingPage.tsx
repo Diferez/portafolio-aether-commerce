@@ -19,6 +19,7 @@ import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
 import { NarrativeSection } from "./NarrativeSection";
+import { AetherNarrativeSection } from "./AetherNarrativeSection";
 import { CookieNotice } from "@/components/legal/CookieNotice";
 import { legalHref } from "@/content/legal-content";
 
@@ -228,6 +229,7 @@ export function LandingPage({ content }: LandingPageProps) {
           </section>
 
           <NarrativeSection content={content.narrative} />
+          <AetherNarrativeSection content={content.aetherNarrative} />
 
           <Section
             id={ids.projects}

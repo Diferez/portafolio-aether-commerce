@@ -4634,3 +4634,346 @@ body {
     margin-bottom: 0;
   }
 }
+
+/* Aether extends the Liminal scroll language: one pinned scene, changing system context. */
+.aether-narrative-section {
+  position: relative;
+  min-height: 100svh;
+  overflow: clip;
+  border-bottom: 1px solid var(--line);
+  background: var(--canvas);
+}
+
+.aether-narrative-frame {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 1.18fr) minmax(19rem, 0.82fr);
+  align-items: center;
+  gap: clamp(2rem, 5.2vw, 6rem);
+}
+
+.aether-narrative-frame::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 59%;
+  width: 1px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.12) 16%, rgba(255, 255, 255, 0.12) 84%, transparent);
+  content: "";
+}
+
+.aether-visual-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 57rem);
+  justify-self: start;
+  aspect-ratio: 1.19;
+}
+
+.aether-dark-wash {
+  position: absolute;
+  inset: 7% 0 7% 3%;
+  z-index: 0;
+  background: #07090c;
+}
+
+.aether-screen {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(242, 240, 235, 0.2);
+  background: #090b0e;
+  box-shadow: 0 1.25rem 3.5rem rgba(0, 0, 0, 0.24);
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.aether-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.aether-storefront,
+.aether-admin {
+  inset: 7% 0 7% 2%;
+}
+
+.aether-store-chat,
+.aether-admin-chat {
+  z-index: 2;
+  right: 5.5%;
+  bottom: 1%;
+  width: 36%;
+  height: auto;
+  max-height: 86%;
+}
+
+.aether-store-chat img,
+.aether-admin-chat img {
+  height: auto;
+}
+
+.aether-narrative-copy {
+  position: relative;
+  z-index: 3;
+  min-height: min(34rem, 66svh);
+}
+
+.aether-stage-copy {
+  position: absolute;
+  inset: 50% 0 auto;
+  max-width: 33rem;
+  transform: translateY(-50%);
+}
+
+.aether-eyebrow {
+  margin: 0 0 1.85rem;
+  color: #c4c0ca;
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.aether-eyebrow::before {
+  display: inline-block;
+  width: 1.8rem;
+  height: 1px;
+  margin: 0 0.8rem 0.23rem 0;
+  background: var(--signal-deep);
+  content: "";
+}
+
+.aether-stage-copy h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: clamp(3.1rem, 5.4vw, 6.7rem);
+  font-weight: 430;
+  letter-spacing: -0.09em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.aether-stage-description {
+  display: grid;
+  max-width: 29rem;
+  margin-top: clamp(1.8rem, 3vw, 3rem);
+  gap: 0.8rem;
+}
+
+.aether-stage-description p {
+  margin: 0;
+  color: #b9bac0;
+  font-size: clamp(0.98rem, 1.1vw, 1.1rem);
+  line-height: 1.62;
+}
+
+.aether-stage-description p:nth-last-child(2),
+.aether-stage-description p:last-child {
+  color: #ebe8ee;
+}
+
+.aether-stage-description .aether-emphasis {
+  margin-top: 0.45rem;
+  color: var(--ink);
+  font-size: clamp(1.18rem, 1.65vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.17;
+}
+
+.aether-stage-description .aether-question {
+  color: #d7d5dc;
+  font-family: var(--font-mono);
+  font-size: clamp(0.77rem, 0.9vw, 0.9rem);
+  letter-spacing: -0.025em;
+}
+
+.aether-stage-description .aether-question::before {
+  color: var(--signal);
+  content: "↳ ";
+}
+
+@media (max-width: 64rem) {
+  .aether-narrative-frame {
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.78fr);
+    gap: 2rem;
+  }
+
+  .aether-stage-copy h2 {
+    font-size: clamp(2.7rem, 5.5vw, 4.5rem);
+  }
+}
+
+@media (max-width: 48rem) {
+  .aether-narrative-section,
+  .aether-narrative-frame {
+    min-height: 100dvh;
+  }
+
+  .aether-narrative-frame {
+    display: block;
+    padding-top: 0;
+  }
+
+  .aether-narrative-frame::before {
+    top: 0;
+    right: var(--page-pad);
+    bottom: 0;
+    left: auto;
+  }
+
+  .aether-visual-panel {
+    position: absolute;
+    top: max(3.5rem, 8svh);
+    left: var(--page-pad);
+    width: calc(100% - (var(--page-pad) * 2));
+    max-width: 32rem;
+    height: min(47svh, 29rem);
+    margin: 0;
+    aspect-ratio: auto;
+  }
+
+  .aether-dark-wash {
+    inset: 0;
+  }
+
+  .aether-storefront,
+  .aether-admin {
+    inset: 0;
+  }
+
+  .aether-store-chat,
+  .aether-admin-chat {
+    right: 3%;
+    bottom: -7%;
+    width: 42%;
+    max-height: 93%;
+  }
+
+  .aether-narrative-copy {
+    position: absolute;
+    top: min(61svh, 35rem);
+    right: var(--page-pad);
+    left: var(--page-pad);
+    min-height: 0;
+  }
+
+  .aether-stage-copy {
+    inset: 0;
+    max-width: 28rem;
+    transform: none;
+  }
+
+  .aether-eyebrow {
+    margin-bottom: 1.3rem;
+  }
+
+  .aether-stage-copy h2 {
+    max-width: 10ch;
+    font-size: clamp(2.75rem, 12.6vw, 4.15rem);
+  }
+
+  .aether-stage-description {
+    margin-top: 1.45rem;
+    gap: 0.62rem;
+  }
+
+  .aether-stage-description p {
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .aether-stage-description .aether-emphasis {
+    font-size: 1.14rem;
+  }
+}
+
+@media (max-width: 48rem) and (max-height: 44rem) {
+  .aether-visual-panel {
+    top: 2.7rem;
+    height: min(43svh, 22rem);
+  }
+
+  .aether-narrative-copy {
+    top: 54svh;
+  }
+
+  .aether-stage-copy h2 {
+    font-size: clamp(2.35rem, 10.8vw, 3.3rem);
+  }
+
+  .aether-stage-description {
+    margin-top: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aether-narrative-section {
+    min-height: auto;
+  }
+
+  .aether-narrative-frame {
+    display: grid;
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+
+  .aether-narrative-frame::before {
+    display: none;
+  }
+
+  .aether-visual-panel {
+    display: grid;
+    width: 100%;
+    max-width: 48rem;
+    height: auto;
+    margin: 0;
+    aspect-ratio: auto;
+    gap: 1.25rem;
+  }
+
+  .aether-dark-wash {
+    display: none;
+  }
+
+  .aether-screen,
+  .aether-storefront,
+  .aether-store-chat,
+  .aether-admin,
+  .aether-admin-chat {
+    position: static;
+    width: 100%;
+    max-height: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .aether-store-chat,
+  .aether-admin-chat {
+    width: min(58%, 22rem);
+    justify-self: end;
+  }
+
+  .aether-narrative-copy {
+    display: grid;
+    min-height: auto;
+    gap: 3rem;
+  }
+
+  .aether-stage-copy {
+    position: static;
+    max-width: 38rem;
+    opacity: 1;
+    transform: none;
+  }
+}

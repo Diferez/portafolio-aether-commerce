@@ -100,6 +100,63 @@ export const content = {
       projectDescription: "Productos reales. Problemas reales. Decisiones reales.",
       projectPreviewAlt: "Vista principal de la tienda Liminal Accesorios",
     },
+    aetherNarrative: {
+      intro: {
+        eyebrow: "Aether / comercio conectado",
+        title: "Una tienda que funciona más allá de la interfaz.",
+        paragraphs: [
+          "Comprar es solo una parte del problema.",
+          "Aether conecta la experiencia del cliente con inventario, pedidos, operación y asistencia inteligente en un mismo producto.",
+        ],
+      },
+      storefront: {
+        eyebrow: "Una experiencia pensada para comprar",
+        title: "Menos fricción. Más claridad.",
+        paragraphs: [
+          "El cliente encuentra lo que necesita sin navegar entre ruido, menús innecesarios o procesos complicados.",
+          "Productos, disponibilidad y compra forman parte de una misma experiencia.",
+        ],
+      },
+      customerAssistant: {
+        eyebrow: "El catálogo también puede conversar",
+        title: "Buscar deja de ser adivinar qué escribir.",
+        paragraphs: ["El asistente entiende lo que el cliente necesita, encuentra opciones reales dentro del catálogo y lo ayuda a avanzar hacia la compra."],
+        emphasis: "No responde sobre una tienda. Forma parte de ella.",
+      },
+      administration: {
+        eyebrow: "Del otro lado de la compra",
+        title: "Lo que ocurre en la tienda se convierte en decisiones.",
+        paragraphs: [
+          "Pedidos, productos, inventario y señales importantes de la operación aparecen en un mismo lugar.",
+          "El objetivo no es mostrar más información.",
+        ],
+        emphasis: "Es saber qué necesita atención.",
+      },
+      operationalAssistant: {
+        eyebrow: "La operación también puede conversarse",
+        title: "Preguntar en lugar de buscar.",
+        paragraphs: [
+          "¿Qué pedidos están procesándose?",
+          "¿Qué productos tienen poco stock?",
+          "Aether convierte información dispersa del negocio en respuestas directas y accionables.",
+        ],
+      },
+      closing: {
+        eyebrow: "Una sola experiencia, dos lados del negocio",
+        title: "El cliente compra. El negocio responde.",
+        paragraphs: [
+          "Aether conecta ambos.",
+          "No es solo una tienda con un panel administrativo ni un chatbot añadido encima. Es un producto diseñado para que clientes, datos y operación trabajen juntos.",
+        ],
+      },
+      visuals: {
+        sequenceLabel: "Secuencia visual del producto Aether",
+        storefrontAlt: "Vista principal de la tienda Aether",
+        storefrontAssistantAlt: "Asistente de compra de Aether",
+        administrationAlt: "Panel administrativo de Aether",
+        administrationAssistantAlt: "Asistente operativo del panel de Aether",
+      },
+    },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
       title: "No separo el código del contexto operativo.",
@@ -484,6 +541,63 @@ export const content = {
       projectTitle: "Here is what I have already built.",
       projectDescription: "Real products. Real problems. Real decisions.",
       projectPreviewAlt: "Liminal Accesorios storefront main view",
+    },
+    aetherNarrative: {
+      intro: {
+        eyebrow: "Aether / connected commerce",
+        title: "A store that works beyond the interface.",
+        paragraphs: [
+          "Buying is only one part of the problem.",
+          "Aether connects the customer experience with inventory, orders, operations, and intelligent assistance in one product.",
+        ],
+      },
+      storefront: {
+        eyebrow: "An experience designed for buying",
+        title: "Less friction. More clarity.",
+        paragraphs: [
+          "Customers find what they need without navigating noise, unnecessary menus, or complicated processes.",
+          "Products, availability, and purchase belong to the same experience.",
+        ],
+      },
+      customerAssistant: {
+        eyebrow: "The catalogue can talk too",
+        title: "Search stops being a guessing game.",
+        paragraphs: ["The assistant understands what the customer needs, finds real options in the catalogue, and helps them move towards a purchase."],
+        emphasis: "It does not answer about a store. It is part of it.",
+      },
+      administration: {
+        eyebrow: "On the other side of the purchase",
+        title: "What happens in the store becomes decisions.",
+        paragraphs: [
+          "Orders, products, inventory, and operational signals appear in one place.",
+          "The goal is not to show more information.",
+        ],
+        emphasis: "It is knowing what needs attention.",
+      },
+      operationalAssistant: {
+        eyebrow: "Operations can talk too",
+        title: "Ask instead of search.",
+        paragraphs: [
+          "Which orders are being processed?",
+          "Which products are low in stock?",
+          "Aether turns dispersed business information into direct, actionable answers.",
+        ],
+      },
+      closing: {
+        eyebrow: "One experience, two sides of the business",
+        title: "The customer buys. The business responds.",
+        paragraphs: [
+          "Aether connects both.",
+          "It is not only a storefront with an admin panel or a chatbot added on top. It is a product designed so customers, data, and operations work together.",
+        ],
+      },
+      visuals: {
+        sequenceLabel: "Aether product visual sequence",
+        storefrontAlt: "Aether storefront main view",
+        storefrontAssistantAlt: "Aether shopping assistant",
+        administrationAlt: "Aether administration dashboard",
+        administrationAssistantAlt: "Aether administration operational assistant",
+      },
     },
     expertise: {
       eyebrow: "01 / Value",

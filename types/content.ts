@@ -56,6 +56,29 @@ export type NarrativeContent = {
   projectPreviewAlt: string;
 };
 
+export type AetherNarrativeStep = {
+  eyebrow: string;
+  title: string;
+  paragraphs: readonly string[];
+  emphasis?: string;
+};
+
+export type AetherNarrativeContent = {
+  intro: AetherNarrativeStep;
+  storefront: AetherNarrativeStep;
+  customerAssistant: AetherNarrativeStep;
+  administration: AetherNarrativeStep;
+  operationalAssistant: AetherNarrativeStep;
+  closing: AetherNarrativeStep;
+  visuals: {
+    sequenceLabel: string;
+    storefrontAlt: string;
+    storefrontAssistantAlt: string;
+    administrationAlt: string;
+    administrationAssistantAlt: string;
+  };
+};
+
 export type ContactContent = {
   title: string;
   eyebrow: string;
@@ -129,6 +152,7 @@ export type LandingContent = {
     diagramCaption: string;
   };
   narrative: NarrativeContent;
+  aetherNarrative: AetherNarrativeContent;
   expertise: {
     eyebrow: string;
     title: string;
