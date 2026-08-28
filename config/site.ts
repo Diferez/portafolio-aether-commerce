@@ -3,7 +3,7 @@ export const siteConfig = {
     process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Diego Fernando",
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "https://portafolio-aether-commerce.pickofwow.workers.dev",
+    "https://diferez.com",
   storeUrl:
     process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
     "https://aether-storefront.pickofwow.workers.dev",

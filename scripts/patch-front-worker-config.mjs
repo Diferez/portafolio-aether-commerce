@@ -9,6 +9,17 @@ config.topLevelName = config.name;
 config.compatibility_date = "2026-08-08";
 config.workers_dev = true;
 config.preview_urls = true;
+const customDomains = (process.env.PORTFOLIO_CUSTOM_DOMAINS || "")
+  .split(",")
+  .map((hostname) => hostname.trim())
+  .filter(Boolean);
+
+if (customDomains.length > 0) {
+  config.routes = customDomains.map((pattern) => ({
+    pattern,
+    custom_domain: true,
+  }));
+}
 delete config.legacy_env;
 delete config.legacyEnv;
 config.vars = {
