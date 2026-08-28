@@ -50,19 +50,112 @@ export const content = {
     hero: {
       eyebrow: "Full-Stack Software Engineer · backend first",
       titleLead: "Construyo sistemas para productos reales.",
-      titleEmphasis: "De la arquitectura a producción.",
       description:
-        "Ingeniero de Sistemas especializado en backend, APIs y arquitectura cloud. Construyo productos completos con Node.js, TypeScript, Python, React y Next.js; especialmente en fintech, comercio electrónico, pagos e IA aplicada.",
+        "Convierto procesos complejos en productos digitales simples, confiables y listos para crecer. Diseño soluciones que automatizan operaciones, conectan servicios y eliminan fricción entre tu negocio y la tecnología.",
+      secondaryDescription:
+        "Conecto tecnología y operación para crear soluciones que simplifican procesos y hacen crecer tu negocio.",
       projectsCta: "Ver casos de estudio",
       contactCta: "Hablar conmigo",
       availability: "Disponible para proyectos seleccionados",
       location: "Colombia · remoto internacional",
       focusLabel: "Áreas de trabajo",
       focus: ["Backend & APIs", "Cloud", "Fintech", "IA aplicada"],
-      diagramLabel: "Sistema / producto",
-      diagramNodes: ["Interfaz", "Servicios", "Datos", "Operación"],
+      diagramKicker: "Mapa de responsabilidad",
+      diagramLabel: "Lo visible es solo la entrada.",
+      diagramCoreTitle: "Arquitectura de producto",
+      diagramCoreDetail: "El punto donde experiencia, backend, datos y operación dejan de ser piezas separadas.",
+      diagramNodes: [
+        {
+          phase: "Entrada",
+          title: "Flujo de usuario",
+          detail: "Necesidad, restricción, estado y acción visible.",
+        },
+        {
+          phase: "Núcleo",
+          title: "Reglas y APIs",
+          detail: "Servicios que validan, calculan, autorizan y coordinan.",
+        },
+        {
+          phase: "Estado",
+          title: "Datos e integraciones",
+          detail: "Persistencia, pagos, eventos e idempotencia.",
+        },
+        {
+          phase: "Salida",
+          title: "Operación",
+          detail: "Deploy, observabilidad, seguridad y mantenimiento.",
+        },
+      ],
       diagramCaption:
-        "Trabajo sobre el sistema completo, con mayor profundidad donde viven la lógica, los datos y las integraciones.",
+        "Diseño la interfaz como la puerta de un sistema que debe responder bien cuando hay usuarios, fallos y cambios.",
+    },
+    narrative: {
+      eyebrow: "No parto de una plantilla",
+      title: "Construyo alrededor de tu negocio.",
+      descriptionOne: "Cada empresa tiene procesos, clientes y objetivos distintos.",
+      descriptionTwo: "Diseño soluciones que se adaptan a ellos, no al revés.",
+      firstStatement: "Tu negocio no debería adaptarse al software.",
+      secondStatement: "El software debería adaptarse a tu negocio.",
+      projectTitle: "Aquí está lo que ya he construido.",
+      projectDescription: "Productos reales. Problemas reales. Decisiones reales.",
+      projectPreviewAlt: "Vista principal de la tienda Liminal Accesorios",
+    },
+    aetherNarrative: {
+      intro: {
+        eyebrow: "Aether / comercio conectado",
+        title: "Una tienda que funciona más allá de la interfaz.",
+        paragraphs: [
+          "Comprar es solo una parte del problema.",
+          "Aether conecta la experiencia del cliente con inventario, pedidos, operación y asistencia inteligente en un mismo producto.",
+        ],
+      },
+      storefront: {
+        eyebrow: "Una experiencia pensada para comprar",
+        title: "Menos fricción. Más claridad.",
+        paragraphs: [
+          "El cliente encuentra lo que necesita sin navegar entre ruido, menús innecesarios o procesos complicados.",
+          "Productos, disponibilidad y compra forman parte de una misma experiencia.",
+        ],
+      },
+      customerAssistant: {
+        eyebrow: "El catálogo también puede conversar",
+        title: "Encuentra lo que buscas conversando.",
+        paragraphs: ["El asistente entiende lo que el cliente necesita, encuentra opciones reales dentro del catálogo y lo ayuda a avanzar hacia la compra."],
+        emphasis: "No responde sobre una tienda. Forma parte de ella.",
+      },
+      administration: {
+        eyebrow: "Del otro lado de la compra",
+        title: "Lo que ocurre en la tienda se convierte en decisiones.",
+        paragraphs: [
+          "Pedidos, productos, inventario y señales importantes de la operación aparecen en un mismo lugar.",
+          "El objetivo no es mostrar más información.",
+        ],
+        emphasis: "Es saber qué necesita atención.",
+      },
+      operationalAssistant: {
+        eyebrow: "La operación también puede conversarse",
+        title: "Preguntar en lugar de buscar.",
+        paragraphs: [
+          "¿Qué pedidos están procesándose?",
+          "¿Qué productos tienen poco stock?",
+          "Aether convierte información dispersa del negocio en respuestas directas y accionables.",
+        ],
+      },
+      closing: {
+        eyebrow: "Una sola experiencia, dos lados del negocio",
+        title: "El cliente compra. El negocio responde.",
+        paragraphs: [
+          "Aether conecta ambos.",
+          "No es solo una tienda con un panel administrativo ni un chatbot añadido encima. Es un producto diseñado para que clientes, datos y operación trabajen juntos.",
+        ],
+      },
+      visuals: {
+        sequenceLabel: "Secuencia visual del producto Aether",
+        storefrontAlt: "Vista principal de la tienda Aether",
+        storefrontAssistantAlt: "Asistente de compra de Aether",
+        administrationAlt: "Panel administrativo de Aether",
+        administrationAssistantAlt: "Asistente operativo del panel de Aether",
+      },
     },
     expertise: {
       eyebrow: "01 / Propuesta de valor",
@@ -95,9 +188,9 @@ export const content = {
     },
     projects: {
       eyebrow: "02 / Trabajo seleccionado",
-      title: "Casos de estudio, no vitrinas.",
+      title: "Proyectos reales, explicados desde sus decisiones.",
       description:
-        "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto. Sin métricas inventadas ni nombres confidenciales.",
+        "Cada proyecto muestra el problema, la responsabilidad y las decisiones que sostienen el producto.",
       problemLabel: "Problema",
       responsibilityLabel: "Responsabilidad",
       decisionLabel: "Decisiones",
@@ -201,6 +294,12 @@ export const content = {
               body: "Experiencia en producción descrita al nivel permitido; sin publicar datos internos de la organización.",
             },
           ],
+          architecture: [
+            "Interfaz Angular",
+            "Servicios Node.js",
+            "Funciones AWS Lambda",
+            "Entrega con Azure DevOps",
+          ],
           technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
         },
         {
@@ -278,7 +377,7 @@ export const content = {
     },
     approach: {
       eyebrow: "04 / Enfoque",
-      title: "Primero entiendo el sistema; luego decido la forma.",
+      title: "Entiendo el dominio antes de proponer arquitectura.",
       description:
         "Trabajo por incrementos revisables y hago explícitos los riesgos temprano. La arquitectura debe facilitar el cambio, no volverlo ceremonial.",
       steps: [
@@ -311,7 +410,6 @@ export const content = {
       description:
         "Cuéntame el contexto, el estado actual y qué necesita cambiar. Respondo mejor a problemas concretos que a briefs llenos de adjetivos.",
       directLabel: "Canales directos",
-      linkedinLabel: "Ver perfil profesional",
       fields: {
         name: "Nombre",
         company: "Empresa",
@@ -319,7 +417,8 @@ export const content = {
         projectType: "Tipo de proyecto",
         message: "Contexto",
         preferredLanguage: "Idioma preferido",
-        consent: "Acepto que la información enviada se use para responder esta solicitud.",
+        consent: "Autorizo el tratamiento de mis datos para gestionar y responder esta solicitud conforme a la",
+        privacyLink: "Política de privacidad",
         website: "Sitio web",
       },
       placeholders: {
@@ -336,6 +435,7 @@ export const content = {
         "Inteligencia artificial",
         "Mantenimiento",
         "Consultoría",
+        "Solicitud de privacidad",
         "Otro",
       ],
       languageOptions: { es: "Español", en: "Inglés" },
@@ -345,7 +445,7 @@ export const content = {
       success: "Recibí el contexto. Gracias.",
       error: "No fue posible enviar el mensaje. Inténtalo de nuevo en unos minutos.",
       privacy:
-        "La información se usa únicamente para responder. No incluyas claves, secretos ni datos sensibles.",
+        "Responsable: Diego Fernando Martinez. Conservación máxima ordinaria: 12 meses. No incluyas claves, secretos ni datos sensibles.",
       validation: {
         required: "Este campo es obligatorio.",
         email: "Ingresa un correo válido.",
@@ -357,6 +457,9 @@ export const content = {
       summary: "Ingeniería full-stack con foco en backend, cloud y productos en producción.",
       rights: "Todos los derechos reservados.",
       backToTop: "Volver arriba",
+      privacy: "Privacidad",
+      cookies: "Cookies",
+      terms: "Términos",
     },
   },
   en: {
@@ -389,19 +492,112 @@ export const content = {
     hero: {
       eyebrow: "Full-Stack Software Engineer · backend first",
       titleLead: "I build systems for real products.",
-      titleEmphasis: "From architecture to production.",
       description:
         "Systems Engineer specializing in backend, APIs, and cloud architecture. I build complete products with Node.js, TypeScript, Python, React, and Next.js—particularly in fintech, commerce, payments, and applied AI.",
+      secondaryDescription:
+        "I connect products, payments, operations, and people so the system works beyond the interface.",
       projectsCta: "View case studies",
       contactCta: "Talk to me",
       availability: "Available for selected projects",
       location: "Colombia · international remote",
       focusLabel: "Areas of work",
       focus: ["Backend & APIs", "Cloud", "Fintech", "Applied AI"],
-      diagramLabel: "System / product",
-      diagramNodes: ["Interface", "Services", "Data", "Operations"],
+      diagramKicker: "Responsibility map",
+      diagramLabel: "The visible layer is only the entry point.",
+      diagramCoreTitle: "Product architecture",
+      diagramCoreDetail: "Where experience, backend, data, and operations stop being separate pieces.",
+      diagramNodes: [
+        {
+          phase: "Entry",
+          title: "User flow",
+          detail: "Need, constraint, state, and visible action.",
+        },
+        {
+          phase: "Core",
+          title: "Rules and APIs",
+          detail: "Services that validate, calculate, authorize, and coordinate.",
+        },
+        {
+          phase: "State",
+          title: "Data and integrations",
+          detail: "Persistence, payments, events, and idempotency.",
+        },
+        {
+          phase: "Release",
+          title: "Operations",
+          detail: "Deploy, observability, security, and maintenance.",
+        },
+      ],
       diagramCaption:
-        "I work across the system, with the greatest depth where business logic, data, and integrations live.",
+        "I design the interface as the doorway into a system that must hold up under users, failures, and change.",
+    },
+    narrative: {
+      eyebrow: "I don't start from a template",
+      title: "I build around your business.",
+      descriptionOne: "Every company has different processes, customers, and objectives.",
+      descriptionTwo: "I design solutions that adapt to them, not the other way around.",
+      firstStatement: "Your business should not adapt to software.",
+      secondStatement: "Software should adapt to your business.",
+      projectTitle: "Here is what I have already built.",
+      projectDescription: "Real products. Real problems. Real decisions.",
+      projectPreviewAlt: "Liminal Accesorios storefront main view",
+    },
+    aetherNarrative: {
+      intro: {
+        eyebrow: "Aether / connected commerce",
+        title: "A store that works beyond the interface.",
+        paragraphs: [
+          "Buying is only one part of the problem.",
+          "Aether connects the customer experience with inventory, orders, operations, and intelligent assistance in one product.",
+        ],
+      },
+      storefront: {
+        eyebrow: "An experience designed for buying",
+        title: "Less friction. More clarity.",
+        paragraphs: [
+          "Customers find what they need without navigating noise, unnecessary menus, or complicated processes.",
+          "Products, availability, and purchase belong to the same experience.",
+        ],
+      },
+      customerAssistant: {
+        eyebrow: "The catalogue can talk too",
+        title: "Search stops being a guessing game.",
+        paragraphs: ["The assistant understands what the customer needs, finds real options in the catalogue, and helps them move towards a purchase."],
+        emphasis: "It does not answer about a store. It is part of it.",
+      },
+      administration: {
+        eyebrow: "On the other side of the purchase",
+        title: "What happens in the store becomes decisions.",
+        paragraphs: [
+          "Orders, products, inventory, and operational signals appear in one place.",
+          "The goal is not to show more information.",
+        ],
+        emphasis: "It is knowing what needs attention.",
+      },
+      operationalAssistant: {
+        eyebrow: "Operations can talk too",
+        title: "Ask instead of search.",
+        paragraphs: [
+          "Which orders are being processed?",
+          "Which products are low in stock?",
+          "Aether turns dispersed business information into direct, actionable answers.",
+        ],
+      },
+      closing: {
+        eyebrow: "One experience, two sides of the business",
+        title: "The customer buys. The business responds.",
+        paragraphs: [
+          "Aether connects both.",
+          "It is not only a storefront with an admin panel or a chatbot added on top. It is a product designed so customers, data, and operations work together.",
+        ],
+      },
+      visuals: {
+        sequenceLabel: "Aether product visual sequence",
+        storefrontAlt: "Aether storefront main view",
+        storefrontAssistantAlt: "Aether shopping assistant",
+        administrationAlt: "Aether administration dashboard",
+        administrationAssistantAlt: "Aether administration operational assistant",
+      },
     },
     expertise: {
       eyebrow: "01 / Value",
@@ -434,7 +630,7 @@ export const content = {
     },
     projects: {
       eyebrow: "02 / Selected work",
-      title: "Case studies, not showcases.",
+      title: "Real projects, explained through technical decisions.",
       description:
         "Each project explains the problem, ownership, and decisions that sustain the product. No invented metrics or confidential names.",
       problemLabel: "Problem",
@@ -540,6 +736,12 @@ export const content = {
               body: "Production experience described at the permitted level, without internal organization data.",
             },
           ],
+          architecture: [
+            "Angular interface",
+            "Node.js services",
+            "AWS Lambda functions",
+            "Azure DevOps delivery",
+          ],
           technologies: ["AWS Lambda", "Node.js", "Angular", "Azure DevOps", "CI/CD"],
         },
         {
@@ -617,7 +819,7 @@ export const content = {
     },
     approach: {
       eyebrow: "04 / Approach",
-      title: "Understand the system first; decide the shape second.",
+      title: "I understand the domain before proposing architecture.",
       description:
         "I work in reviewable increments and make risk visible early. Architecture should make change easier, not ceremonial.",
       steps: [
@@ -650,7 +852,6 @@ export const content = {
       description:
         "Tell me the context, the current state, and what needs to change. I respond better to concrete problems than briefs full of adjectives.",
       directLabel: "Direct channels",
-      linkedinLabel: "View professional profile",
       fields: {
         name: "Name",
         company: "Company",
@@ -658,7 +859,8 @@ export const content = {
         projectType: "Project type",
         message: "Context",
         preferredLanguage: "Preferred language",
-        consent: "I agree that the submitted information may be used to respond to this request.",
+        consent: "I authorize the processing of my data to manage and respond to this request under the",
+        privacyLink: "Privacy policy",
         website: "Website",
       },
       placeholders: {
@@ -675,6 +877,7 @@ export const content = {
         "Artificial intelligence",
         "Maintenance",
         "Consulting",
+        "Privacy request",
         "Other",
       ],
       languageOptions: { es: "Spanish", en: "English" },
@@ -684,7 +887,7 @@ export const content = {
       success: "I received the context. Thank you.",
       error: "The message could not be sent. Please try again in a few minutes.",
       privacy:
-        "The information is used only to respond. Do not include keys, secrets, or sensitive data.",
+        "Controller: Diego Fernando Martinez. Ordinary maximum retention: 12 months. Do not include keys, secrets, or sensitive data.",
       validation: {
         required: "This field is required.",
         email: "Enter a valid email address.",
@@ -696,6 +899,9 @@ export const content = {
       summary: "Backend-focused full-stack engineering for cloud products in production.",
       rights: "All rights reserved.",
       backToTop: "Back to top",
+      privacy: "Privacy",
+      cookies: "Cookies",
+      terms: "Terms",
     },
   },
 } as const satisfies Record<Locale, LandingContent>;

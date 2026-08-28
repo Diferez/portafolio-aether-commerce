@@ -60,7 +60,8 @@ Variables del environment `production` en GitHub:
 
 - `CLOUDFLARE_DEPLOY_ENABLED=true`
 - `PORTFOLIO_WORKER_NAME=portafolio-aether-commerce`
-- `NEXT_PUBLIC_SITE_URL`
+- `PORTFOLIO_CUSTOM_DOMAINS=diferez.com,www.diferez.com`
+- `NEXT_PUBLIC_SITE_URL=https://diferez.com`
 - `NEXT_PUBLIC_STORE_URL`
 - `NEXT_PUBLIC_AETHER_API_URL`
 - `AETHER_API_ORIGIN`

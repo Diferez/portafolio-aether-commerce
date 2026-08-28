@@ -38,12 +38,52 @@ export type CapabilityItem = {
   tools: readonly string[];
 };
 
+export type DiagramNode = {
+  phase: string;
+  title: string;
+  detail: string;
+};
+
+export type NarrativeContent = {
+  eyebrow: string;
+  title: string;
+  descriptionOne: string;
+  descriptionTwo: string;
+  firstStatement: string;
+  secondStatement: string;
+  projectTitle: string;
+  projectDescription: string;
+  projectPreviewAlt: string;
+};
+
+export type AetherNarrativeStep = {
+  eyebrow: string;
+  title: string;
+  paragraphs: readonly string[];
+  emphasis?: string;
+};
+
+export type AetherNarrativeContent = {
+  intro: AetherNarrativeStep;
+  storefront: AetherNarrativeStep;
+  customerAssistant: AetherNarrativeStep;
+  administration: AetherNarrativeStep;
+  operationalAssistant: AetherNarrativeStep;
+  closing: AetherNarrativeStep;
+  visuals: {
+    sequenceLabel: string;
+    storefrontAlt: string;
+    storefrontAssistantAlt: string;
+    administrationAlt: string;
+    administrationAssistantAlt: string;
+  };
+};
+
 export type ContactContent = {
   title: string;
   eyebrow: string;
   description: string;
   directLabel: string;
-  linkedinLabel: string;
   fields: {
     name: string;
     company: string;
@@ -52,6 +92,7 @@ export type ContactContent = {
     message: string;
     preferredLanguage: string;
     consent: string;
+    privacyLink: string;
     website: string;
   };
   placeholders: {
@@ -95,8 +136,8 @@ export type LandingContent = {
   hero: {
     eyebrow: string;
     titleLead: string;
-    titleEmphasis: string;
     description: string;
+    secondaryDescription: string;
     projectsCta: string;
     contactCta: string;
     availability: string;
@@ -104,9 +145,14 @@ export type LandingContent = {
     focusLabel: string;
     focus: readonly string[];
     diagramLabel: string;
-    diagramNodes: readonly string[];
+    diagramKicker: string;
+    diagramCoreTitle: string;
+    diagramCoreDetail: string;
+    diagramNodes: readonly DiagramNode[];
     diagramCaption: string;
   };
+  narrative: NarrativeContent;
+  aetherNarrative: AetherNarrativeContent;
   expertise: {
     eyebrow: string;
     title: string;
@@ -142,5 +188,8 @@ export type LandingContent = {
     summary: string;
     rights: string;
     backToTop: string;
+    privacy: string;
+    cookies: string;
+    terms: string;
   };
 };

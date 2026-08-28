@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: new URL("/og.png", siteConfig.siteUrl),
-        width: 1728,
-        height: 904,
-        alt: "Diego Fernando Martinez — Systems Engineer, Backend First",
+        width: 1734,
+        height: 907,
+        alt: "Diego Fernando Martínez — Sistemas reales, de la arquitectura a producción",
       },
     ],
   },

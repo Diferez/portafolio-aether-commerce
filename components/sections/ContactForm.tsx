@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import type { FormEvent } from "react";
 import type { ContactContent } from "@/types/content";
 import type { Locale } from "@/i18n/config";
+import { legalHref, privacyVersion } from "@/content/legal-content";
 
 type ContactFormProps = {
   content: ContactContent;
@@ -38,34 +39,55 @@ export function ContactForm({ content, locale }: ContactFormProps) {
     return nextErrors;
   }
 
+  function handleInput(event: FormEvent<HTMLFormElement>) {
+    const target = event.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    if (!target.name) return;
+
+    if (errors[target.name]) {
+      setErrors((current) => {
+        const next = { ...current };
+        delete next[target.name];
+        return next;
+      });
+    }
+
+    if (state === "error" || state === "success") {
+      setState("idle");
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const validationErrors = validate(formData);
 
     setErrors(validationErrors);
     setState("idle");
 
     if (Object.keys(validationErrors).length > 0) {
+      window.setTimeout(() => {
+        form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      }, 0);
       return;
     }
 
     setState("sending");
-
     const payload = Object.fromEntries(formData.entries());
 
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, locale }),
+        body: JSON.stringify({ ...payload, locale, privacyVersion }),
       });
 
       if (!response.ok) {
         throw new Error("Request failed");
       }
 
-      event.currentTarget.reset();
+      form.reset();
+      setErrors({});
       setState("success");
     } catch {
       setState("error");
@@ -76,7 +98,12 @@ export function ContactForm({ content, locale }: ContactFormProps) {
     state === "success" ? content.success : state === "error" ? content.error : "";
 
   return (
-    <form className="contact-form" noValidate onSubmit={handleSubmit}>
+    <form
+      className="contact-form"
+      noValidate
+      onInput={handleInput}
+      onSubmit={handleSubmit}
+    >
       <div className="honeypot" aria-hidden="true">
         <label htmlFor={`${formId}-website`}>{content.fields.website}</label>
         <input
@@ -128,28 +155,32 @@ export function ContactForm({ content, locale }: ContactFormProps) {
             </option>
           ))}
         </select>
-        {errors.projectType ? (
-          <span className="field-error" id={`${formId}-project-error`}>
-            {errors.projectType}
-          </span>
-        ) : null}
+        <span className="field-message" aria-live="polite">
+          {errors.projectType ? (
+            <span className="field-error" id={`${formId}-project-error`}>
+              {errors.projectType}
+            </span>
+          ) : null}
+        </span>
       </label>
 
       <label className="field field-full">
         <span>{content.fields.message}</span>
         <textarea
           name="message"
-          rows={6}
+          rows={7}
           placeholder={content.placeholders.message}
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? `${formId}-message-error` : undefined}
           required
         />
-        {errors.message ? (
-          <span className="field-error" id={`${formId}-message-error`}>
-            {errors.message}
-          </span>
-        ) : null}
+        <span className="field-message" aria-live="polite">
+          {errors.message ? (
+            <span className="field-error" id={`${formId}-message-error`}>
+              {errors.message}
+            </span>
+          ) : null}
+        </span>
       </label>
 
       <label className="field">
@@ -158,34 +189,50 @@ export function ContactForm({ content, locale }: ContactFormProps) {
           <option value="es">{content.languageOptions.es}</option>
           <option value="en">{content.languageOptions.en}</option>
         </select>
+        <span className="field-message" aria-hidden="true" />
       </label>
 
-      <label className="consent field-full">
+      <div className="consent field-full">
         <input
+          id={`${formId}-consent`}
           name="consent"
           type="checkbox"
           aria-invalid={Boolean(errors.consent)}
           aria-describedby={errors.consent ? `${formId}-consent-error` : undefined}
         />
-        <span>{content.fields.consent}</span>
-      </label>
+        <label htmlFor={`${formId}-consent`}>
+          {content.fields.consent}{" "}
+          <a href={legalHref(locale, "privacy")}>{content.fields.privacyLink}</a>.
+        </label>
+      </div>
 
-      {errors.consent ? (
-        <span className="field-error field-full" id={`${formId}-consent-error`}>
-          {errors.consent}
-        </span>
-      ) : null}
+      <span className="field-message field-full" aria-live="polite">
+        {errors.consent ? (
+          <span className="field-error" id={`${formId}-consent-error`}>
+            {errors.consent}
+          </span>
+        ) : null}
+      </span>
 
       <p className="privacy-note field-full" id="privacidad">
         {content.privacy}
       </p>
 
-      <button className="primary-button field-full" type="submit" disabled={state === "sending"}>
+      <button
+        className="primary-button field-full"
+        type="submit"
+        disabled={state === "sending"}
+        aria-busy={state === "sending"}
+      >
         <Send aria-hidden="true" size={18} />
-        {state === "sending" ? content.sending : content.submit}
+        <span>{state === "sending" ? content.sending : content.submit}</span>
       </button>
 
-      <p className="form-status field-full" role="status" aria-live="polite">
+      <p
+        className={`form-status field-full is-${state}`}
+        role={state === "error" ? "alert" : "status"}
+        aria-live="polite"
+      >
         {statusMessage}
       </p>
     </form>
@@ -223,11 +270,13 @@ function Field({
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
       />
-      {error ? (
-        <span className="field-error" id={`${id}-error`}>
-          {error}
-        </span>
-      ) : null}
+      <span className="field-message" aria-live="polite">
+        {error ? (
+          <span className="field-error" id={`${id}-error`}>
+            {error}
+          </span>
+        ) : null}
+      </span>
     </label>
   );
 }

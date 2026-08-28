@@ -34,15 +34,17 @@ async function text(pathname) {
   return response.text();
 }
 
-test("renders Spanish and English without mixing hero copy", async () => {
+test("renders Spanish and English without mixing hero or narrative copy", async () => {
   const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
   assert.match(es, /Construyo sistemas para productos reales/);
-  assert.match(es, /De la arquitectura a producción/);
+  assert.match(es, /Construyo alrededor de tu negocio/);
   assert.match(en, /I build systems for real products/);
-  assert.match(en, /From architecture to production/);
+  assert.match(en, /I build around your business/);
   assert.doesNotMatch(es, /I build systems for real products/);
   assert.doesNotMatch(en, /Construyo sistemas para productos reales/);
+  assert.doesNotMatch(es, /I build around your business/);
+  assert.doesNotMatch(en, /Construyo alrededor de tu negocio/);
 });
 
 test("includes localized navigation, hreflang, and production project link", async () => {
@@ -71,17 +73,97 @@ test("renders accessible contact form fields and privacy copy", async () => {
   assert.doesNotMatch(en, /name="budget"/);
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
   assert.match(en, /aria-live="polite"/);
-  assert.match(en, /used only to respond/);
+  assert.match(en, /Ordinary maximum retention: 12 months/);
+  assert.match(en, /href="\/en\/legal\/privacy"/);
+  assert.match(en, /href="https:\/\/github\.com\/Diferez"/);
+  assert.match(en, />GitHub</);
+  assert.doesNotMatch(en, /View professional profile[^]*https:\/\/github\.com\/Diferez/);
+});
+
+test("publishes complete localized legal information", async () => {
+  const pages = await Promise.all([
+    text("/es/legal/privacidad"),
+    text("/es/legal/cookies"),
+    text("/es/legal/terminos"),
+    text("/en/legal/privacy"),
+    text("/en/legal/cookies"),
+    text("/en/legal/terms"),
+  ]);
+
+  assert.match(pages[0], /privacidad y tratamiento de datos/);
+  assert.match(pages[0], /Diego Fernando Martinez/);
+  assert.match(pages[0], /12 meses/);
+  assert.match(pages[0], /property="og:url" content="[^"]+\/es\/legal\/privacidad"/);
+  assert.match(pages[1], /portfolio_locale/);
+  assert.match(pages[1], /no usa cookies de publicidad/);
+  assert.match(pages[2], /Propiedad intelectual/);
+  assert.match(pages[3], /Privacy and personal data policy/);
+  assert.match(pages[4], /does not use advertising, analytics/);
+  assert.match(pages[5], /Intellectual property/);
+});
+
+test("adds privacy evidence and defensive response headers", async () => {
+  const response = await render("/en");
+  const route = await readFile(path.join(root, "app", "api", "contact", "route.ts"), "utf8");
+
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("permissions-policy") ?? "", /camera=\(\)/);
+  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
+  assert.match(route, /privacyVersion/);
+  assert.match(route, /2026-08-12/);
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {
-  const es = await text("/es");
+  const [es, en] = await Promise.all([text("/es"), text("/en")]);
 
   assert.match(es, /Aether Commerce/);
+  assert.match(es, /Proyectos reales, explicados desde sus decisiones/);
+  assert.match(es, /Entiendo el dominio antes de proponer arquitectura/);
+  assert.match(es, /Mapa de responsabilidad/);
+  assert.match(es, /Lo visible es solo la entrada/);
+  assert.match(es, /Servicios que validan, calculan, autorizan y coordinan/);
+  assert.match(es, /Diseño la interfaz como la puerta de un sistema/);
+  assert.doesNotMatch(es, /SYS \/ 01/);
+  assert.doesNotMatch(es, /Sistema \/ producto/);
   assert.match(es, /FastAPI\/LangGraph está validada en Docker/);
   assert.match(es, /PostgreSQL y Redis permanece documentado como siguiente etapa/);
   assert.match(es, /tokens de carrito e idempotencia/);
+  assert.match(es, /Interfaz Angular/);
+  assert.match(es, /Servicios Node\.js/);
+  assert.match(es, /Funciones AWS Lambda/);
+  assert.match(es, /Entrega con Azure DevOps/);
+  assert.match(en, /Angular interface/);
+  assert.match(en, /Azure DevOps delivery/);
   assert.doesNotMatch(es, /99%|10x|millones de usuarios/i);
+});
+
+test("hero architecture corridor uses supplied responsive artwork", async () => {
+  const [css, source] = await Promise.all([
+    readFile(path.join(root, "app", "globals.css"), "utf8"),
+    readFile(path.join(root, "components", "sections", "LandingPage.tsx"), "utf8"),
+  ]);
+
+  assert.match(css, /\.architecture-graphic\s*{[^}]*width:\s*min\(100%, 56rem\)/s);
+  assert.match(css, /@media \(min-width: 75rem\)[^]*\.architecture-graphic\s*{[^}]*width:\s*calc\(100% \+/s);
+  assert.match(css, /@media \(max-width: 48rem\)[^]*\.architecture-graphic,[^}]*\.architecture-graphic img/s);
+  assert.match(source, /function ArchitectureCorridor/);
+  assert.match(source, /<source media="\(max-width: 48rem\)" srcSet=\{graph\.mobile\}/);
+  assert.match(source, /src=\{graph\.desktop\}/);
+});
+
+test("capability rows keep their layout stable on hover", async () => {
+  const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
+  const hoverRule = css.match(/\.capability-row:hover\s*{([^}]*)}/s)?.[1] ?? "";
+  const accentRule = css.match(/\.capability-row::before\s*{([^}]*)}/s)?.[1] ?? "";
+  const motionRule = css.match(/\.capability-row:hover\s*>\s*\*\s*{([^}]*)}/s)?.[1] ?? "";
+
+  assert.notEqual(hoverRule, "");
+  assert.doesNotMatch(hoverRule, /\b(?:padding|margin|width|transform)\b/);
+  assert.match(hoverRule, /background-color:/);
+  assert.match(accentRule, /left:\s*-12px/);
+  assert.match(accentRule, /transform:\s*scaleY\(0\)/);
+  assert.match(motionRule, /transform:\s*translateX\(8px\)/);
 });
 
 test("proxy keeps browser language detection and saved preference", async () => {

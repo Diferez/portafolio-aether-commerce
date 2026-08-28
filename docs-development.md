@@ -14,7 +14,7 @@
 ## URLs esperadas
 
 - Desarrollo: `https://portafolio-aether-commerce-dev.pickofwow.workers.dev`
-- Producción: `https://portafolio-aether-commerce.pickofwow.workers.dev`
+- Producción: `https://diferez.com` (también disponible en `https://www.diferez.com`)
 
 ## GitHub Environment `development`
 

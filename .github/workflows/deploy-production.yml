@@ -21,7 +21,8 @@ jobs:
     environment: production
     env:
       PORTFOLIO_WORKER_NAME: ${{ vars.PORTFOLIO_WORKER_NAME || 'portafolio-aether-commerce' }}
-      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://portafolio-aether-commerce.pickofwow.workers.dev' }}
+      PORTFOLIO_CUSTOM_DOMAINS: ${{ vars.PORTFOLIO_CUSTOM_DOMAINS || 'diferez.com,www.diferez.com' }}
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://diferez.com' }}
       NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront.pickofwow.workers.dev' }}
       NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
       AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}

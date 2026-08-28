@@ -1,0 +1,180 @@
+{
+  "brand": "Liminal Accesorios",
+  "source": "63FB7E48-96E0-444D-A8A6-E274A4AA3DD6.jpeg",
+  "canvas": {
+    "width": 1536,
+    "height": 1536
+  },
+  "background": "#000000",
+  "status": "first-pass raster separation from the only available JPEG",
+  "layers": [
+    {
+      "id": "01_key",
+      "description": "Llave superior",
+      "full_canvas": "layers_full_canvas/01_key.png",
+      "trimmed": "layers_trimmed/01_key.png",
+      "x": 632,
+      "y": 176,
+      "width": 279,
+      "height": 117,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "02_door_light",
+      "description": "Interior luminoso y máscara de entrada",
+      "full_canvas": "layers_full_canvas/02_door_light.png",
+      "trimmed": "layers_trimmed/02_door_light.png",
+      "x": 660,
+      "y": 321,
+      "width": 217,
+      "height": 461,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.55
+      }
+    },
+    {
+      "id": "03_torch_left_flame",
+      "description": "Llama izquierda y halo",
+      "full_canvas": "layers_full_canvas/03_torch_left_flame.png",
+      "trimmed": "layers_trimmed/03_torch_left_flame.png",
+      "x": 423,
+      "y": 416,
+      "width": 138,
+      "height": 173,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    {
+      "id": "04_torch_right_flame",
+      "description": "Llama derecha y halo",
+      "full_canvas": "layers_full_canvas/04_torch_right_flame.png",
+      "trimmed": "layers_trimmed/04_torch_right_flame.png",
+      "x": 969,
+      "y": 416,
+      "width": 138,
+      "height": 175,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    {
+      "id": "05_torch_left_body",
+      "description": "Cuerpo de antorcha izquierda",
+      "full_canvas": "layers_full_canvas/05_torch_left_body.png",
+      "trimmed": "layers_trimmed/05_torch_left_body.png",
+      "x": 420,
+      "y": 548,
+      "width": 152,
+      "height": 344,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.12
+      }
+    },
+    {
+      "id": "06_torch_right_body",
+      "description": "Cuerpo de antorcha derecha",
+      "full_canvas": "layers_full_canvas/06_torch_right_body.png",
+      "trimmed": "layers_trimmed/06_torch_right_body.png",
+      "x": 958,
+      "y": 548,
+      "width": 156,
+      "height": 346,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.12
+      }
+    },
+    {
+      "id": "07_portal_architecture",
+      "description": "Arco, columnas, escaleras y ornamentos laterales",
+      "full_canvas": "layers_full_canvas/07_portal_architecture.png",
+      "trimmed": "layers_trimmed/07_portal_architecture.png",
+      "x": 566,
+      "y": 293,
+      "width": 397,
+      "height": 605,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.72
+      }
+    },
+    {
+      "id": "08_stars_particles",
+      "description": "Estrellas y partículas alrededor del portal",
+      "full_canvas": "layers_full_canvas/08_stars_particles.png",
+      "trimmed": "layers_trimmed/08_stars_particles.png",
+      "x": 543,
+      "y": 344,
+      "width": 452,
+      "height": 304,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "09_wordmark_liminal",
+      "description": "Texto LIMINAL",
+      "full_canvas": "layers_full_canvas/09_wordmark_liminal.png",
+      "trimmed": "layers_trimmed/09_wordmark_liminal.png",
+      "x": 360,
+      "y": 952,
+      "width": 831,
+      "height": 167,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "10_subtitle_accesorios",
+      "description": "Texto ACCESORIOS",
+      "full_canvas": "layers_full_canvas/10_subtitle_accesorios.png",
+      "trimmed": "layers_trimmed/10_subtitle_accesorios.png",
+      "x": 512,
+      "y": 1144,
+      "width": 512,
+      "height": 89,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "11_bottom_ornament",
+      "description": "Ornamento inferior",
+      "full_canvas": "layers_full_canvas/11_bottom_ornament.png",
+      "trimmed": "layers_trimmed/11_bottom_ornament.png",
+      "x": 710,
+      "y": 1233,
+      "width": 122,
+      "height": 39,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "12_unassigned_detail",
+      "description": "Detalle residual conservado para recomposición fiel; revisar antes de animar",
+      "full_canvas": "layers_full_canvas/12_unassigned_detail.png",
+      "trimmed": "layers_trimmed/12_unassigned_detail.png",
+      "x": 381,
+      "y": 448,
+      "width": 779,
+      "height": 184,
+      "transform_origin": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  ]
+}

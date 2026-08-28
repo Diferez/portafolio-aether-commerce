@@ -2,6 +2,7 @@
 
 import {
   ArrowDownRight,
+  ArrowRight,
   ArrowUpRight,
   ExternalLink,
   Globe2,
@@ -11,12 +12,16 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 import { localeCookieName, type Locale } from "@/i18n/config";
 import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "./ContactForm";
+import { NarrativeSection } from "./NarrativeSection";
+import { AetherNarrativeSection } from "./AetherNarrativeSection";
+import { CookieNotice } from "@/components/legal/CookieNotice";
+import { legalHref } from "@/content/legal-content";
 
 type LandingPageProps = {
   content: LandingContent;
@@ -49,6 +54,8 @@ export function LandingPage({ content }: LandingPageProps) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.documentElement.classList.add("has-js");
+    return () => document.documentElement.classList.remove("has-js");
   }, [locale]);
 
   useEffect(() => {
@@ -90,7 +97,8 @@ export function LandingPage({ content }: LandingPageProps) {
     );
     const nextHash = semanticKey ? `#${nextIds[semanticKey]}` : "";
 
-    document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax`;
+    const secure = window.location.protocol === "https:" ? "; secure" : "";
+    document.cookie = `${localeCookieName}=${alternateLocale}; path=/; max-age=31536000; samesite=lax${secure}`;
     router.push(`/${alternateLocale}${nextHash}`);
     setMenuOpen(false);
   }
@@ -104,138 +112,124 @@ export function LandingPage({ content }: LandingPageProps) {
       <a className="skip-link" href={`#${ids.projects}`}>
         {content.hero.projectsCta}
       </a>
+
       <div className="site-shell" id={ids.home}>
         <header className="site-header">
-          <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
-            <span className="brand-mark" aria-hidden="true">
-              DM
-            </span>
-            <span className="brand-copy">
-              <strong>{siteConfig.brandName}</strong>
-              <span>{content.nav.role}</span>
-            </span>
-          </a>
-
-          <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
-            {content.nav.items.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="header-actions">
-            <button
-              className="language-switch"
-              type="button"
-              onClick={switchLanguage}
-              aria-label={content.nav.switchLanguage}
-            >
-              <Globe2 aria-hidden="true" size={15} />
-              {alternateLocale.toUpperCase()}
-            </button>
-            <a className="header-contact" href={`#${ids.contact}`}>
-              {content.nav.cta}
-              <ArrowDownRight aria-hidden="true" size={16} />
+          <div className="header-inner section-frame">
+            <a className="brand" href={`#${ids.home}`} aria-label={siteConfig.brandName}>
+              <span className="brand-copy">
+                <strong>Diego Martinez</strong>
+                <span>{content.nav.role}</span>
+              </span>
             </a>
-            <button
-              className="menu-button"
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
-              aria-label={menuOpen ? content.nav.closeMenu : content.nav.openMenu}
+            <p className="header-availability">
+              <span className="status-indicator" aria-hidden="true" />
+              {content.hero.availability}
+            </p>
+
+            <nav className="desktop-nav" aria-label={content.nav.primaryLabel}>
+              {content.nav.items.map((item) => (
+                <a key={item.href} href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="header-actions">
+              <button
+                className="language-switch"
+                type="button"
+                onClick={switchLanguage}
+                aria-label={content.nav.switchLanguage}
+              >
+                <Globe2 aria-hidden="true" size={15} />
+                {alternateLocale.toUpperCase()}
+              </button>
+              <a className="header-contact" href={`#${ids.contact}`}>
+                {content.nav.cta}
+                <ArrowDownRight aria-hidden="true" size={16} />
+              </a>
+              <button
+                className="menu-button"
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                aria-label={menuOpen ? content.nav.closeMenu : content.nav.openMenu}
+              >
+                {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+              </button>
+            </div>
+
+            <nav
+              className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
+              id="mobile-menu"
+              aria-label={content.nav.primaryLabel}
+              hidden={!menuOpen}
             >
-              {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-            </button>
+              {content.nav.items.map((item, index) => (
+                <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {item.label}
+                </a>
+              ))}
+              <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
+                <span>{String(content.nav.items.length + 1).padStart(2, "0")}</span>
+                {content.nav.cta}
+              </a>
+              <button type="button" onClick={switchLanguage}>
+                <span>↳</span>
+                {content.nav.switchLanguage}
+              </button>
+            </nav>
           </div>
-
-          <nav
-            className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
-            id="mobile-menu"
-            aria-label={content.nav.primaryLabel}
-            hidden={!menuOpen}
-          >
-            {content.nav.items.map((item, index) => (
-              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {item.label}
-              </a>
-            ))}
-            <a href={`#${ids.contact}`} onClick={() => setMenuOpen(false)}>
-              <span>{String(content.nav.items.length + 1).padStart(2, "0")}</span>
-              {content.nav.cta}
-            </a>
-            <button type="button" onClick={switchLanguage}>
-              <span>↳</span>
-              {content.nav.switchLanguage}
-            </button>
-          </nav>
         </header>
 
         <main>
           <section className="hero section-frame" aria-labelledby="hero-title">
-            <div className="hero-rail" aria-label={content.hero.focusLabel}>
-              <span className="rail-index">00</span>
-              <p>{content.hero.focusLabel}</p>
-              <ul>
-                {content.hero.focus.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+            <div className="hero-copy">
+              <p className="eyebrow"><span className="status-indicator" aria-hidden="true" />{content.hero.availability}</p>
+              <h1 id="hero-title">
+                <span>{content.hero.titleLead.replace(/\.$/, "")}<span className="headline-dot">.</span></span>
+              </h1>
             </div>
 
-            <div className="hero-main">
-              <p className="eyebrow">{content.hero.eyebrow}</p>
-              <h1 id="hero-title">
-                <span>{content.hero.titleLead}</span>
-                <em>{content.hero.titleEmphasis}</em>
-              </h1>
-              <p className="hero-description">{content.hero.description}</p>
+            <aside className="hero-aside">
+              <p className="hero-lead">{content.hero.description}</p>
+              <p className="hero-description">{content.hero.secondaryDescription}</p>
               <div className="hero-actions">
-                <a className="button button-dark" href={`#${ids.projects}`}>
+                <a className="button button-signal" href={`#${ids.projects}`}>
                   {content.hero.projectsCta}
                   <ArrowDownRight aria-hidden="true" size={17} />
                 </a>
                 <a className="text-link" href={`#${ids.contact}`}>
                   {content.hero.contactCta}
-                  <ArrowDownRight aria-hidden="true" size={17} />
+                  <ArrowRight aria-hidden="true" size={17} />
                 </a>
               </div>
-            </div>
+            </aside>
 
-            <div className="hero-system">
-              <SystemDiagram content={content} />
-            </div>
+            <ArchitectureCorridor content={content} />
 
-            <div className="hero-status" aria-label={content.hero.availability}>
-              <span className="status-indicator" aria-hidden="true" />
-              <span>{content.hero.availability}</span>
-              <span>{content.hero.location}</span>
+            <div className="hero-meta">
+              <div className="availability" aria-label={content.hero.availability}>
+                <span className="status-indicator" aria-hidden="true" />
+                <span>{content.hero.availability}</span>
+                <span>{content.locale === "es" ? "Ingeniero de software / Creador de productos" : "Software Engineer / Product Builder"} — {content.hero.location}</span>
+              </div>
+              <div className="focus-list" aria-label={content.hero.focusLabel}>
+                <span>{content.hero.focusLabel}</span>
+                <ul>
+                  {content.hero.focus.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </section>
 
-          <Section
-            eyebrow={content.expertise.eyebrow}
-            title={content.expertise.title}
-            description={content.expertise.description}
-            className="expertise-section"
-          >
-            <div className="expertise-list">
-              {content.expertise.items.map((item) => (
-                <article className="expertise-row" key={item.index}>
-                  <span className="row-index">{item.index}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <ul className="inline-list" aria-label={item.title}>
-                    {item.evidence.map((entry) => (
-                      <li key={entry}>{entry}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </Section>
+          <NarrativeSection content={content.narrative} />
+          <AetherNarrativeSection content={content.aetherNarrative} />
 
           <Section
             id={ids.projects}
@@ -250,9 +244,32 @@ export function LandingPage({ content }: LandingPageProps) {
                   key={project.number}
                   project={project}
                   labels={content.projects}
-                  featured={index === 0}
-                  reversed={index === 2}
+                  index={index}
                 />
+              ))}
+            </div>
+          </Section>
+
+          <Section
+            eyebrow={content.expertise.eyebrow}
+            title={content.expertise.title}
+            description={content.expertise.description}
+            className="expertise-section"
+          >
+            <div className="expertise-list">
+              {content.expertise.items.map((item, index) => (
+                <Reveal delay={index * 70} key={item.index}>
+                  <article className="expertise-row">
+                    <span className="row-index">{item.index}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <ul className="inline-list" aria-label={item.title}>
+                      {item.evidence.map((entry) => (
+                        <li key={entry}>{entry}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </Section>
@@ -266,16 +283,18 @@ export function LandingPage({ content }: LandingPageProps) {
           >
             <div className="capabilities-table">
               {content.capabilities.items.map((item, index) => (
-                <article className="capability-row" key={item.title}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <ul className="inline-list">
-                    {item.tools.map((tool) => (
-                      <li key={tool}>{tool}</li>
-                    ))}
-                  </ul>
-                </article>
+                <Reveal delay={(index % 3) * 55} key={item.title}>
+                  <article className="capability-row">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <ul className="inline-list" aria-label={item.title}>
+                      {item.tools.map((tool) => (
+                        <li key={tool}>{tool}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </Section>
@@ -288,12 +307,14 @@ export function LandingPage({ content }: LandingPageProps) {
                 <p>{content.approach.description}</p>
               </Reveal>
               <div className="execution-line">
-                {content.approach.steps.map((step) => (
-                  <article key={step.number}>
-                    <span>{step.number}</span>
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
-                  </article>
+                {content.approach.steps.map((step, index) => (
+                  <Reveal delay={index * 75} key={step.number}>
+                    <article>
+                      <span>{step.number}</span>
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </article>
+                  </Reveal>
                 ))}
               </div>
               <Reveal>
@@ -317,7 +338,7 @@ export function LandingPage({ content }: LandingPageProps) {
                   {siteConfig.socialLinks.map((link) => (
                     <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
                       <ExternalLink aria-hidden="true" size={17} />
-                      {content.contact.linkedinLabel}
+                      {link.label}
                       <ArrowUpRight aria-hidden="true" size={15} />
                     </a>
                   ))}
@@ -331,9 +352,9 @@ export function LandingPage({ content }: LandingPageProps) {
         </main>
 
         <footer className="site-footer section-frame">
-          <div>
+          <div className="footer-signature">
             <span className="brand-mark" aria-hidden="true">
-              DM
+              DF
             </span>
             <p>{content.footer.summary}</p>
           </div>
@@ -349,36 +370,41 @@ export function LandingPage({ content }: LandingPageProps) {
             <button type="button" onClick={switchLanguage}>
               {alternateLocale.toUpperCase()}
             </button>
+            <a href={legalHref(locale, "privacy")}>{content.footer.privacy}</a>
+            <a href={legalHref(locale, "cookies")}>{content.footer.cookies}</a>
+            <a href={legalHref(locale, "terms")}>{content.footer.terms}</a>
             <a href={`#${ids.home}`}>{content.footer.backToTop} ↑</a>
           </div>
           <p className="copyright">
             © {new Date().getFullYear()} {siteConfig.brandName}. {content.footer.rights}
           </p>
         </footer>
+        <CookieNotice locale={locale} />
       </div>
     </>
   );
 }
 
-function SystemDiagram({ content }: { content: LandingContent }) {
+function ArchitectureCorridor({ content }: { content: LandingContent }) {
+  const graph = content.locale === "es"
+    ? {
+        desktop: "/images/graph-desktop-es.png",
+        mobile: "/images/graph-mobile-es.png",
+        alt: "Diagrama de comercio, pagos, automatización y plataformas.",
+      }
+    : {
+        desktop: "/images/graph-desktop-en.png",
+        mobile: "/images/graph-mobile-en.png",
+        alt: "Diagram showing commerce, payments, automation, and platforms.",
+      };
+
   return (
-    <figure className="system-diagram">
-      <figcaption>
-        <span>SYS / 01</span>
-        {content.hero.diagramLabel}
-      </figcaption>
-      <div className="diagram-flow" aria-label={content.hero.diagramNodes.join(", ")}>
-        {content.hero.diagramNodes.map((node, index) => (
-          <div className="diagram-step" key={node}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{node}</strong>
-            {index < content.hero.diagramNodes.length - 1 ? (
-              <i aria-hidden="true" />
-            ) : null}
-          </div>
-        ))}
-      </div>
-      <p>{content.hero.diagramCaption}</p>
+    <figure className="architecture-corridor" aria-label={content.hero.diagramLabel}>
+      <picture className="architecture-graphic">
+        <source media="(max-width: 48rem)" srcSet={graph.mobile} />
+        <img src={graph.desktop} alt={graph.alt} />
+      </picture>
+      <figcaption>{content.hero.diagramCaption}</figcaption>
     </figure>
   );
 }
@@ -399,13 +425,15 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className={`content-section section-frame ${className}`} id={id}>
-      <Reveal className="section-intro">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </Reveal>
-      {children}
+    <section className={`content-section ${className}`} id={id}>
+      <div className="section-frame">
+        <Reveal className="section-intro">
+          <p className="eyebrow">{eyebrow}</p>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </Reveal>
+        {children}
+      </div>
     </section>
   );
 }
@@ -413,23 +441,17 @@ function Section({
 function ProjectCase({
   project,
   labels,
-  featured,
-  reversed,
+  index,
 }: {
   project: ProjectItem;
   labels: LandingContent["projects"];
-  featured?: boolean;
-  reversed?: boolean;
+  index: number;
 }) {
   const projectHref = project.href === "store" ? siteConfig.storeUrl : project.href;
 
   return (
     <Reveal>
-      <article
-        className={`project-case ${featured ? "project-featured" : ""} ${
-          reversed ? "project-reversed" : ""
-        }`}
-      >
+      <article className={`project-case project-tone-${(index % 4) + 1}`}>
         <header className="project-header">
           <span className="project-number">{project.number}</span>
           <p>{project.category}</p>
@@ -439,8 +461,13 @@ function ProjectCase({
           </span>
         </header>
 
-        <div className="project-summary">
+        <div className="project-heading">
           <h3>{project.title}</h3>
+        </div>
+
+        <ProjectVisual project={project} labels={labels} index={index} />
+
+        <div className="project-overview">
           <p>{project.summary}</p>
           {projectHref && project.hrefLabel ? (
             <a href={projectHref} target="_blank" rel="noreferrer">
@@ -449,20 +476,6 @@ function ProjectCase({
             </a>
           ) : null}
         </div>
-
-        {project.architecture ? (
-          <div className="project-architecture">
-            <p>{labels.architectureLabel}</p>
-            <ol>
-              {project.architecture.map((node, index) => (
-                <li key={node}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <strong>{node}</strong>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ) : null}
 
         <dl className="project-details">
           {project.sections.map((section) => (
@@ -474,7 +487,7 @@ function ProjectCase({
         </dl>
 
         <footer className="project-footer">
-          <ul className="inline-list">
+          <ul className="inline-list" aria-label={project.title}>
             {project.technologies.map((technology) => (
               <li key={technology}>{technology}</li>
             ))}
@@ -483,5 +496,42 @@ function ProjectCase({
         </footer>
       </article>
     </Reveal>
+  );
+}
+
+function ProjectVisual({
+  project,
+  labels,
+  index,
+}: {
+  project: ProjectItem;
+  labels: LandingContent["projects"];
+  index: number;
+}) {
+  const nodes = project.architecture ?? project.technologies.slice(0, 4);
+
+  return (
+    <figure className={`project-visual visual-${(index % 4) + 1}`}>
+      <figcaption>
+        <span>{project.architecture ? labels.architectureLabel : project.category}</span>
+        <strong>{project.title}</strong>
+      </figcaption>
+      <div className="project-canvas">
+        <span className="project-watermark" aria-hidden="true">
+          {project.number}
+        </span>
+        <ol>
+          {nodes.map((node, nodeIndex) => (
+            <li
+              key={node}
+              style={{ "--node-index": nodeIndex } as CSSProperties}
+            >
+              <span>{String(nodeIndex + 1).padStart(2, "0")}</span>
+              <strong>{node}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </figure>
   );
 }
