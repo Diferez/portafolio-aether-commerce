@@ -165,6 +165,17 @@ test("Liminal narrative media shares one square responsive frame", async () => {
   assert.match(css, /\.narrative-media-slot\s*{[^}]*height:\s*var\(--narrative-mobile-media-size\)/s);
 });
 
+test("mobile narrative phases keep media and copy from competing for the same space", async () => {
+  const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
+
+  assert.match(css, /--narrative-mobile-media-size:\s*min\(calc\(100vw - \(var\(--page-pad\) \* 3\)\), 34svh, 20rem\)/);
+  assert.match(css, /--narrative-mobile-media-top:\s*clamp\(24rem, 58svh, 29rem\)/);
+  assert.match(css, /\.narrative-resolution\s*{[^}]*top:\s*clamp\(9rem, 22svh, 12rem\)[^}]*bottom:\s*auto/s);
+  assert.match(css, /\.project-bridge\s*{[^}]*top:\s*clamp\(8rem, 20svh, 12rem\)[^}]*bottom:\s*auto/s);
+  assert.match(css, /\.project-bridge h2\s*{[^}]*font-size:\s*clamp\(2\.35rem, 10vw, 3\.65rem\)/s);
+  assert.match(css, /--narrative-mobile-media-size:\s*min\(calc\(100vw - \(var\(--page-pad\) \* 3\)\), 30svh, 18rem\)/);
+});
+
 test("capability rows keep their layout stable on hover", async () => {
   const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
   const hoverRule = css.match(/\.capability-row:hover\s*{([^}]*)}/s)?.[1] ?? "";
