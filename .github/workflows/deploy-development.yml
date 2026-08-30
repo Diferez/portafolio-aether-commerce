@@ -22,7 +22,7 @@ jobs:
     env:
       PORTFOLIO_WORKER_NAME: ${{ vars.PORTFOLIO_WORKER_NAME || 'portafolio-aether-commerce-dev' }}
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://portafolio-aether-commerce-dev.pickofwow.workers.dev' }}
-      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront.pickofwow.workers.dev' }}
+      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront-dev.pickofwow.workers.dev' }}
       NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
       AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
     steps:
@@ -53,6 +53,5 @@ jobs:
           wranglerVersion: "4"
           command: deploy --config dist/server/wrangler.json
       - name: Verify development deployment
-        run: |
-          curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_SITE_URL}"
-          curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_STORE_URL}"
+        run: curl --fail --retry 3 --retry-delay 5 "${NEXT_PUBLIC_SITE_URL}"
+

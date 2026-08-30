@@ -117,7 +117,13 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           </div>
         </div>
 
-        <LiminalCanvas onTimelineReady={setLiminalTimeline} />
+        <div className="narrative-media-slot">
+          <LiminalCanvas onTimelineReady={setLiminalTimeline} />
+
+          <figure className="project-store-view" data-project-store>
+            <img src="/images/liminal-store-main-view.png" alt={content.projectPreviewAlt} />
+          </figure>
+        </div>
 
         <div className="narrative-resolution" data-resolution aria-live="polite">
           <p data-resolution-one>{content.firstStatement}</p>
@@ -130,9 +136,6 @@ export function NarrativeSection({ content }: NarrativeSectionProps) {
           <p>{content.projectDescription}</p>
         </div>
 
-        <figure className="project-store-view" data-project-store>
-          <img src="/images/liminal-store-main-view.png" alt={content.projectPreviewAlt} />
-        </figure>
       </div>
     </section>
   );
