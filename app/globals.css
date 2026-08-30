@@ -4317,7 +4317,7 @@ body {
   color: #ebe8ee;
 }
 
-.liminal-canvas {
+.narrative-media-slot {
   position: relative;
   z-index: 2;
   width: min(100%, 43rem);
@@ -4325,6 +4325,19 @@ body {
   justify-self: end;
   aspect-ratio: 1;
   isolation: isolate;
+}
+
+.liminal-canvas,
+.project-store-view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.liminal-canvas {
+  z-index: 1;
 }
 
 .liminal-art {
@@ -4492,12 +4505,7 @@ body {
 }
 
 .project-store-view {
-  position: absolute;
   z-index: 4;
-  right: var(--page-pad);
-  bottom: clamp(3.5rem, 8vw, 7rem);
-  width: min(43vw, 42rem);
-  margin: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: #050306;
@@ -4507,7 +4515,9 @@ body {
 .project-store-view img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (max-width: 48rem) {
@@ -4559,12 +4569,13 @@ body {
     inset: 0;
   }
 
-  .liminal-canvas {
+  .narrative-media-slot {
     position: absolute;
     top: var(--narrative-mobile-media-top);
     right: var(--page-pad);
     left: var(--page-pad);
     width: var(--narrative-mobile-media-size);
+    height: var(--narrative-mobile-media-size);
     margin: 0 auto;
   }
 
@@ -4585,15 +4596,6 @@ body {
     bottom: 3.4rem;
     left: var(--page-pad);
     width: auto;
-  }
-
-  .project-store-view {
-    right: var(--page-pad);
-    top: var(--narrative-mobile-media-top);
-    bottom: auto;
-    left: var(--page-pad);
-    width: var(--narrative-mobile-media-size);
-    margin-inline: auto;
   }
 
   .project-bridge {

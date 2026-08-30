@@ -152,6 +152,19 @@ test("hero architecture corridor uses supplied responsive artwork", async () => 
   assert.match(source, /src=\{graph\.desktop\}/);
 });
 
+test("Liminal narrative media shares one square responsive frame", async () => {
+  const [css, source] = await Promise.all([
+    readFile(path.join(root, "app", "globals.css"), "utf8"),
+    readFile(path.join(root, "components", "sections", "NarrativeSection.tsx"), "utf8"),
+  ]);
+
+  assert.match(source, /<div className="narrative-media-slot">[\s\S]*<LiminalCanvas[\s\S]*<figure className="project-store-view"/);
+  assert.match(css, /\.narrative-media-slot\s*{[^}]*aspect-ratio:\s*1/s);
+  assert.match(css, /\.liminal-canvas,\s*\.project-store-view\s*{[^}]*inset:\s*0[^}]*width:\s*100%[^}]*height:\s*100%/s);
+  assert.match(css, /\.project-store-view img\s*{[^}]*object-fit:\s*cover[^}]*object-position:\s*center/s);
+  assert.match(css, /\.narrative-media-slot\s*{[^}]*height:\s*var\(--narrative-mobile-media-size\)/s);
+});
+
 test("capability rows keep their layout stable on hover", async () => {
   const css = await readFile(path.join(root, "app", "globals.css"), "utf8");
   const hoverRule = css.match(/\.capability-row:hover\s*{([^}]*)}/s)?.[1] ?? "";
