@@ -4527,8 +4527,9 @@ body {
   }
 
   .narrative-section {
-    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 46svh, 27rem);
-    --narrative-mobile-media-top: clamp(22rem, 53svh, 29rem);
+    /* Keep the media as the visual anchor without letting it consume the whole phone viewport. */
+    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 3)), 34svh, 20rem);
+    --narrative-mobile-media-top: clamp(24rem, 58svh, 29rem);
   }
 
   .narrative-frame {
@@ -4553,20 +4554,23 @@ body {
   }
 
   .narrative-copy h2 {
-    max-width: 9ch;
-    font-size: clamp(3.25rem, 14vw, 4.85rem);
+    max-width: 11ch;
+    font-size: clamp(2.75rem, 12.4vw, 4.2rem);
   }
 
   .narrative-description {
     position: relative;
     display: block;
     min-height: 3.4rem;
-    margin-top: 1.7rem;
+    max-width: 20rem;
+    margin-top: 1.35rem;
   }
 
   .narrative-description p {
     position: absolute;
     inset: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
   }
 
   .narrative-media-slot {
@@ -4580,31 +4584,35 @@ body {
   }
 
   .narrative-resolution {
+    top: clamp(9rem, 22svh, 12rem);
     right: var(--page-pad);
-    bottom: 21%;
+    bottom: auto;
     left: var(--page-pad);
     width: auto;
   }
 
   .narrative-resolution p {
-    max-width: 13ch;
-    font-size: clamp(1.55rem, 7vw, 2.25rem);
+    max-width: 17ch;
+    font-size: clamp(1.45rem, 6.2vw, 2.1rem);
   }
 
   .project-bridge {
+    top: clamp(8rem, 20svh, 12rem);
     right: var(--page-pad);
-    bottom: 3.4rem;
+    bottom: auto;
     left: var(--page-pad);
-    width: auto;
-  }
-
-  .project-bridge {
-    bottom: min(60svh, 31rem);
+    width: min(100%, 20rem);
   }
 
   .project-bridge h2 {
-    max-width: 9ch;
-    font-size: clamp(2.65rem, 12vw, 4.25rem);
+    max-width: 11ch;
+    font-size: clamp(2.35rem, 10vw, 3.65rem);
+  }
+
+  .project-bridge p {
+    margin-top: 0.85rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 }
 
@@ -4615,16 +4623,17 @@ body {
   }
 
   .narrative-section {
-    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 2)), 33svh, 21rem);
-    --narrative-mobile-media-top: clamp(22rem, 53svh, 24rem);
+    --narrative-mobile-media-size: min(calc(100vw - (var(--page-pad) * 3)), 30svh, 18rem);
+    --narrative-mobile-media-top: clamp(24rem, 58svh, 26rem);
   }
 
   .narrative-copy h2 {
-    font-size: clamp(2.9rem, 12.8vw, 3.7rem);
+    max-width: 11ch;
+    font-size: clamp(2.55rem, 11.4vw, 3.3rem);
   }
 
   .narrative-description {
-    margin-top: 1.4rem;
+    margin-top: 1.2rem;
   }
 
 }
