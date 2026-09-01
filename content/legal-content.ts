@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 
-export const privacyVersion = "2026-08-12";
+export const privacyVersion = "2026-09-01";
 
 export type LegalDocumentKey = "privacy" | "cookies" | "terms";
 
@@ -79,20 +79,19 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
       description:
         "Explica qué datos recoge este portafolio, para qué se usan, durante cuánto tiempo se conservan y cómo ejercer tus derechos.",
       updatedLabel: "Última actualización",
-      updatedAt: "12 de agosto de 2026",
+      updatedAt: "1 de septiembre de 2026",
       sections: [
         {
           title: "1. Responsable y alcance",
           paragraphs: [
-            "El responsable del tratamiento es Diego Fernando Martinez, profesional independiente. Domicilio y dirección: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Correo electrónico: diferez676@gmail.com. Teléfono: +57 304 274 9571. Esta política aplica al portafolio y a su formulario de contacto.",
-            "Puedes comunicar una consulta de privacidad mediante el formulario del portafolio, indicando “Solicitud de privacidad” como tipo de proyecto, por correo a diferez676@gmail.com o por teléfono al +57 304 274 9571.",
+            "El responsable del tratamiento es Diego Fernando Martinez, profesional independiente. Domicilio y dirección: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Correo electrónico: diferez676@gmail.com. Teléfono: +57 304 274 9571. Esta política aplica al portafolio y a sus canales directos de contacto.",
+            "Puedes comunicar una consulta de privacidad por correo a diferez676@gmail.com o por teléfono al +57 304 274 9571.",
           ],
         },
         {
           title: "2. Datos que se tratan",
           items: [
-            "Datos enviados por ti: nombre, correo electrónico, empresa opcional, tipo de proyecto, mensaje, idioma preferido y constancia de autorización.",
-            "Datos técnicos transitorios: dirección IP usada durante la ventana de limitación de solicitudes para prevenir abuso. No se guarda junto al mensaje desde este portafolio.",
+            "Datos que compartas voluntariamente por correo o teléfono, como nombre, correo electrónico, empresa, contexto de la solicitud y cualquier información que incluyas.",
             "Preferencia de idioma: una cookie propia llamada portfolio_locale y el registro local de que cerraste el aviso de cookies.",
           ],
         },
@@ -100,23 +99,21 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
           title: "3. Finalidades y bases",
           items: [
             "Responder la solicitud, evaluar una posible colaboración y mantener el contexto de la conversación.",
-            "Proteger el formulario contra spam, fraude y uso abusivo.",
-            "Conservar prueba de la autorización y atender obligaciones legales o reclamaciones.",
-            "El formulario se basa en tu autorización previa, expresa e informada. La seguridad del sitio se apoya además en el interés legítimo de proteger el servicio. No se usan los datos para publicidad, listas de correo, perfiles ni decisiones automatizadas.",
+            "Atender obligaciones legales o reclamaciones cuando corresponda.",
+            "El tratamiento de la información que envíes por canales directos se basa en tu autorización y en el interés legítimo de responder y proteger el servicio. No se usan los datos para publicidad, listas de correo, perfiles ni decisiones automatizadas.",
           ],
         },
         {
           title: "4. Encargados y tratamiento internacional",
           paragraphs: [
-            "El sitio utiliza infraestructura de Cloudflare para alojamiento, seguridad y almacenamiento de mensajes en D1. Cuando está habilitada la entrega por correo, Resend procesa el mensaje para enviarlo al responsable. Estos proveedores pueden procesar información fuera de Colombia bajo sus propias medidas y compromisos de seguridad.",
+            "El sitio utiliza infraestructura de Cloudflare para alojamiento y seguridad. Los mensajes enviados por correo también pueden ser procesados por el proveedor de correo correspondiente para entregarlos y almacenarlos. Estos proveedores pueden procesar información fuera de Colombia bajo sus propias medidas y compromisos de seguridad.",
             "No se venden datos personales ni se comparten con terceros para fines publicitarios. Solo se comunican cuando es necesario para prestar el servicio, cumplir la ley o proteger derechos.",
           ],
         },
         {
           title: "5. Conservación",
           paragraphs: [
-            "Los mensajes y la prueba de autorización se conservan hasta 12 meses desde su recepción, salvo que deban mantenerse por más tiempo para cumplir una obligación legal, resolver una disputa o ejercer derechos. Al vencer el periodo aplicable, se eliminan o anonimizan razonablemente.",
-            "La IP empleada por el portafolio para limitar solicitudes permanece únicamente en memoria durante la ventana técnica de un minuto. La cookie de idioma dura hasta 12 meses o hasta que la elimines.",
+            "La información recibida por canales directos se conserva solo durante el tiempo necesario para responder y atender obligaciones legales, salvo que deba mantenerse por más tiempo para resolver una disputa o ejercer derechos. Luego se elimina o anonimiza razonablemente.",
           ],
         },
         {
@@ -134,14 +131,14 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
         {
           title: "7. Datos sensibles y menores",
           paragraphs: [
-            "El formulario no solicita datos sensibles, financieros, credenciales, secretos ni documentos de identidad. No los incluyas en el mensaje. El sitio no está dirigido a menores de edad ni pretende recopilar sus datos.",
+            "No envíes datos sensibles, financieros, credenciales, secretos ni documentos de identidad por los canales de contacto. El sitio no está dirigido a menores de edad ni pretende recopilar sus datos.",
           ],
         },
         {
           title: "8. Seguridad y cambios",
           paragraphs: [
-            "Se aplican validación, minimización, control de acceso, transporte cifrado y limitación de solicitudes. Ningún sistema es infalible; si se identifica un incidente relevante se actuará conforme a las obligaciones aplicables.",
-            "Los cambios sustanciales se publicarán en esta página con una nueva fecha de actualización y, cuando corresponda, se solicitará una nueva autorización.",
+            "Se aplican minimización, control de acceso y transporte cifrado cuando corresponde. Ningún sistema es infalible; si se identifica un incidente relevante se actuará conforme a las obligaciones aplicables.",
+            "Los cambios sustanciales se publicarán en esta página con una nueva fecha de actualización.",
           ],
         },
       ],
@@ -223,14 +220,14 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
           title: "5. Uso permitido",
           items: [
             "No interferir con el funcionamiento, seguridad o disponibilidad del sitio.",
-            "No intentar acceder sin autorización, introducir código malicioso, automatizar solicitudes abusivas ni usar el formulario para spam.",
+            "No intentar acceder sin autorización, introducir código malicioso, automatizar solicitudes abusivas ni enviar spam a los canales directos.",
             "No enviar datos sensibles, secretos, credenciales ni contenido ilícito o que vulnere derechos de terceros.",
           ],
         },
         {
           title: "6. Contacto y contratación",
           paragraphs: [
-            "Enviar un formulario o iniciar una conversación no crea una relación contractual, laboral, fiduciaria ni de exclusividad. Cualquier servicio profesional requerirá alcance, condiciones y aceptación por separado.",
+            "Enviar un correo o iniciar una conversación no crea una relación contractual, laboral, fiduciaria ni de exclusividad. Cualquier servicio profesional requerirá alcance, condiciones y aceptación por separado.",
           ],
         },
         {
@@ -256,20 +253,19 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
       description:
         "Explains what data this portfolio collects, why it is used, how long it is retained, and how to exercise your rights.",
       updatedLabel: "Last updated",
-      updatedAt: "August 12, 2026",
+      updatedAt: "September 1, 2026",
       sections: [
         {
           title: "1. Controller and scope",
           paragraphs: [
-            "The data controller is Diego Fernando Martinez, an independent professional. Registered address: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Email: diferez676@gmail.com. Phone: +57 304 274 9571. This policy applies to the portfolio and its contact form.",
-            "You may submit a privacy request through the portfolio form by selecting “Privacy request,” by email at diferez676@gmail.com, or by phone at +57 304 274 9571.",
+            "The data controller is Diego Fernando Martinez, an independent professional. Registered address: Carrera 73 # 20A-40, Medellín, Antioquia, Colombia. Email: diferez676@gmail.com. Phone: +57 304 274 9571. This policy applies to the portfolio and its direct contact channels.",
+            "You may submit a privacy request by email at diferez676@gmail.com or by phone at +57 304 274 9571.",
           ],
         },
         {
           title: "2. Data processed",
           items: [
-            "Data you submit: name, email address, optional company, project type, message, preferred language, and proof of authorization.",
-            "Transient technical data: IP address used during the request-limiting window to prevent abuse. This portfolio does not store it with the message.",
+            "Data you voluntarily share by email or phone, such as your name, email address, company, request context, and any information you include.",
             "Language preference: a first-party cookie named portfolio_locale and the local record that you dismissed the cookie notice.",
           ],
         },
@@ -277,23 +273,21 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
           title: "3. Purposes and legal grounds",
           items: [
             "Respond to your request, assess a potential engagement, and preserve conversation context.",
-            "Protect the form against spam, fraud, and abusive use.",
-            "Keep evidence of authorization and address legal duties or claims.",
-            "The form relies on your prior, express, and informed consent. Site security also relies on the legitimate interest in protecting the service. Data is not used for advertising, mailing lists, profiling, or automated decisions.",
+            "Address legal duties or claims where applicable.",
+            "Processing information sent through direct channels relies on your authorization and the legitimate interest in responding and protecting the service. Data is not used for advertising, mailing lists, profiling, or automated decisions.",
           ],
         },
         {
           title: "4. Processors and international processing",
           paragraphs: [
-            "The site uses Cloudflare infrastructure for hosting, security, and D1 message storage. When email delivery is enabled, Resend processes the message to deliver it to the controller. These providers may process information outside Colombia under their own security measures and commitments.",
+            "The site uses Cloudflare infrastructure for hosting and security. Messages sent by email may also be processed by the relevant email provider to deliver and store them. These providers may process information outside Colombia under their own security measures and commitments.",
             "Personal data is not sold or shared with third parties for advertising. It is disclosed only when needed to provide the service, comply with law, or protect rights.",
           ],
         },
         {
           title: "5. Retention",
           paragraphs: [
-            "Messages and authorization evidence are retained for up to 12 months from receipt, unless they must be kept longer to comply with law, resolve a dispute, or exercise legal rights. They are then reasonably deleted or anonymized.",
-            "The IP used by the portfolio for request limiting remains in memory only for the one-minute technical window. The language cookie lasts up to 12 months or until you remove it.",
+            "Information received through direct channels is retained only as long as needed to respond and meet legal duties, unless it must be kept longer to resolve a dispute or exercise legal rights. It is then reasonably deleted or anonymized.",
           ],
         },
         {
@@ -311,14 +305,14 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
         {
           title: "7. Sensitive data and children",
           paragraphs: [
-            "The form does not request sensitive or financial data, credentials, secrets, or identity documents. Do not include them. The site is not directed to children and does not intentionally collect their data.",
+            "Do not send sensitive or financial data, credentials, secrets, or identity documents through the contact channels. The site is not directed to children and does not intentionally collect their data.",
           ],
         },
         {
           title: "8. Security and changes",
           paragraphs: [
-            "Validation, minimization, access control, encrypted transport, and request limiting are used. No system is infallible; relevant incidents will be handled under applicable obligations.",
-            "Material changes will be published here with a new update date and renewed consent will be requested when required.",
+            "Minimization, access control, and encrypted transport where applicable are used. No system is infallible; relevant incidents will be handled under applicable obligations.",
+            "Material changes will be published here with a new update date.",
           ],
         },
       ],
@@ -400,14 +394,14 @@ export const legalContent: Record<Locale, Record<LegalDocumentKey, LegalDocument
           title: "5. Acceptable use",
           items: [
             "Do not interfere with the site's operation, security, or availability.",
-            "Do not attempt unauthorized access, introduce malicious code, automate abusive requests, or use the form for spam.",
+            "Do not attempt unauthorized access, introduce malicious code, automate abusive requests, or send spam through direct channels.",
             "Do not submit sensitive data, secrets, credentials, unlawful material, or content that infringes third-party rights.",
           ],
         },
         {
           title: "6. Contact and engagement",
           paragraphs: [
-            "Submitting a form or starting a conversation does not create a contractual, employment, fiduciary, or exclusive relationship. Any professional service requires separately agreed scope and terms.",
+            "Sending an email or starting a conversation does not create a contractual, employment, fiduciary, or exclusive relationship. Any professional service requires separately agreed scope and terms.",
           ],
         },
         {

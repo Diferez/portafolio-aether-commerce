@@ -23,9 +23,7 @@ Variables:
 - `CLOUDFLARE_DEPLOY_ENABLED=true`
 - `PORTFOLIO_WORKER_NAME=portafolio-aether-commerce-dev`
 - `NEXT_PUBLIC_SITE_URL=https://portafolio-aether-commerce-dev.pickofwow.workers.dev`
-- `NEXT_PUBLIC_STORE_URL=https://aether-storefront-dev.pickofwow.workers.dev`
-- `NEXT_PUBLIC_AETHER_API_URL=https://aether-api-dev.pickofwow.workers.dev`
-- `AETHER_API_ORIGIN=https://aether-api-dev.pickofwow.workers.dev`
+- `NEXT_PUBLIC_STORE_URL=https://aether-storefront.pickofwow.workers.dev`
 
 Secrets:
 
