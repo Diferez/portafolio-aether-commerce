@@ -22,7 +22,7 @@ jobs:
     env:
       PORTFOLIO_WORKER_NAME: ${{ vars.PORTFOLIO_WORKER_NAME || 'portafolio-aether-commerce-dev' }}
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://portafolio-aether-commerce-dev.pickofwow.workers.dev' }}
-      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront-dev.pickofwow.workers.dev' }}
+      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront.pickofwow.workers.dev' }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
