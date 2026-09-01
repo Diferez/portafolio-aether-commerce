@@ -6,7 +6,8 @@ export const siteConfig = {
     "https://diferez.com",
   storeUrl:
     process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
-    "https://aether-storefront.pickofwow.workers.dev",
+    "https://store.diferez.com",
+  email: "diferez676@gmail.com",
   whatsappUrl: "https://wa.me/message/QUSZJKVQDACUM1",
   availability: {
     es: "Disponible para nuevos proyectos",

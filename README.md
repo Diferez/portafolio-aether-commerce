@@ -18,8 +18,6 @@ Copia `.env.example` como `.env.local` cuando necesites sobrescribir la configur
 - `NEXT_PUBLIC_SITE_URL`: URL pública del portafolio, usada por canonical, sitemap y Open Graph.
 - `NEXT_PUBLIC_BRAND_NAME`: nombre profesional visible.
 - `NEXT_PUBLIC_STORE_URL`: URL absoluta del despliegue independiente de Aether.
-- `NEXT_PUBLIC_AETHER_API_URL`: URL pública del Worker API de Aether.
-- `AETHER_API_ORIGIN`: origen server-side del mismo API; el formulario envía a `/api/v1/contact` para persistir solicitudes en D1.
 
 No incluyas datos privados en variables `NEXT_PUBLIC_*`.
 
@@ -62,9 +60,7 @@ Variables del environment `production` en GitHub:
 - `PORTFOLIO_WORKER_NAME=portafolio-aether-commerce`
 - `PORTFOLIO_CUSTOM_DOMAINS=diferez.com,www.diferez.com`
 - `NEXT_PUBLIC_SITE_URL=https://diferez.com`
-- `NEXT_PUBLIC_STORE_URL`
-- `NEXT_PUBLIC_AETHER_API_URL`
-- `AETHER_API_ORIGIN`
+- `NEXT_PUBLIC_STORE_URL=https://store.diferez.com`
 
 Secrets:
 

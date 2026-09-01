@@ -51,7 +51,7 @@ test("includes localized navigation, hreflang, and production project link", asy
   const es = await text("/es");
   const expectedStoreUrl =
     process.env.NEXT_PUBLIC_STORE_URL?.trim() ||
-    "https://aether-storefront.pickofwow.workers.dev";
+    "https://store.diferez.com";
 
   assert.match(es, /href="#proyectos"/);
   assert.doesNotMatch(es, /href="#experiencia"/);
@@ -62,18 +62,14 @@ test("includes localized navigation, hreflang, and production project link", asy
   assert.doesNotMatch(es, /href=""/);
 });
 
-test("renders accessible contact form fields and privacy copy", async () => {
+test("renders direct contact channels and privacy copy without the contact form", async () => {
   const en = await text("/en");
 
-  assert.match(en, /name="name"/);
-  assert.match(en, /name="email"/);
-  assert.match(en, /name="projectType"/);
-  assert.match(en, /name="message"/);
-  assert.match(en, /name="website"/);
-  assert.doesNotMatch(en, /name="budget"/);
+  assert.match(en, /mailto:diferez676@gmail\.com/);
+  assert.match(en, /diferez676@gmail\.com/);
+  assert.doesNotMatch(en, /contact-form/);
+  assert.doesNotMatch(en, /name="projectType"/);
   assert.match(en, /https:\/\/www\.linkedin\.com\/in\/diferez\//);
-  assert.match(en, /aria-live="polite"/);
-  assert.match(en, /Ordinary maximum retention: 12 months/);
   assert.match(en, /href="\/en\/legal\/privacy"/);
   assert.match(en, /href="https:\/\/github\.com\/Diferez"/);
   assert.match(en, />GitHub</);
@@ -92,7 +88,7 @@ test("publishes complete localized legal information", async () => {
 
   assert.match(pages[0], /privacidad y tratamiento de datos/);
   assert.match(pages[0], /Diego Fernando Martinez/);
-  assert.match(pages[0], /12 meses/);
+  assert.match(pages[0], /1 de septiembre de 2026/);
   assert.match(pages[0], /property="og:url" content="[^"]+\/es\/legal\/privacidad"/);
   assert.match(pages[1], /portfolio_locale/);
   assert.match(pages[1], /no usa cookies de publicidad/);
@@ -102,16 +98,13 @@ test("publishes complete localized legal information", async () => {
   assert.match(pages[5], /Intellectual property/);
 });
 
-test("adds privacy evidence and defensive response headers", async () => {
+test("adds defensive response headers", async () => {
   const response = await render("/en");
-  const route = await readFile(path.join(root, "app", "api", "contact", "route.ts"), "utf8");
 
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-frame-options"), "DENY");
   assert.match(response.headers.get("permissions-policy") ?? "", /camera=\(\)/);
   assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
-  assert.match(route, /privacyVersion/);
-  assert.match(route, /2026-08-12/);
 });
 
 test("renders honest case-study status and the validated AI architecture", async () => {

@@ -2727,6 +2727,14 @@ ol {
   color: white;
 }
 
+.contact-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.contact-copy {
+  max-width: 52rem;
+}
+
 .contact-copy .eyebrow {
   color: rgba(255, 255, 255, 0.68);
 }

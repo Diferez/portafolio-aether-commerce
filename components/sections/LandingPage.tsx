@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   ExternalLink,
   Globe2,
+  Mail,
   Menu,
   MessageSquareText,
   X,
@@ -17,7 +18,6 @@ import { siteConfig } from "@/config/site";
 import { localeCookieName, type Locale } from "@/i18n/config";
 import type { LandingContent, ProjectItem } from "@/types/content";
 import { Reveal } from "@/components/ui/Reveal";
-import { ContactForm } from "./ContactForm";
 import { NarrativeSection } from "./NarrativeSection";
 import { AetherNarrativeSection } from "./AetherNarrativeSection";
 import { CookieNotice } from "@/components/legal/CookieNotice";
@@ -330,6 +330,11 @@ export function LandingPage({ content }: LandingPageProps) {
                 <h2>{content.contact.title}</h2>
                 <p>{content.contact.description}</p>
                 <div className="direct-links" aria-label={content.contact.directLabel}>
+                  <a href={`mailto:${siteConfig.email}`}>
+                    <Mail aria-hidden="true" size={17} />
+                    {siteConfig.email}
+                    <ArrowUpRight aria-hidden="true" size={15} />
+                  </a>
                   <a href={siteConfig.whatsappUrl} target="_blank" rel="noreferrer">
                     <MessageSquareText aria-hidden="true" size={17} />
                     {content.contact.whatsappCta}
@@ -343,9 +348,6 @@ export function LandingPage({ content }: LandingPageProps) {
                     </a>
                   ))}
                 </div>
-              </Reveal>
-              <Reveal>
-                <ContactForm content={content.contact} locale={content.locale} />
               </Reveal>
             </div>
           </section>

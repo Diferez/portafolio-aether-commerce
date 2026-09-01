@@ -84,37 +84,7 @@ export type ContactContent = {
   eyebrow: string;
   description: string;
   directLabel: string;
-  fields: {
-    name: string;
-    company: string;
-    email: string;
-    projectType: string;
-    message: string;
-    preferredLanguage: string;
-    consent: string;
-    privacyLink: string;
-    website: string;
-  };
-  placeholders: {
-    name: string;
-    company: string;
-    email: string;
-    message: string;
-  };
-  projectTypes: readonly string[];
-  languageOptions: Record<Locale, string>;
-  submit: string;
   whatsappCta: string;
-  sending: string;
-  success: string;
-  error: string;
-  privacy: string;
-  validation: {
-    required: string;
-    email: string;
-    message: string;
-    consent: string;
-  };
 };
 
 export type LandingContent = {
