@@ -63,11 +63,10 @@ Fonts are self-hosted from `public/fonts` to avoid late external requests and la
 ## Content and interaction rules
 
 - Projects appear immediately after the hero because proof is the page's primary job.
-- All original projects, claims, bilingual routes, legal pages, links, and form behavior remain.
+- All original projects, claims, bilingual routes, legal pages, and links remain.
 - Aether Commerce is the only public featured case and receives the highest visual emphasis.
-- Native selects remain intentional: their short option sets and platform familiarity outweigh owning popup geometry.
+- Contact is intentionally direct: email, WhatsApp, and social links are the available channels; there is no embedded form.
 - Every action uses semantic HTML, visible keyboard focus, a minimum 44px touch target, and a non-color cue.
-- Form errors remain inline, focus moves to the first invalid field, entered values are preserved, and submit is protected from duplicates.
 - Scrollbars stay visible and inherit a global themed baseline.
 
 ## Anti-patterns

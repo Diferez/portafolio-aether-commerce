@@ -23,9 +23,7 @@ jobs:
       PORTFOLIO_WORKER_NAME: ${{ vars.PORTFOLIO_WORKER_NAME || 'portafolio-aether-commerce' }}
       PORTFOLIO_CUSTOM_DOMAINS: ${{ vars.PORTFOLIO_CUSTOM_DOMAINS || 'diferez.com,www.diferez.com' }}
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://diferez.com' }}
-      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://aether-storefront.pickofwow.workers.dev' }}
-      NEXT_PUBLIC_AETHER_API_URL: ${{ vars.NEXT_PUBLIC_AETHER_API_URL }}
-      AETHER_API_ORIGIN: ${{ vars.AETHER_API_ORIGIN || vars.NEXT_PUBLIC_AETHER_API_URL }}
+      NEXT_PUBLIC_STORE_URL: ${{ vars.NEXT_PUBLIC_STORE_URL || 'https://store.diferez.com' }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -36,7 +34,7 @@ jobs:
         run: npm ci
       - name: Verify public connections
         run: |
-          for name in NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_STORE_URL NEXT_PUBLIC_AETHER_API_URL AETHER_API_ORIGIN; do
+          for name in NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_STORE_URL; do
             if [ -z "${!name}" ]; then
               echo "::error::${name} is required for the production deploy"
               exit 1

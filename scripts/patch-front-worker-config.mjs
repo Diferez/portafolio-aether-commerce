@@ -24,8 +24,6 @@ delete config.legacy_env;
 delete config.legacyEnv;
 config.vars = {
   ...(config.vars || {}),
-  NEXT_PUBLIC_AETHER_API_URL: process.env.NEXT_PUBLIC_AETHER_API_URL || "",
-  AETHER_API_ORIGIN: process.env.AETHER_API_ORIGIN || process.env.NEXT_PUBLIC_AETHER_API_URL || "",
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || "",
   NEXT_PUBLIC_STORE_URL: process.env.NEXT_PUBLIC_STORE_URL || ""
 };

@@ -2,10 +2,8 @@ import { spawnSync } from "node:child_process";
 
 const requiredVariables = [
   "CLOUDFLARE_DEPLOY_ENABLED",
-  "AETHER_D1_DATABASE_ID",
-  "NEXT_PUBLIC_AETHER_API_URL",
-  "NEXT_PUBLIC_PORTFOLIO_URL",
-  "APP_ORIGIN_ADMIN"
+  "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_STORE_URL"
 ];
 
 const recommendedVariables = [
@@ -13,7 +11,6 @@ const recommendedVariables = [
   "AETHER_FRONT_WORKER_NAME",
   "AETHER_ADMIN_PAGES_PROJECT",
   "AETHER_D1_DATABASE_NAME",
-  "AETHER_API_ORIGIN",
   "APP_ORIGIN_STORE",
   "DUMMYJSON_API_BASE_URL",
   "NEXT_PUBLIC_AETHER_AI_URL",
@@ -24,11 +21,9 @@ const recommendedVariables = [
 
 const requiredSecrets = ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"];
 const assistantRecommendedSecrets = [];
-const assistantProductionSecrets = ["GEMINI_API_KEY", "AETHER_CART_TOKEN_SECRET", "DATABASE_URL"];
+const assistantProductionSecrets = [];
 
-const assistantProductionVariables = [
-  "NEXT_PUBLIC_AETHER_AI_URL"
-];
+const assistantProductionVariables = [];
 
 const productionEnvironment = "production";
 
